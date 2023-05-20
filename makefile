@@ -30,3 +30,6 @@ bump:
 commit:
 	pipenv run cz commit
 
+push:
+	git push -u origin
+
