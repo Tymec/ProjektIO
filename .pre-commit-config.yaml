@@ -30,7 +30,8 @@ repos:
         name: isort
         stages: [commit]
         language: system
-        entry: cd backend && pipenv run isort --settings-path=backend/setup.cfg
+        entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run isort
+        args: ["--settings-path=backend/setup.cfg"]
         types: [python]
         files: backend/
 
@@ -38,7 +39,7 @@ repos:
         name: black
         stages: [commit]
         language: system
-        entry: cd backend && pipenv run black
+        entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run black
         types: [python]
         files: backend/
 
@@ -46,7 +47,8 @@ repos:
         name: flake8
         stages: [commit]
         language: system
-        entry: cd backend && pipenv run flake8 --config=backend/setup.cfg
+        entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run flake8
+        args: ["--config=backend/setup.cfg"]
         types: [python]
         exclude: setup.py
         files: backend/
@@ -55,7 +57,8 @@ repos:
         name: mypy
         stages: [commit]
         language: system
-        entry: make backend mypy --config-file=backend/setup.cfg
+        entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run mypy
+        args: ["--config-file=backend/setup.cfg"]
         types: [python]
         pass_filenames: false
         files: backend/
@@ -64,6 +67,7 @@ repos:
         name: pytest
         stages: [commit]
         language: system
-        entry: cd backend && pipenv run pytest --cov=app --cov-report term-missing --cov-branch --cov-report term
+        entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run pytest
+        args: ["--cov=app", "--cov-report", "term-missing", "--cov-branch", "--cov-report", "term"]
         types: [python]
         files: backend/
