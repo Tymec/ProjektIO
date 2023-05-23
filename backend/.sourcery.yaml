@@ -1,6 +1,5 @@
 version: '1'
 ignore:
-- .git/*
 - .env
 rule_settings:
   enable:
