@@ -14,13 +14,17 @@ repos:
     rev: 3.2.2
     hooks:
       - id: commitizen
+        stages: [commit-msg]
       - id: commitizen-branch
         stages: [push]
+        pass_filenames: false
+        args: [--rev-range, origin/HEAD..HEAD]
 
   - repo: https://github.com/sourcery-ai/sourcery
     rev: v1.3.0
     hooks:
       - id: sourcery
+        stages: [commit]
         args: [--diff=git diff HEAD, --no-summary]
         files: backend/
 
@@ -31,7 +35,7 @@ repos:
         stages: [commit]
         language: system
         entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run isort
-        args: ["--settings-path", "backend/setup.cfg"]
+        args: [--settings-path backend/setup.cfg]
         types: [python]
         files: backend/
 
@@ -48,7 +52,7 @@ repos:
         stages: [commit]
         language: system
         entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run flake8
-        args: ["--config", "backend/setup.cfg"]
+        args: [--config backend/setup.cfg]
         types: [python]
         files: backend/
 
@@ -57,7 +61,7 @@ repos:
         stages: [commit]
         language: system
         entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run mypy
-        args: ["--config-file", "backend/setup.cfg"]
+        args: [--config-file backend/setup.cfg]
         types: [python]
         files: backend/
         exclude: ^backend/tests/
@@ -67,6 +71,6 @@ repos:
         stages: [commit]
         language: system
         entry: env PIPENV_PIPFILE=backend/Pipfile pipenv run pytest
-        args: ["--rootdir=backend/"]
+        args: [--rootdir=backend/]
         types: [python]
         files: backend/
