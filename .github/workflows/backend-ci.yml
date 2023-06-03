@@ -1,0 +1,61 @@
+name: Backend CI
+
+on: [pull_request, push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup backend
+        uses: ./.github/actions/setup-backend
+
+      - name: Lint
+        run: make backend lint
+
+      - name: Test
+        run: make backend test
+        env:
+          DJANGO_SECRET: ${{ secrets.DJANGO_SECRET }}
+
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: development
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup backend
+        uses: ./.github/actions/setup-backend
+
+      - name: Install graphviz
+        run: sudo apt-get install graphviz
+
+      - name: Generate UML class diagram
+        run: make backend uml
+        env:
+          DJANGO_SECRET: ${{ secrets.DJANGO_SECRET }}
+
+      - name: Generate requirements files
+        run: make backend requirements
+
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add backend/docs/uml.dot backend/docs/uml.png backend/requirements.txt backend/requirements-dev.txt
+          git commit -m "docs(backend): generate uml diagram and requirements" || true
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.head_ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

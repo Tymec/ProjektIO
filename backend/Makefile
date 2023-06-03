@@ -7,13 +7,13 @@ audit:
 	pipenv check --audit-and-monitor --save-json audit.json
 
 black:
-	pipenv run black app/ users/
+	pipenv run black .
 
 isort:
-	pipenv run isort --settings-path=setup.cfg app/ users/
+	pipenv run isort --settings-path=setup.cfg .
 
 flake8:
-	pipenv run flake8 --config=setup.cfg app/ users/
+	pipenv run flake8 --config=setup.cfg .
 
 lint: isort black flake8
 
