@@ -13,12 +13,7 @@ backend:
 frontend:
 	$(MAKE) -C frontend $(filter-out $@,$(MAKECMDGOALS))
 
-commit:
-	export PIPENV_PIPFILE=$(PWD)/backend/Pipfile
-	bash .git/hooks/pre-commit
-	pipenv run cz commit
+%:
+	@true
 
-push:
-	git push -u origin main
-
-.PHONY: default setup backend frontend commit push
+.PHONY: default backend frontend

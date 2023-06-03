@@ -72,11 +72,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
-docs/_generated/
-docs/utils/
-
 # PyBuilder
 .pybuilder/
 target/
@@ -126,6 +121,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.dev.env
+.prod.env
 .env
 .venv
 env/
@@ -188,3 +185,6 @@ pyvenv.cfg
 pip-selfcheck.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,virtualenv
+
+### VisualStudioCode ###
+.vscode

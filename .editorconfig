@@ -15,12 +15,11 @@ max_line_length = 88
 
 # Override rules for markdown
 [*.md]
-# trailing whitespace is significant in markdown -> do not remove
 trim_trailing_whitespace = false
 
-# Override rules for commit messages
-[COMMIT_EDITMSG]
-max_line_length = 0
+# Override rules for yaml
+[*.{yml,yaml}]
+indent_size = 2
 
 # Override rules for makefile
 [Makefile]
