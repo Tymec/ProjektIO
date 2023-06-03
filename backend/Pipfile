@@ -6,22 +6,16 @@ name = "pypi"
 [scripts]
 
 [packages]
+django = "*"
+djangorestframework = "*"
+pillow = "*"
+djangorestframework-simplejwt = "*"
+django-extensions = "*"
 
 [dev-packages]
 black = "*"
 isort = "*"
 flake8 = "*"
-mypy = "*"
-pytest = "*"
-pytest-cov = "*"
-pre-commit = "*"
-commitizen = "*"
-pylint = "*"
-sphinx = "*"
-sphinx-test-reports = "*"
-sphinx-needs = "*"
-sphinxcontrib-plantuml = "*"
-sourcery = "*"
 
 [requires]
 python_version = "3.10"
