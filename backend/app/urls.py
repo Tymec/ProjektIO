@@ -1,8 +1,6 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from users.views import UsersViewSet
-
 from .views import (
     APIRootView,
     OrderItemViewSet,
@@ -26,6 +24,5 @@ router.register(r"order-items", OrderItemViewSet, basename="order-item")
 router.register(
     r"shipping-addresses", ShippingAddressViewSet, basename="shipping-address"
 )
-router.register(r"users", UsersViewSet, basename="users")
 
 urlpatterns = [path("", include(router.urls))]
