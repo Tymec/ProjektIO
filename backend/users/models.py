@@ -42,6 +42,7 @@ class User(AbstractUser):
 
     username = None
     email = models.EmailField(_("email address"), unique=True)
+    coins = models.IntegerField(default=0)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

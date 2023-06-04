@@ -11,6 +11,7 @@ djangorestframework = "*"
 pillow = "*"
 djangorestframework-simplejwt = "*"
 django-extensions = "*"
+openai = "*"
 
 [dev-packages]
 black = "*"
