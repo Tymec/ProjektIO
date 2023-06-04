@@ -1,13 +1,17 @@
-from django.urls import path
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
+from django.urls import include, path
+from rest_framework_simplejwt.views import TokenObtainPairView
+from users.views import UserViewSet, logout, register
+
+user_list = UserViewSet.as_view({"get": "list", "post": "create"})
+user_detail = UserViewSet.as_view(
+    {"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"}
 )
 
-# Create your urls here.
 urlpatterns = [
-    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("verify/", TokenVerifyView.as_view(), name="token_verify"),
+    path("", user_list, name="user-list"),
+    path("<int:pk>/", user_detail, name="user-detail"),
+    path("me/", user_detail, name="user-me", kwargs={"pk": "me"}),
+    path("login/", TokenObtainPairView.as_view(), name="login"),
+    path("logout/", logout, name="logout"),
+    path("register/", register, name="register"),
 ]
