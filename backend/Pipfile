@@ -11,6 +11,9 @@ djangorestframework = "*"
 pillow = "*"
 djangorestframework-simplejwt = "*"
 django-extensions = "*"
+dj-database-url = "*"
+django-cockroachdb = "==4.2.*"
+psycopg = {extras = ["binary"], version = "*"}
 
 [dev-packages]
 black = "*"

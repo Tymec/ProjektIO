@@ -1,0 +1,7 @@
+setup:
+  - project: frontend
+    config: dev
+    path: frontend/
+  - project: backend
+    config: dev
+    path: backend/
