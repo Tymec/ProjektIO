@@ -1,7 +1,6 @@
 import pytest
 from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
-from django.urls import reverse
 
 # Database tests
 User = get_user_model()
