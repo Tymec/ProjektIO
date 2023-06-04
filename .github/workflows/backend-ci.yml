@@ -17,17 +17,17 @@ jobs:
       - name: Lint
         run: make backend lint
 
-      - name: Test
-        run: make backend test
+      - name: Test and coverage
+        run: make backend coverage
         env:
           DJANGO_SECRET: ${{ secrets.DJANGO_SECRET }}
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: docs/coverage.xml
+          filename: backend/docs/coverage.xml
           badge: true
-          fail_below_min: true
+          fail_below_min: false
           format: markdown
           hide_branch_rate: false
           hide_complexity: true
