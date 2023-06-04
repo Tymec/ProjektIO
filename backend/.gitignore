@@ -55,6 +55,9 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Security vulnerabilities
+audit.json
+
 # Translations
 *.mo
 *.pot
