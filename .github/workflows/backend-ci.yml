@@ -22,6 +22,26 @@ jobs:
         env:
           DJANGO_SECRET: ${{ secrets.DJANGO_SECRET }}
 
+      - name: Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: docs/coverage.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '60 80'
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
+
   docs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -30,6 +50,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup backend
         uses: ./.github/actions/setup-backend
@@ -50,7 +72,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add backend/docs/uml.dot backend/docs/uml.png backend/requirements.txt backend/requirements-dev.txt
-          git commit -m "docs(backend): generate uml class diagram" || true
+          git commit -m "docs(backend): generate uml diagram and requirements" || true
 
       - name: Push changes
         uses: ad-m/github-push-action@master
