@@ -28,6 +28,6 @@ def test_user_create_superuser(user_count):
 
 
 def test_user_create_fail():
-    user1 = User.objects.create_user("user@test.com", "testuser12345")
+    User.objects.create_user("user@test.com", "testuser12345")
     with pytest.raises(IntegrityError):
-        user2 = User.objects.create_superuser("user@test.com", "testuser67890")
+        User.objects.create_superuser("user@test.com", "testuser67890")

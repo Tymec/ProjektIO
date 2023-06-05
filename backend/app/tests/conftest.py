@@ -1,6 +1,3 @@
-import os
-import sqlite3
-
 import pytest
 from django.core.management import call_command
 
