@@ -14,6 +14,8 @@ django-extensions = "*"
 dj-database-url = "*"
 django-cockroachdb = "==4.2.*"
 psycopg = {extras = ["binary"], version = "*"}
+django-storages = "*"
+boto3 = "*"
 
 [dev-packages]
 black = "*"

@@ -16,9 +16,17 @@ from pathlib import Path
 
 import dj_database_url
 
-### Build path and environment variables
+### Environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV = os.getenv("ENV", "development")
+CI = os.getenv("CI") == "1"
+USE_PIPENV = os.getenv("PIPENV_ACTIVE") == "1"
+
+if not USE_PIPENV:
+    print("Not using pipenv, manually loading .env file")
+    from dotenv import load_dotenv
+
+    load_dotenv(BASE_DIR / ".env")
 
 
 ### Quick-start development settings - unsuitable for production
@@ -76,11 +84,19 @@ WSGI_APPLICATION = "setup.wsgi.application"
 
 ### Database
 ### https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"), engine="django_cockroachdb"
-    )
-}
+if not CI:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.getenv("DATABASE_URL"), engine="django_cockroachdb"
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 ### Password validation
@@ -115,20 +131,52 @@ USE_TZ = True
 
 ### Static files (CSS, JavaScript, Images)
 ### https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = "static/"
+STATIC_LOCATION = "static"
+MEDIA_LOCATION = "media"
 
-MEDIA_URL = "images/"
+if not CI:
+    AWS_ACCESS_KEY_ID = os.getenv("S3_ACCESS")
+    AWS_SECRET_ACCESS_KEY = os.getenv("S3_SECRET")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("S3_BUCKET")
+    AWS_DEFAULT_ACL = None
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
 
-MEDIA_ROOT = BASE_DIR / "static/images"
+    STORAGES = {
+        "default": {"BACKEND": "setup.storages.MediaStorage"},
+        "staticfiles": {"BACKEND": "setup.storages.StaticStorage"},
+    }
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": BASE_DIR / MEDIA_LOCATION,
+                "base_url": f"/{MEDIA_LOCATION}/",
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            "OPTIONS": {
+                "location": BASE_DIR / STATIC_LOCATION,
+                "base_url": f"/{STATIC_LOCATION}/",
+            },
+        },
+    }
+
+STATICFILES_DIRS = [BASE_DIR / STATIC_LOCATION]
 
 ### Default primary key field type
 ### https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
 ### Django extensions
 GRAPH_MODELS = {"all_applications": True, "group_models": True}
+
 
 ### REST Framework
 REST_FRAMEWORK = {

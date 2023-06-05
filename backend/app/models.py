@@ -8,7 +8,7 @@ class Product(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
     name = models.CharField(max_length=200)
-    image = models.ImageField(null=True, blank=True, default="/placeholder.png")
+    image = models.ImageField(null=True, blank=True, default="placeholder.png")
     brand = models.CharField(max_length=200)
     category = models.CharField(max_length=200)
     description = models.TextField(blank=True)
