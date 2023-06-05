@@ -44,7 +44,7 @@ jobs:
           path: code-coverage-results.md
 
   docs:
-    if: github.event.pull_request.merged
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: development
