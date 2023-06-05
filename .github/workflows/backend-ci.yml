@@ -1,6 +1,6 @@
 name: Backend CI
 
-on: [pull_request, push]
+on: [pull_request]
 
 jobs:
   test:
@@ -44,6 +44,7 @@ jobs:
           path: code-coverage-results.md
 
   docs:
+    if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: development
@@ -52,6 +53,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       - name: Setup backend
