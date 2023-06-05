@@ -12,7 +12,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ["email", "_id", "name", "is_admin", "orders"]
+        fields = ["email", "_id", "name", "is_admin"]
 
     def get__id(self, obj):
         return obj.id
