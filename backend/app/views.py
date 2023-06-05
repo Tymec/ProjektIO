@@ -45,6 +45,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_view_name(self):
         return "Products"
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """
@@ -63,6 +66,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_view_name(self):
         return "Reviews"
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     """
@@ -75,6 +81,9 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_view_name(self):
         return "Orders"
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
