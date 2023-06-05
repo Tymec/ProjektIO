@@ -10,13 +10,6 @@ from .serializers import (
     ShippingAddressSerializer,
 )
 
-ORDERS = {
-    "date": "createdAt",
-    "price": "price",
-    "rating": "rating",
-    "name": "name",
-}
-
 
 # Create your views here.
 class APIRootView(APIRootView):
