@@ -146,8 +146,8 @@ if not CI:
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
 
     STORAGES = {
-        "default": {"BACKEND": "setup.storages.MediaStorage"},
-        "staticfiles": {"BACKEND": "setup.storages.StaticStorage"},
+        "default": {"BACKEND": "app.backends.MediaStorageBackend"},
+        "staticfiles": {"BACKEND": "app.backends.StaticStorageBackend"},
     }
 else:
     STORAGES = {
@@ -180,7 +180,7 @@ GRAPH_MODELS = {"all_applications": True, "group_models": True}
 
 ### REST Framework
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "app.backends.NumberedPaginationBackend",
     "PAGE_SIZE": 10,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
