@@ -1,4 +1,6 @@
 from rest_framework import filters, permissions, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.routers import APIRootView
 
 from .models import Order, OrderItem, Product, Review, ShippingAddress
@@ -69,6 +71,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=False, methods=["GET"])
+    def me(self, request, pk=None):
+        reviews = self.get_queryset().filter(user=request.user)
+        serializer = self.get_serializer(reviews, many=True)
+        return Response(serializer.data)
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     """
@@ -84,6 +92,12 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    @action(detail=False, methods=["GET"])
+    def me(self, request, pk=None):
+        orders = self.get_queryset().filter(user=request.user)
+        serializer = self.get_serializer(orders, many=True)
+        return Response(serializer.data)
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
