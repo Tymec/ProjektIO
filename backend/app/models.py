@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from .utils import upload_to
+
 
 # Create your models here.
 class Product(models.Model):
@@ -8,7 +10,9 @@ class Product(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
     name = models.CharField(max_length=200)
-    image = models.ImageField(null=True, blank=True, default="placeholder.png")
+    image = models.ImageField(
+        null=True, blank=True, default="placeholder.png", upload_to=upload_to
+    )
     brand = models.CharField(max_length=200)
     category = models.CharField(max_length=200)
     description = models.TextField(blank=True)
