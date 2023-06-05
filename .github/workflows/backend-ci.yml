@@ -21,6 +21,7 @@ jobs:
         run: make backend coverage
         env:
           DJANGO_SECRET: ${{ secrets.DJANGO_SECRET }}
+          CI: 1
 
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0

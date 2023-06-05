@@ -19,7 +19,7 @@ import dj_database_url
 ### Environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV = os.getenv("ENV", "development")
-USE_S3 = os.getenv("USE_S3") == "1"
+CI = os.getenv("CI") == "1"
 USE_PIPENV = os.getenv("PIPENV_ACTIVE") == "1"
 
 if not USE_PIPENV:
@@ -84,11 +84,19 @@ WSGI_APPLICATION = "setup.wsgi.application"
 
 ### Database
 ### https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"), engine="django_cockroachdb"
-    )
-}
+if not CI:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.getenv("DATABASE_URL"), engine="django_cockroachdb"
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 ### Password validation
@@ -126,7 +134,7 @@ USE_TZ = True
 STATIC_LOCATION = "static"
 MEDIA_LOCATION = "media"
 
-if USE_S3:
+if not CI:
     AWS_ACCESS_KEY_ID = os.getenv("S3_ACCESS")
     AWS_SECRET_ACCESS_KEY = os.getenv("S3_SECRET")
     AWS_STORAGE_BUCKET_NAME = os.getenv("S3_BUCKET")
