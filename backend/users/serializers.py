@@ -26,6 +26,16 @@ class UserSerializer(serializers.ModelSerializer):
             name = obj.username
         return name
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret["_id"] = str(ret["_id"])
+        return ret
+
+    def to_internal_value(self, data):
+        if "_id" in data:
+            data["_id"] = int(data["_id"])
+        return super().to_internal_value(data)
+
 
 class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
