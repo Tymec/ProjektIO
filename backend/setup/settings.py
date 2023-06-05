@@ -16,9 +16,17 @@ from pathlib import Path
 
 import dj_database_url
 
-### Build path and environment variables
+### Environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV = os.getenv("ENV", "development")
+USE_S3 = os.getenv("USE_S3") == "1"
+USE_PIPENV = os.getenv("PIPENV_ACTIVE") == "1"
+
+if not USE_PIPENV:
+    print("Not using pipenv, manually loading .env file")
+    from dotenv import load_dotenv
+
+    load_dotenv(BASE_DIR / ".env")
 
 
 ### Quick-start development settings - unsuitable for production
@@ -115,20 +123,43 @@ USE_TZ = True
 
 ### Static files (CSS, JavaScript, Images)
 ### https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = "static/"
+if USE_S3:
+    AWS_ACCESS_KEY_ID = os.getenv("S3_ACCESS")
+    AWS_SECRET_ACCESS_KEY = os.getenv("S3_SECRET")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("S3_BUCKET")
+    AWS_DEFAULT_ACL = None
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
 
-MEDIA_URL = "images/"
+    STATIC_LOCATION = "static"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+    PUBLIC_MEDIA_LOCATION = "media"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "setup.storages.PublicMediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "setup.storages.StaticStorage",
+        },
+    }
+else:
+    STATIC_URL = "/staticfiles/"
+    STATIC_ROOT = BASE_DIR / "staticfiles"
+    MEDIA_URL = "/mediafiles/"
+    MEDIA_ROOT = BASE_DIR / "mediafiles"
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
-
-MEDIA_ROOT = BASE_DIR / "static/images"
 
 ### Default primary key field type
 ### https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
 ### Django extensions
 GRAPH_MODELS = {"all_applications": True, "group_models": True}
+
 
 ### REST Framework
 REST_FRAMEWORK = {
