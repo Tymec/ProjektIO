@@ -123,6 +123,9 @@ USE_TZ = True
 
 ### Static files (CSS, JavaScript, Images)
 ### https://docs.djangoproject.com/en/4.2/howto/static-files/
+STATIC_LOCATION = "static"
+MEDIA_LOCATION = "media"
+
 if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv("S3_ACCESS")
     AWS_SECRET_ACCESS_KEY = os.getenv("S3_SECRET")
@@ -131,26 +134,32 @@ if USE_S3:
     AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
 
-    STATIC_LOCATION = "static"
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
-    PUBLIC_MEDIA_LOCATION = "media"
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
 
     STORAGES = {
-        "default": {
-            "BACKEND": "setup.storages.PublicMediaStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "setup.storages.StaticStorage",
-        },
+        "default": {"BACKEND": "setup.storages.MediaStorage"},
+        "staticfiles": {"BACKEND": "setup.storages.StaticStorage"},
     }
 else:
-    STATIC_URL = "/staticfiles/"
-    STATIC_ROOT = BASE_DIR / "staticfiles"
-    MEDIA_URL = "/mediafiles/"
-    MEDIA_ROOT = BASE_DIR / "mediafiles"
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": BASE_DIR / MEDIA_LOCATION,
+                "base_url": f"/{MEDIA_LOCATION}/",
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            "OPTIONS": {
+                "location": BASE_DIR / STATIC_LOCATION,
+                "base_url": f"/{STATIC_LOCATION}/",
+            },
+        },
+    }
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / STATIC_LOCATION]
 
 ### Default primary key field type
 ### https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

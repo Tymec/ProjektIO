@@ -14,10 +14,10 @@ migrate:
 	pipenv run python manage.py migrate
 
 test:
-	pipenv run pytest
+	pipenv run pytest -W ignore::DeprecationWarning
 
 coverage:
-	pipenv run pytest --cov=. --cov-report term --cov-report xml:docs/coverage.xml
+	pipenv run pytest --cov=. --cov-report term --cov-report xml:docs/coverage.xml -W ignore::DeprecationWarning
 
 black:
 	pipenv run black .
