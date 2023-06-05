@@ -1,18 +1,18 @@
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
 # Create your serializers here.
-class UserSerializer(serializers.ModelSerializer):
-    _id = serializers.SerializerMethodField(read_only=True)
-    name = serializers.SerializerMethodField(read_only=True)
-    is_admin = serializers.SerializerMethodField(read_only=True)
+class UserSerializer(ModelSerializer):
+    _id = SerializerMethodField(read_only=True)
+    name = SerializerMethodField(read_only=True)
+    is_admin = SerializerMethodField(read_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = ["email", "_id", "name", "is_admin"]
+        fields = ["email", "_id", "name", "is_admin", "orders"]
 
     def get__id(self, obj):
         return obj.id
@@ -31,14 +31,9 @@ class UserSerializer(serializers.ModelSerializer):
         ret["_id"] = str(ret["_id"])
         return ret
 
-    def to_internal_value(self, data):
-        if "_id" in data:
-            data["_id"] = int(data["_id"])
-        return super().to_internal_value(data)
-
 
 class UserSerializerWithToken(UserSerializer):
-    token = serializers.SerializerMethodField(read_only=True)
+    token = SerializerMethodField(read_only=True)
 
     class Meta:
         model = get_user_model()
