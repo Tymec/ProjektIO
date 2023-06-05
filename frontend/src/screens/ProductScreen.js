@@ -139,7 +139,7 @@ function ProductScreen({ match, history }) {
                                                 <Button
                                                     onClick={addToCartHandler}
                                                     className='btn-block'
-                                                    disabled={product.countInStock == 0}
+                                                    disabled={product.countInStock === 0}
                                                     type='button'>
                                                     Add to Cart
                                                 </Button>

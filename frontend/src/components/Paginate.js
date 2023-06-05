@@ -4,7 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap'
 
 function Paginate({ pages, page, keyword = '', isAdmin = false }) {
     if (keyword) {
-        keyword = keyword.split('?keyword=')[1].split('&')[0]
+        keyword = keyword.split('?search=')[1].split('&')[0]
     }
 
     return (pages > 1 && (
@@ -13,8 +13,8 @@ function Paginate({ pages, page, keyword = '', isAdmin = false }) {
                 <LinkContainer
                     key={x + 1}
                     to={!isAdmin ?
-                        `/?keyword=${keyword}&page=${x + 1}`
-                        : `/admin/productlist/?keyword=${keyword}&page=${x + 1}`
+                        `/?search=${keyword}&page=${x + 1}`
+                        : `/admin/productlist/?search=${keyword}&page=${x + 1}`
                     }
                 >
                     <Pagination.Item active={x + 1 === page}>{x + 1}</Pagination.Item>

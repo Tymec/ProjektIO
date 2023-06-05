@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import axios from "axios";
 
@@ -8,21 +8,6 @@ const ChatBox = () => {
     const [chatHistory, setChatHistory] = useState([]);
     const chatBoxRef = useRef(null);
 
-    useEffect(() => {
-        const handleKeyPress = (event) => {
-            if (event.key === "Enter" && message.trim()) {
-                event.preventDefault();
-                handleFormSubmit(event);
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyPress);
-
-        return () => {
-            document.removeEventListener("keydown", handleKeyPress);
-        };
-    }, [message]);
-
     const toggleChatBox = () => {
         setIsOpen(!isOpen);
     };
@@ -31,7 +16,8 @@ const ChatBox = () => {
         setMessage(event.target.value);
     };
 
-    const handleFormSubmit = async (event) => {
+    // wrap handleFormSubmit in useCallback to prevent infinite loop
+    const handleFormSubmit = useCallback(async (event) => {
         event.preventDefault();
         if (message.trim()) {
             setChatHistory((prevChatHistory) => [
@@ -65,7 +51,22 @@ const ChatBox = () => {
                 console.error("There was an error in making the request: ", error);
             }
         }
-    };
+    }, [message]);
+
+    useEffect(() => {
+        const handleKeyPress = (event) => {
+            if (event.key === "Enter" && message.trim()) {
+                event.preventDefault();
+                handleFormSubmit(event);
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyPress);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyPress);
+        };
+    }, [message, handleFormSubmit]);
 
     return (
         <>

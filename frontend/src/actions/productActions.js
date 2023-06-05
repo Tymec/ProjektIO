@@ -36,7 +36,7 @@ export const listProducts = (keyword = '') => async (dispatch) => {
     try {
         dispatch({ type: PRODUCT_LIST_REQUEST })
 
-        const { data } = await axios.get(`/api/products${keyword}`)
+        const { data } = await axios.get(`/api/products/?search=${keyword}`)
 
         dispatch({
             type: PRODUCT_LIST_SUCCESS,
@@ -57,7 +57,7 @@ export const listTopProducts = () => async (dispatch) => {
     try {
         dispatch({ type: PRODUCT_TOP_REQUEST })
 
-        const { data } = await axios.get(`/api/products/top/`)
+        const { data } = await axios.get(`/api/products/?ordering=-rating`)
 
         dispatch({
             type: PRODUCT_TOP_SUCCESS,
@@ -121,6 +121,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
 
         dispatch({
             type: PRODUCT_DELETE_SUCCESS,
+            payload: data,
         })
 
 

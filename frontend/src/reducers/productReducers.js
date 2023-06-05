@@ -40,7 +40,7 @@ export const productListReducer = (state = { products: [] }, action) => {
         case PRODUCT_LIST_SUCCESS:
             return {
                 loading: false,
-                products: action.payload.products,
+                products: action.payload.results,
                 page: action.payload.page,
                 pages: action.payload.pages
             }
@@ -157,10 +157,10 @@ export const productTopRatedReducer = (state = { products: [] }, action) => {
             return { loading: true, products: [] }
 
         case PRODUCT_TOP_SUCCESS:
-            return { loading: false, products: action.payload, }
+            return { loading: false, products: action.payload.results, }
 
         case PRODUCT_TOP_FAIL:
-            return { loading: false, error: action.payload }
+            return { loading: false, error: action.payload.results }
 
         default:
             return state
