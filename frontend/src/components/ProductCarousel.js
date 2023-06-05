@@ -4,16 +4,17 @@ import { Link } from 'react-router-dom'
 import { Carousel, Image } from 'react-bootstrap'
 import Loader from './Loader'
 import Message from './Message'
-import { listTopProducts } from '../actions/productActions'
+import { listProducts } from '../actions/productActions'
+import { PRODUCT_ORDER_BY_RATING } from '../constants/productConstants'
 
 function ProductCarousel() {
     const dispatch = useDispatch()
 
-    const productTopRated = useSelector(state => state.productTopRated)
-    const { error, loading, products } = productTopRated
+    const productList = useSelector(state => state.productList)
+    const { error, loading, products } = productList
 
     useEffect(() => {
-        dispatch(listTopProducts())
+        dispatch(listProducts('', 1, PRODUCT_ORDER_BY_RATING))
     }, [dispatch])
 
     return (loading ? <Loader />

@@ -42,6 +42,7 @@ function LoginScreen({ location, history }) {
                         type='email'
                         placeholder='Enter Email'
                         value={email}
+                        autoComplete='current-email'
                         onChange={(e) => setEmail(e.target.value)}
                     >
                     </Form.Control>
@@ -54,6 +55,7 @@ function LoginScreen({ location, history }) {
                         type='password'
                         placeholder='Enter Password'
                         value={password}
+                        autoComplete='current-password'
                         onChange={(e) => setPassword(e.target.value)}
                     >
                     </Form.Control>

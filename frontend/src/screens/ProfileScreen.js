@@ -37,7 +37,7 @@ function ProfileScreen({ history }) {
         } else {
             if (!user || !user.name || success || userInfo._id !== user._id) {
                 dispatch({ type: USER_UPDATE_PROFILE_RESET })
-                dispatch(getUserDetails('profile'))
+                dispatch(getUserDetails('me'))
                 dispatch(listMyOrders())
             } else {
                 setName(user.name)
@@ -78,6 +78,7 @@ function ProfileScreen({ history }) {
                             required
                             type='name'
                             placeholder='Enter name'
+                            autoComplete='new-name'
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                         >
@@ -90,6 +91,7 @@ function ProfileScreen({ history }) {
                             required
                             type='email'
                             placeholder='Enter Email'
+                            autoComplete='new-email'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         >
@@ -102,6 +104,7 @@ function ProfileScreen({ history }) {
 
                             type='password'
                             placeholder='Enter Password'
+                            autoComplete='new-password'
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         >
@@ -114,6 +117,7 @@ function ProfileScreen({ history }) {
 
                             type='password'
                             placeholder='Confirm Password'
+                            autoComplete='confirm-password'
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         >

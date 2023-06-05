@@ -11,8 +11,6 @@ function SearchBox() {
         e.preventDefault()
         if (keyword) {
             history.push(`/?search=${keyword}&page=1`)
-        } else {
-            history.push(history.push(history.location.pathname))
         }
     }
     return (
@@ -28,6 +26,7 @@ function SearchBox() {
                 type='submit'
                 variant='outline-success'
                 className='p-2'
+                disabled={!keyword}
             >
                 Submit
             </Button>

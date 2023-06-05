@@ -7,6 +7,7 @@ import Message from '../components/Message'
 import Paginate from '../components/Paginate'
 import ProductCarousel from '../components/ProductCarousel'
 import { listProducts } from '../actions/productActions'
+import queryString from 'query-string';
 
 
 function HomeScreen({ history }) {
@@ -14,15 +15,15 @@ function HomeScreen({ history }) {
     const productList = useSelector(state => state.productList)
     const { error, loading, products, page, pages } = productList
 
-    let keyword = history.location.search
+    const {search, page: currentPage} = queryString.parse(history.location.search)
 
     useEffect(() => {
-        dispatch(listProducts(keyword))
-    }, [dispatch, keyword])
+        dispatch(listProducts(search, currentPage))
+    }, [dispatch, search, currentPage])
 
     return (
         <div>
-            {!keyword && <ProductCarousel />}
+            {!search && <ProductCarousel />}
 
             <h1>Latest Products</h1>
             {loading ? <Loader />
@@ -36,7 +37,7 @@ function HomeScreen({ history }) {
                                 </Col>
                             ))}
                         </Row>
-                        <Paginate page={page} pages={pages} keyword={keyword} />
+                        <Paginate page={page} pages={pages} keyword={search} />
                     </div>
             }
         </div>
