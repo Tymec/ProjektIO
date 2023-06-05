@@ -5,6 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap'
 import SearchBox from './SearchBox'
 import { logout } from '../actions/userActions'
 
+
 function Header() {
 
     const userLogin = useSelector(state => state.userLogin)
@@ -18,6 +19,7 @@ function Header() {
 
     return (
         <header>
+            
             <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
                 <Container>
                     <LinkContainer to='/'>
