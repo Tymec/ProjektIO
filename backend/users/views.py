@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework import status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -20,6 +20,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
+
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["id", "email", "name"]
+    ordering = ["-id"]
 
     def get_view_name(self):
         return "User"
