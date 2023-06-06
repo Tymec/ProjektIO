@@ -32,6 +32,7 @@ if not USE_PIPENV:
 ### Quick-start development settings - unsuitable for production
 ### See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 SECRET_KEY = os.getenv("DJANGO_SECRET")
+STRIPE_SK = os.getenv("STRIPE_SK")
 DEBUG = ENV == "development"
 ALLOWED_HOSTS = []
 
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "users",
+    "payments",
     "app",
 ]
 
