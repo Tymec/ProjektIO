@@ -16,6 +16,7 @@ django-cockroachdb = "==4.2.*"
 psycopg = {extras = ["binary"], version = "*"}
 django-storages = "*"
 boto3 = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 black = "*"
