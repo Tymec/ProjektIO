@@ -30,6 +30,7 @@ import {
     orderListReducer,
     orderDeliverReducer,
 } from './reducers/orderReducers'
+import { cartSlice } from './features/cart'
 
 const cartItemsFromStorage = localStorage.getItem('cartItems') ?
     JSON.parse(localStorage.getItem('cartItems')) : []
@@ -54,6 +55,7 @@ const store = configureStore({
     reducer: {
         [api.reducerPath]: api.reducer,
         userState: userSlice.reducer,
+        cartState: cartSlice.reducer,
         // productList: productListReducer,
         // productDetails: productDetailsReducer,
         // productDelete: productDeleteReducer,

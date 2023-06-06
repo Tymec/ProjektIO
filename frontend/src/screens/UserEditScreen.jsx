@@ -15,20 +15,24 @@ function UserEditScreen({ match, history }) {
     const [email, setEmail] = useState('')
     const [isAdmin, setIsAdmin] = useState(false)
 
-    const { data: user, isLoading, isError, error } = useGetUserQuery(userId)
+    const { data: user, isLoading, isError, error, refetch } = useGetUserQuery(userId)
     const [updateUser, { isLoading: isUpdateLoading, isError: isUpdateError, isSuccess: isUpdateSuccess, error: updateError }] = useUpdateUserMutation()
 
     useEffect(() => {
         if (isUpdateSuccess) {
             history.push('/admin/userlist')
         } else {
-            setFirstName(user.firstName)
-            setLastName(user.lastName)
-            setEmail(user.email)
-            setIsAdmin(user.isAdmin)
+            if (!user || user._id !== userId) {
+                refetch()
+            } else {
+                setFirstName(user.firstName)
+                setLastName(user.lastName)
+                setEmail(user.email)
+                setIsAdmin(user.isAdmin)
+            }
         }
 
-    }, [user, isUpdateSuccess, history])
+    }, [user, isUpdateSuccess, history, refetch])
 
     const submitHandler = (e) => {
         e.preventDefault()

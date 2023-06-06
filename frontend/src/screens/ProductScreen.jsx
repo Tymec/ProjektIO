@@ -7,12 +7,16 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import {useGetProductQuery} from '../features/product'
 import {useCreateReviewMutation} from '../features/review'
+import {useStripe} from '@stripe/react-stripe-js';
+
 
 function ProductScreen({ match, history }) {
     const [qty, setQty] = useState(1)
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
     const [status, setStatus] = useState(false)
+
+    const stripe = useStripe();
 
     const { data: product, isLoading, isError, error, refetch } = useGetProductQuery(match.params.id)
     const {user} = useSelector((state) => state.userState);
@@ -21,6 +25,21 @@ function ProductScreen({ match, history }) {
 
     const addToCartHandler = () => {
         history.push(`/cart/${match.params.id}?qty=${qty}`)
+    }
+
+    const stripeHandler = async () => {
+
+        const checkoutOptions = {
+            mode: 'payment',
+            successUrl: `${window.location.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancelUrl: `${window.location.origin}/cancel`,
+            lineItems: [{
+                price: 'price_1NG633KRk4JVwerryNmqRxiq',
+                quantity: 1
+            }]
+        }
+
+        const { error } = await stripe.redirectToCheckout(checkoutOptions);
     }
 
     const submitHandler = (e) => {
@@ -130,6 +149,16 @@ function ProductScreen({ match, history }) {
                                                     disabled={product.countInStock === 0}
                                                     type='button'>
                                                     Add to Cart
+                                                </Button>
+                                            </ListGroup.Item>
+
+                                            <ListGroup.Item>
+                                                <Button
+                                                    onClick={stripeHandler}
+                                                    className='btn-block'
+                                                    disabled={product.countInStock === 0}
+                                                    type='button'>
+                                                    Buy
                                                 </Button>
                                             </ListGroup.Item>
                                         </ListGroup>

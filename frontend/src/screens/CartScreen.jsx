@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap'
 import Message from '../components/Message'
-import { addToCart, removeFromCart } from '../actions/cartActions'
+import { addToCart } from '../features/cart'
+import queryString from 'query-string';
 
 function CartScreen({ match, location, history }) {
     const productId = match.params.id
-    const qty = location.search ? Number(location.search.split('=')[1]) : 1
+    const { qty = 1 } = queryString.parse(history.location.search)
     const dispatch = useDispatch()
 
-    const cart = useSelector(state => state.cart)
+    const cart = useSelector(state => state.cartState)
     const { cartItems } = cart
 
     useEffect(() => {
@@ -24,7 +25,7 @@ function CartScreen({ match, location, history }) {
         dispatch(removeFromCart(id))
     }
 
-    const checkoutHandler = () => {
+    const checkoutHandler = async () => {
         history.push('/login?redirect=shipping')
     }
 

@@ -33,7 +33,12 @@ function ProductListScreen({ history, match }) {
     }
 
     const createProductHandler = () => {
-        createProduct()
+        createProduct({
+            "name": "Sample name",
+            "category": "Sample category",
+            "brand": "Sample brand",
+            "price": 0,
+        })
     }
 
     return (

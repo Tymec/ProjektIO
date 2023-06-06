@@ -23,6 +23,8 @@ function ProductEditScreen({ match, history }) {
     const [updateProduct, { isLoading: isLoadingUpdate, isError: isErrorUpdate, isSuccess: isSuccessUpdate, error: errorUpdate }] = useUpdateProductMutation()
 
     const uploadImage = (url) => {
+        if (!url) return ""
+
         setUploading(true)
 
         try {
@@ -47,7 +49,7 @@ function ProductEditScreen({ match, history }) {
             } else {
                 setName(product.name)
                 setPrice(product.price)
-                uploadImage(product.image)
+                setImage(product.image)
                 setBrand(product.brand)
                 setCategory(product.category)
                 setCountInStock(product.countInStock)

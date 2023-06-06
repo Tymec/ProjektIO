@@ -1,40 +1,33 @@
 import React, { useEffect } from 'react'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import Paginate from '../components/Paginate'
-import { listOrders } from '../actions/orderActions'
+import queryString from 'query-string';
+import { useListOrdersQuery } from '../features/order'
 
 function OrderListScreen({ history }) {
-
-    const dispatch = useDispatch()
-
-    const orderList = useSelector(state => state.orderList)
-    const { loading, error, orders, page, pages } = orderList
-
-    const userLogin = useSelector(state => state.userLogin)
-    const { userInfo } = userLogin
-
-
+    const { page = 1 } = queryString.parse(history.location.search)
+    const { data, isLoading, isError, error, refetch } = useListOrdersQuery({ page })
+    const { user } = useSelector(state => state.userState)
 
     useEffect(() => {
-        if (userInfo && userInfo.isAdmin) {
-            dispatch(listOrders())
+        if (user && user.isAdmin) {
+            refetch()
         } else {
             history.push('/login')
         }
 
-    }, [dispatch, history, userInfo])
-
+    }, [refetch, history, user])
 
     return (
         <div>
             <h1>Orders</h1>
-            {loading
+            {isLoading
                 ? (<Loader />)
-                : error
+                : isError
                     ? (<Message variant='danger'>{error}</Message>)
                     : (
                         <div>
@@ -52,7 +45,7 @@ function OrderListScreen({ history }) {
                                 </thead>
 
                                 <tbody>
-                                    {orders.map(order => (
+                                    {data.orders.map(order => (
                                         <tr key={order._id}>
                                             <td>{order._id}</td>
                                             <td>{order.user && order.user.name}</td>
@@ -86,7 +79,7 @@ function OrderListScreen({ history }) {
                                     ))}
                                 </tbody>
                             </Table>
-                            <Paginate pages={pages} page={page} isAdmin={true} />
+                            <Paginate pages={data.pages} page={data.page} isAdmin={true} />
                         </div>
                     )}
         </div>
