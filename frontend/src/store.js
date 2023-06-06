@@ -1,6 +1,6 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
-import { composeWithDevTools } from 'redux-devtools-extension'
+import { configureStore } from '@reduxjs/toolkit'
+import { api } from './features/api'
+import { userSlice } from './features/user'
 import {
     productListReducer,
     productDetailsReducer,
@@ -31,32 +31,6 @@ import {
     orderDeliverReducer,
 } from './reducers/orderReducers'
 
-const reducer = combineReducers({
-    productList: productListReducer,
-    productDetails: productDetailsReducer,
-    productDelete: productDeleteReducer,
-    productCreate: productCreateReducer,
-    productUpdate: productUpdateReducer,
-    productReviewCreate: productReviewCreateReducer,
-
-    cart: cartReducer,
-    userLogin: userLoginReducer,
-    userRegister: userRegisterReducer,
-    userDetails: userDetailsReducer,
-    userUpdateProfile: userUpdateProfileReducer,
-    userList: userListReducer,
-    userDelete: userDeleteReducer,
-    userUpdate: userUpdateReducer,
-
-    orderCreate: orderCreateReducer,
-    orderDetails: orderDetailsReducer,
-    orderPay: orderPayReducer,
-    orderListMy: orderListMyReducer,
-    orderList: orderListReducer,
-    orderDeliver: orderDeliverReducer,
-})
-
-
 const cartItemsFromStorage = localStorage.getItem('cartItems') ?
     JSON.parse(localStorage.getItem('cartItems')) : []
 
@@ -76,9 +50,34 @@ const initialState = {
     userLogin: { userInfo: userInfoFromStorage },
 }
 
-const middleware = [thunk]
+const store = configureStore({
+    reducer: {
+        [api.reducerPath]: api.reducer,
+        userState: userSlice.reducer,
+        // productList: productListReducer,
+        // productDetails: productDetailsReducer,
+        // productDelete: productDeleteReducer,
+        // productCreate: productCreateReducer,
+        // productUpdate: productUpdateReducer,
+        // productReviewCreate: productReviewCreateReducer,
 
-const store = createStore(reducer, initialState,
-    composeWithDevTools(applyMiddleware(...middleware)))
+        // cart: cartReducer,
+        // userLogin: userLoginReducer,
+        // userRegister: userRegisterReducer,
+        // userDetails: userDetailsReducer,
+        // userUpdateProfile: userUpdateProfileReducer,
+        // userList: userListReducer,
+        // userDelete: userDeleteReducer,
+        // userUpdate: userUpdateReducer,
+
+        // orderCreate: orderCreateReducer,
+        // orderDetails: orderDetailsReducer,
+        // orderPay: orderPayReducer,
+        // orderListMy: orderListMyReducer,
+        // orderList: orderListReducer,
+        // orderDeliver: orderDeliverReducer,
+    },
+    middleware: getDefaultMiddleware => getDefaultMiddleware().concat(api.middleware)
+})
 
 export default store

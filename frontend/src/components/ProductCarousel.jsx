@@ -1,28 +1,19 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { Carousel, Image } from 'react-bootstrap'
 import Loader from './Loader'
 import Message from './Message'
-import { listProducts } from '../actions/productActions'
-import { PRODUCT_ORDER_BY_RATING } from '../constants/productConstants'
+import { useListProductsQuery } from '../features/product'
 
 function ProductCarousel() {
-    const dispatch = useDispatch()
+    const { data, isLoading, isError, error } = useListProductsQuery({})
 
-    const productList = useSelector(state => state.productList)
-    const { error, loading, products } = productList
-
-    useEffect(() => {
-        dispatch(listProducts('', 1, PRODUCT_ORDER_BY_RATING))
-    }, [dispatch])
-
-    return (loading ? <Loader />
-        : error
+    return (isLoading ? <Loader />
+        : isError
             ? <Message variant='danger'>{error}</Message>
             : (
                 <Carousel pause='hover' className='bg-dark'>
-                    {products.map(product => (
+                    {data.products.map(product => (
                         <Carousel.Item key={product._id}>
                             <Link to={`/product/${product._id}`}>
                                 <Image src={product.image} alt={product.name} fluid />

@@ -1,28 +1,25 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Row, Col, Table } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { getUserDetails, updateUserProfile } from '../actions/userActions'
 import { USER_UPDATE_PROFILE_RESET } from '../constants/userConstants'
 import { listMyOrders } from '../actions/orderActions'
+import { useGetUserQuery } from '../features/user'
+import { useSelector } from 'react-redux'
 
 function ProfileScreen({ history }) {
-
+    // FIXME: finish replacing redux with RTK
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [message, setMessage] = useState('')
 
-    const dispatch = useDispatch()
 
-    const userDetails = useSelector(state => state.userDetails)
-    const { error, loading, user } = userDetails
-
-    const userLogin = useSelector(state => state.userLogin)
-    const { userInfo } = userLogin
+    const {user} = useSelector(state => state.userState)
+    const { data: userDetails, isLoading, isSuccess, isError, error } = useGetUserQuery(user._id)
 
     const userUpdateProfile = useSelector(state => state.userUpdateProfile)
     const { success } = userUpdateProfile

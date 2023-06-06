@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { Form, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
@@ -86,12 +85,18 @@ function ProductEditScreen({ match, history }) {
                 }
             }
 
-            const { data } = await axios.post('/api/products/upload/', formData, config)
-
-
-            setImage(data)
-            setUploading(false)
-
+            fetch('/api/products/upload/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(async res => {
+                const data = await res.json()
+                setImage(data)
+                setUploading(false)
+            })
         } catch (error) {
             setUploading(false)
         }

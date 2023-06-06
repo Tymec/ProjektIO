@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button, Card, Form } from "react-bootstrap";
-import axios from "axios";
 
 const ChatBox = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -28,25 +27,17 @@ const ChatBox = () => {
 
             // Send the message to the GPT-3 API
             try {
-                const response = await axios.post(
-                    "https://api.openai.com/v1/engines/davinci-codex/completions",
-                    {
-                        prompt: message,
-                        max_tokens: 60,
+                fetch("https://api.openai.com/v1/engines/davinci-codex/completions", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer YOUR_OPENAI_API_KEY`,
                     },
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer YOUR_OPENAI_API_KEY`,
-                        },
-                    }
-                );
-
-                // Add the response to the chat history
-                setChatHistory((prevChatHistory) => [
+                })
+                .then(async res => setChatHistory((prevChatHistory) => [
                     ...prevChatHistory,
-                    { text: response.data.choices[0].text, sender: "Bot" },
-                ]);
+                    { text: res.json().data.choices[0].text, sender: "Bot" },
+                ]))
             } catch (error) {
                 console.error("There was an error in making the request: ", error);
             }
