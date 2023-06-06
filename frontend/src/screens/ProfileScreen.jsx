@@ -6,42 +6,29 @@ import Message from '../components/Message'
 import { getUserDetails, updateUserProfile } from '../actions/userActions'
 import { USER_UPDATE_PROFILE_RESET } from '../constants/userConstants'
 import { listMyOrders } from '../actions/orderActions'
-import { useGetUserQuery } from '../features/user'
+import { useUpdateUserMutation } from '../features/user'
 import { useSelector } from 'react-redux'
+import { useMyOrdersQuery } from '../features/order'
 
 function ProfileScreen({ history }) {
-    // FIXME: finish replacing redux with RTK
-    const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [message, setMessage] = useState('')
 
+    const { user } = useSelector((state) => state.userState);
 
-    const {user} = useSelector(state => state.userState)
-    const { data: userDetails, isLoading, isSuccess, isError, error } = useGetUserQuery(user._id)
-
-    const userUpdateProfile = useSelector(state => state.userUpdateProfile)
-    const { success } = userUpdateProfile
-
-    const orderListMy = useSelector(state => state.orderListMy)
-    const { loading: loadingOrders, error: errorOrders, orders } = orderListMy
-
+    const [updateUser, { isLoading: isUserLoading, isError: isUserError, error: userError }] = useUpdateUserMutation();
+    const {data: orders, isLoading: isOrdersLoading, isSuccess: isOrdersSuccess, isError: isOrdersError, error: ordersError, refetch: ordersRefetch } = useMyOrdersQuery({});
 
     useEffect(() => {
-        if (!userInfo) {
+        if (!user) {
             history.push('/login')
         } else {
-            if (!user || !user.name || success || userInfo._id !== user._id) {
-                dispatch({ type: USER_UPDATE_PROFILE_RESET })
-                dispatch(getUserDetails('me'))
-                dispatch(listMyOrders())
-            } else {
-                setName(user.name)
-                setEmail(user.email)
-            }
+            setEmail(user.email)
+            ordersRefetch()
         }
-    }, [dispatch, history, userInfo, user, success])
+    }, [history, user])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -49,15 +36,14 @@ function ProfileScreen({ history }) {
         if (password !== confirmPassword) {
             setMessage('Passwords do not match')
         } else {
-            dispatch(updateUserProfile({
+            console.log(user)
+            updateUser({
                 'id': user._id,
-                'name': name,
                 'email': email,
                 'password': password
-            }))
+            })
             setMessage('')
         }
-
     }
     return (
         <Row>
@@ -65,10 +51,9 @@ function ProfileScreen({ history }) {
                 <h2>User Profile</h2>
 
                 {message && <Message variant='danger'>{message}</Message>}
-                {error && <Message variant='danger'>{error}</Message>}
-                {loading && <Loader />}
+                {isUserError && <Message variant='danger'>{userError}</Message>}
+                {isUserLoading && <Loader />}
                 <Form onSubmit={submitHandler}>
-
                     <Form.Group controlId='name'>
                         <Form.Label>Name</Form.Label>
                         <Form.Control
@@ -76,8 +61,8 @@ function ProfileScreen({ history }) {
                             type='name'
                             placeholder='Enter name'
                             autoComplete='new-name'
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={user?.name}
+                            disabled
                         >
                         </Form.Control>
                     </Form.Group>
@@ -98,7 +83,6 @@ function ProfileScreen({ history }) {
                     <Form.Group controlId='password'>
                         <Form.Label>Password</Form.Label>
                         <Form.Control
-
                             type='password'
                             placeholder='Enter Password'
                             autoComplete='new-password'
@@ -111,7 +95,6 @@ function ProfileScreen({ history }) {
                     <Form.Group controlId='passwordConfirm'>
                         <Form.Label>Confirm Password</Form.Label>
                         <Form.Control
-
                             type='password'
                             placeholder='Confirm Password'
                             autoComplete='confirm-password'
@@ -123,17 +106,16 @@ function ProfileScreen({ history }) {
 
                     <Button type='submit' variant='primary'>
                         Update
-                </Button>
-
+                    </Button>
                 </Form>
             </Col>
 
             <Col md={9}>
                 <h2>My Orders</h2>
-                {loadingOrders ? (
+                {isOrdersLoading ? (
                     <Loader />
-                ) : errorOrders ? (
-                    <Message variant='danger'>{errorOrders}</Message>
+                ) : isOrdersError ? (
+                    <Message variant='danger'>{ordersError}</Message>
                 ) : (
                             <Table striped responsive className='table-sm'>
                                 <thead>

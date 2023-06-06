@@ -41,18 +41,6 @@ class ProductSerializer(ModelSerializer):
         return serializer.data
 
 
-class OrderSerializer(ModelSerializer):
-    class Meta:
-        model = Order
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret["user"] = str(ret["user"])
-        ret["_id"] = str(ret["_id"])
-        return ret
-
-
 class OrderItemSerializer(ModelSerializer):
     class Meta:
         model = OrderItem
@@ -67,8 +55,6 @@ class OrderItemSerializer(ModelSerializer):
 
 
 class ShippingAddressSerializer(ModelSerializer):
-    order = OrderSerializer(read_only=True)
-
     class Meta:
         model = ShippingAddress
         fields = "__all__"
@@ -77,3 +63,30 @@ class ShippingAddressSerializer(ModelSerializer):
         ret = super().to_representation(instance)
         ret["_id"] = str(ret["_id"])
         return ret
+
+
+class OrderSerializer(ModelSerializer):
+    orderItems = SerializerMethodField(read_only=True)
+    shippingAddress = SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret["user"] = str(ret["user"])
+        ret["_id"] = str(ret["_id"])
+        return ret
+
+    def get_orderItems(self, obj):
+        items = obj.orderitem_set.all()
+        serializer = OrderItemSerializer(items, many=True)
+        return serializer.data
+
+    def get_shippingAddress(self, obj):
+        try:
+            address = ShippingAddressSerializer(obj.shippingaddress, many=False).data
+        except:
+            address = False
+        return address

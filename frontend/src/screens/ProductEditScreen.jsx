@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Form, Button } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
-import { listProductDetails, updateProduct } from '../actions/productActions'
-import { PRODUCT_UPDATE_RESET } from '../constants/productConstants'
-
+import { useGetProductQuery, useUpdateProductMutation } from '../features/product'
 
 function ProductEditScreen({ match, history }) {
-
     const productId = match.params.id
 
     const [name, setName] = useState('')
@@ -22,42 +19,46 @@ function ProductEditScreen({ match, history }) {
     const [description, setDescription] = useState('')
     const [uploading, setUploading] = useState(false)
 
-    const dispatch = useDispatch()
+    const { data: product, isLoading, isError, error, refetch } = useGetProductQuery(productId)
+    const [updateProduct, { isLoading: isLoadingUpdate, isError: isErrorUpdate, isSuccess: isSuccessUpdate, error: errorUpdate }] = useUpdateProductMutation()
 
-    const productDetails = useSelector(state => state.productDetails)
-    const { error, loading, product } = productDetails
+    const uploadImage = (url) => {
+        setUploading(true)
 
-    const productUpdate = useSelector(state => state.productUpdate)
-    const { error: errorUpdate, loading: loadingUpdate, success: successUpdate } = productUpdate
-
+        try {
+            fetch(url)
+            .then((res) => res.blob())
+            .then((blob) => {
+                const file = new File([blob], 'image.png', {type: blob.type});
+                setImage(file)
+                setUploading(false)
+            })
+        } catch (error) {
+            setUploading(false)
+        }
+    }
 
     useEffect(() => {
-
-        if (successUpdate) {
-            dispatch({ type: PRODUCT_UPDATE_RESET })
+        if (isSuccessUpdate) {
             history.push('/admin/productlist')
         } else {
-            if (!product.name || product._id !== Number(productId)) {
-                dispatch(listProductDetails(productId))
+            if (!product || product._id !== productId) {
+                refetch()
             } else {
                 setName(product.name)
                 setPrice(product.price)
-                setImage(product.image)
+                uploadImage(product.image)
                 setBrand(product.brand)
                 setCategory(product.category)
                 setCountInStock(product.countInStock)
                 setDescription(product.description)
-
             }
         }
-
-
-
-    }, [dispatch, product, productId, history, successUpdate])
+    }, [product, productId, history, isSuccessUpdate])
 
     const submitHandler = (e) => {
         e.preventDefault()
-        dispatch(updateProduct({
+        updateProduct({
             _id: productId,
             name,
             price,
@@ -66,40 +67,14 @@ function ProductEditScreen({ match, history }) {
             category,
             countInStock,
             description
-        }))
+        })
     }
 
     const uploadFileHandler = async (e) => {
         const file = e.target.files[0]
         const formData = new FormData()
 
-        formData.append('image', file)
-        formData.append('product_id', productId)
-
-        setUploading(true)
-
-        try {
-            const config = {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }
-
-            fetch('/api/products/upload/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-            .then(async res => {
-                const data = await res.json()
-                setImage(data)
-                setUploading(false)
-            })
-        } catch (error) {
-            setUploading(false)
-        }
+        uploadImage(file)
     }
 
     return (
@@ -110,17 +85,15 @@ function ProductEditScreen({ match, history }) {
 
             <FormContainer>
                 <h1>Edit Product</h1>
-                {loadingUpdate && <Loader />}
-                {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
+                {isLoadingUpdate && <Loader />}
+                {isErrorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
 
-                {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message>
+                {isLoading ? <Loader /> : isError ? <Message variant='danger'>{error}</Message>
                     : (
                         <Form onSubmit={submitHandler}>
-
                             <Form.Group controlId='name'>
                                 <Form.Label>Name</Form.Label>
                                 <Form.Control
-
                                     type='name'
                                     placeholder='Enter name'
                                     value={name}
@@ -132,7 +105,6 @@ function ProductEditScreen({ match, history }) {
                             <Form.Group controlId='price'>
                                 <Form.Label>Price</Form.Label>
                                 <Form.Control
-
                                     type='number'
                                     placeholder='Enter price'
                                     value={price}
@@ -141,11 +113,9 @@ function ProductEditScreen({ match, history }) {
                                 </Form.Control>
                             </Form.Group>
 
-
                             <Form.Group controlId='image'>
                                 <Form.Label>Image</Form.Label>
                                 <Form.Control
-
                                     type='text'
                                     placeholder='Enter image'
                                     value={image}
@@ -159,17 +129,13 @@ function ProductEditScreen({ match, history }) {
                                     custom
                                     onChange={uploadFileHandler}
                                 >
-
                                 </Form.File>
                                 {uploading && <Loader />}
-
                             </Form.Group>
-
 
                             <Form.Group controlId='brand'>
                                 <Form.Label>Brand</Form.Label>
                                 <Form.Control
-
                                     type='text'
                                     placeholder='Enter brand'
                                     value={brand}
@@ -181,7 +147,6 @@ function ProductEditScreen({ match, history }) {
                             <Form.Group controlId='countinstock'>
                                 <Form.Label>Stock</Form.Label>
                                 <Form.Control
-
                                     type='number'
                                     placeholder='Enter stock'
                                     value={countInStock}
@@ -193,7 +158,6 @@ function ProductEditScreen({ match, history }) {
                             <Form.Group controlId='category'>
                                 <Form.Label>Category</Form.Label>
                                 <Form.Control
-
                                     type='text'
                                     placeholder='Enter category'
                                     value={category}
@@ -205,7 +169,6 @@ function ProductEditScreen({ match, history }) {
                             <Form.Group controlId='description'>
                                 <Form.Label>Description</Form.Label>
                                 <Form.Control
-
                                     type='text'
                                     placeholder='Enter description'
                                     value={description}
@@ -214,14 +177,11 @@ function ProductEditScreen({ match, history }) {
                                 </Form.Control>
                             </Form.Group>
 
-
                             <Button type='submit' variant='primary'>
                                 Update
-                        </Button>
-
+                            </Button>
                         </Form>
                     )}
-
             </FormContainer >
         </div>
 

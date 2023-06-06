@@ -4,18 +4,20 @@ import { createSlice } from '@reduxjs/toolkit'
 export const userSlice = createSlice({
     name: 'user',
     initialState: {
-        user: null
+        user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
     },
     reducers: {
         setUser: (state, action) => {
             state.user = {
                 email: action.payload.email,
                 isAdmin: action.payload.isAdmin,
-                token: action.payload.token
+                token: action.payload.token,
+                name: action.payload.name,
+                id: action.payload._id
             }
             localStorage.setItem('user', JSON.stringify(state.user))
         },
-        logout: state => {
+        logout: (state, action) => {
             state.user = null
             localStorage.removeItem('user')
         }
@@ -57,7 +59,7 @@ export const userApi = api.injectEndpoints({
         }),
         updateUser: build.mutation({
             query: updatedUser => ({
-                url: `/users/${updatedUser.id}/`,
+                url: `/users/${updatedUser._id}/`,
                 method: 'PUT',
                 body: updatedUser
             })
@@ -69,7 +71,12 @@ export const userApi = api.injectEndpoints({
             })
         }),
         listUsers: build.query({
-            query: page => `/users/?page=${page}`
+            query: page => `/users/?page=${page}`,
+            transformResponse: (response) => ({
+                users: response.results,
+                page: response.pagination.page,
+                pages: response.pagination.pages
+            })
         })
     })
 })

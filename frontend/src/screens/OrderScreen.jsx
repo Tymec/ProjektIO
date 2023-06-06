@@ -7,6 +7,7 @@ import Loader from '../components/Loader'
 import { getOrderDetails, payOrder, deliverOrder } from '../actions/orderActions'
 import { ORDER_PAY_RESET, ORDER_DELIVER_RESET } from '../constants/orderConstants'
 
+// TODO: Replace with Stripe
 function OrderScreen({ match, history }) {
     const orderId = match.params.id
     const dispatch = useDispatch()

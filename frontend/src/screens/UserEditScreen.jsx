@@ -5,46 +5,34 @@ import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
-import { getUserDetails, updateUser } from '../actions/userActions'
-import { USER_UPDATE_RESET } from '../constants/userConstants'
+import { useUpdateUserMutation, useGetUserQuery } from '../features/user'
 
 function UserEditScreen({ match, history }) {
-
     const userId = match.params.id
 
-    const [name, setName] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [isAdmin, setIsAdmin] = useState(false)
 
-    const dispatch = useDispatch()
-
-    const userDetails = useSelector(state => state.userDetails)
-    const { error, loading, user } = userDetails
-
-    const userUpdate = useSelector(state => state.userUpdate)
-    const { error: errorUpdate, loading: loadingUpdate, success: successUpdate } = userUpdate
+    const { data: user, isLoading, isError, error } = useGetUserQuery(userId)
+    const [updateUser, { isLoading: isUpdateLoading, isError: isUpdateError, isSuccess: isUpdateSuccess, error: updateError }] = useUpdateUserMutation()
 
     useEffect(() => {
-
-        if (successUpdate) {
-            dispatch({ type: USER_UPDATE_RESET })
+        if (isUpdateSuccess) {
             history.push('/admin/userlist')
         } else {
-
-            if (!user.name || user._id !== Number(userId)) {
-                dispatch(getUserDetails(userId))
-            } else {
-                setName(user.name)
-                setEmail(user.email)
-                setIsAdmin(user.isAdmin)
-            }
+            setFirstName(user.firstName)
+            setLastName(user.lastName)
+            setEmail(user.email)
+            setIsAdmin(user.isAdmin)
         }
 
-    }, [user, userId, successUpdate, history, dispatch])
+    }, [user, isUpdateSuccess, history])
 
     const submitHandler = (e) => {
         e.preventDefault()
-        dispatch(updateUser({ _id: user._id, name, email, isAdmin }))
+        updateUser({ _id: user._id, firstName, lastName, email, isAdmin })
     }
 
     return (
@@ -55,21 +43,32 @@ function UserEditScreen({ match, history }) {
 
             <FormContainer>
                 <h1>Edit User</h1>
-                {loadingUpdate && <Loader />}
-                {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
+                {isUpdateLoading && <Loader />}
+                {isUpdateError && <Message variant='danger'>{updateError}</Message>}
 
-                {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message>
+                {isLoading ? <Loader /> : isError ? <Message variant='danger'>{error}</Message>
                     : (
                         <Form onSubmit={submitHandler}>
-
-                            <Form.Group controlId='name'>
-                                <Form.Label>Name</Form.Label>
+                            <Form.Group controlId='firstName'>
+                                <Form.Label>First name</Form.Label>
                                 <Form.Control
-
-                                    type='name'
+                                    type='firstName'
                                     placeholder='Enter name'
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    autoComplete='firstName'
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                >
+                                </Form.Control>
+                            </Form.Group>
+
+                            <Form.Group controlId='lastName'>
+                                <Form.Label>Last name</Form.Label>
+                                <Form.Control
+                                    type='lastName'
+                                    placeholder='Enter last name'
+                                    autoComplete='lastName'
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
                                 >
                                 </Form.Control>
                             </Form.Group>

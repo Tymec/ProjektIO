@@ -4,13 +4,15 @@ import { LinkContainer } from 'react-router-bootstrap'
 import SearchBox from './SearchBox'
 import { logout } from '../features/user'
 import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 
 function Header() {
+    const dispatch = useDispatch();
     const {user} = useSelector((state) => state.userState);
 
     const logoutHandler = () => {
-        logout()
+        dispatch(logout())
     }
 
     return (

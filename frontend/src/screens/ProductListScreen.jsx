@@ -1,56 +1,39 @@
 import React, { useEffect } from 'react'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button, Row, Col } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import Paginate from '../components/Paginate'
-import { listProducts, deleteProduct, createProduct } from '../actions/productActions'
-import { PRODUCT_CREATE_RESET } from '../constants/productConstants'
+import queryString from 'query-string';
+import { useListProductsQuery, useDeleteProductMutation, useCreateProductMutation } from '../features/product'
 
 function ProductListScreen({ history, match }) {
+    const { keyword = '', page = 1 } = queryString.parse(history.location.search)
 
-    const dispatch = useDispatch()
+    const { data, isLoading, isError, error } = useListProductsQuery({ search: keyword, page, orderBy: 'createdAt' })
+    const [deleteProduct, { isLoading: isLoadingDelete, isError: isErrorDelete, isSuccess: isSuccessDelete, error: errorDelete }] = useDeleteProductMutation()
+    const [createProduct, { data: dataCreate, isLoading: isLoadingCreate, isError: isErrorCreate, isSuccess: isSuccessCreate, error: errorCreate, data: createdProduct }] = useCreateProductMutation()
+    const { user } = useSelector(state => state.userState)
 
-    const productList = useSelector(state => state.productList)
-    const { loading, error, products, pages, page } = productList
-
-    const productDelete = useSelector(state => state.productDelete)
-    const { loading: loadingDelete, error: errorDelete, success: successDelete } = productDelete
-
-    const productCreate = useSelector(state => state.productCreate)
-    const { loading: loadingCreate, error: errorCreate, success: successCreate, product: createdProduct } = productCreate
-
-
-    const userLogin = useSelector(state => state.userLogin)
-    const { userInfo } = userLogin
-
-    let keyword = history.location.search
     useEffect(() => {
-        dispatch({ type: PRODUCT_CREATE_RESET })
-
-        if (!userInfo.isAdmin) {
+        if (!user.isAdmin) {
             history.push('/login')
         }
 
-        if (successCreate) {
-            history.push(`/admin/product/${createdProduct._id}/edit`)
-        } else {
-            dispatch(listProducts(keyword))
+        if (isSuccessCreate) {
+            history.push(`/admin/product/${dataCreate._id}/edit`)
         }
-
-    }, [dispatch, history, userInfo, successDelete, successCreate, createdProduct, keyword])
-
+    }, [history, user, isSuccessCreate, dataCreate])
 
     const deleteHandler = (id) => {
-
         if (window.confirm('Are you sure you want to delete this product?')) {
-            dispatch(deleteProduct(id))
+            deleteProduct(id)
         }
     }
 
     const createProductHandler = () => {
-        dispatch(createProduct())
+        createProduct()
     }
 
     return (
@@ -67,16 +50,16 @@ function ProductListScreen({ history, match }) {
                 </Col>
             </Row>
 
-            {loadingDelete && <Loader />}
-            {errorDelete && <Message variant='danger'>{errorDelete}</Message>}
+            {isLoadingDelete && <Loader />}
+            {isErrorDelete && <Message variant='danger'>{errorDelete}</Message>}
 
 
-            {loadingCreate && <Loader />}
-            {errorCreate && <Message variant='danger'>{errorCreate}</Message>}
+            {isLoadingCreate && <Loader />}
+            {isErrorCreate && <Message variant='danger'>{errorCreate}</Message>}
 
-            {loading
+            {isLoading
                 ? (<Loader />)
-                : error
+                : isError
                     ? (<Message variant='danger'>{error}</Message>)
                     : (
                         <div>
@@ -93,7 +76,7 @@ function ProductListScreen({ history, match }) {
                                 </thead>
 
                                 <tbody>
-                                    {products.map(product => (
+                                    {data.products.map(product => (
                                         <tr key={product._id}>
                                             <td>{product._id}</td>
                                             <td>{product.name}</td>
@@ -116,7 +99,7 @@ function ProductListScreen({ history, match }) {
                                     ))}
                                 </tbody>
                             </Table>
-                            <Paginate pages={pages} page={page} isAdmin={true} />
+                            <Paginate pages={data.pages} page={data.page} isAdmin={true} />
                         </div>
                     )}
         </div>

@@ -5,39 +5,19 @@ import { Row, Col, Image, ListGroup, Button, Card, Form } from 'react-bootstrap'
 import Rating from '../components/Rating'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
-import { listProductDetails, createProductReview } from '../actions/productActions'
-import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants'
+import {useGetProductQuery} from '../features/product'
+import {useCreateReviewMutation} from '../features/review'
 
 function ProductScreen({ match, history }) {
     const [qty, setQty] = useState(1)
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
+    const [status, setStatus] = useState(false)
 
-    const dispatch = useDispatch()
+    const { data: product, isLoading, isError, error, refetch } = useGetProductQuery(match.params.id)
+    const {user} = useSelector((state) => state.userState);
 
-    const productDetails = useSelector(state => state.productDetails)
-    const { loading, error, product } = productDetails
-
-    const userLogin = useSelector(state => state.userLogin)
-    const { userInfo } = userLogin
-
-    const productReviewCreate = useSelector(state => state.productReviewCreate)
-    const {
-        loading: loadingProductReview,
-        error: errorProductReview,
-        success: successProductReview,
-    } = productReviewCreate
-
-    useEffect(() => {
-        if (successProductReview) {
-            setRating(0)
-            setComment('')
-            dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
-        }
-
-        dispatch(listProductDetails(match.params.id))
-
-    }, [dispatch, match, successProductReview])
+    const [createReview, {isLoading: isReviewLoading, isError: isReviewError, isSuccess: isReviewSuccess, error: reviewError}] = useCreateReviewMutation()
 
     const addToCartHandler = () => {
         history.push(`/cart/${match.params.id}?qty=${qty}`)
@@ -45,20 +25,28 @@ function ProductScreen({ match, history }) {
 
     const submitHandler = (e) => {
         e.preventDefault()
-        dispatch(createProductReview(
-            match.params.id, {
-            rating,
-            comment
-        }
-        ))
+        createReview({product: match.params.id, rating, comment, name: user.name})
     }
+
+    useEffect(() => {
+        if (isReviewSuccess) {
+            refetch()
+            setRating(0)
+            setComment('')
+            setTimeout(() => {
+                setStatus(false)
+            }, 3000)
+        }
+
+        setStatus(true)
+    }, [isReviewSuccess, refetch])
 
     return (
         <div>
             <Link to='/' className='btn btn-light my-3'>Go Back</Link>
-            {loading ?
+            {isLoading ?
                 <Loader />
-                : error
+                : isError
                     ? <Message variant='danger'>{error}</Message>
                     : (
                         <div>
@@ -167,11 +155,11 @@ function ProductScreen({ match, history }) {
                                         <ListGroup.Item>
                                             <h4>Write a review</h4>
 
-                                            {loadingProductReview && <Loader />}
-                                            {successProductReview && <Message variant='success'>Review Submitted</Message>}
-                                            {errorProductReview && <Message variant='danger'>{errorProductReview}</Message>}
+                                            {status && isReviewLoading && <Loader />}
+                                            {status && isReviewSuccess && <Message variant='success'>Review Submitted</Message>}
+                                            {status && isReviewError && <Message variant='danger'>{reviewError}</Message>}
 
-                                            {userInfo ? (
+                                            {user ? (
                                                 <Form onSubmit={submitHandler}>
                                                     <Form.Group controlId='rating'>
                                                         <Form.Label>Rating</Form.Label>
@@ -200,7 +188,7 @@ function ProductScreen({ match, history }) {
                                                     </Form.Group>
 
                                                     <Button
-                                                        disabled={loadingProductReview}
+                                                        disabled={isReviewLoading}
                                                         type='submit'
                                                         variant='primary'
                                                     >

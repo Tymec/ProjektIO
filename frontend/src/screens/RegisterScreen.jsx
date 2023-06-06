@@ -1,32 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
-import { register } from '../actions/userActions'
+import {useRegisterMutation} from '../features/user'
 
 function RegisterScreen({ location, history }) {
-
-    const [name, setName] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [message, setMessage] = useState('')
 
-    const dispatch = useDispatch()
-
     const redirect = location.search ? location.search.split('=')[1] : '/'
 
-    const userRegister = useSelector(state => state.userRegister)
-    const { error, loading, userInfo } = userRegister
+    const [register, {data: user, isLoading, isError, isSuccess, error}] = useRegisterMutation()
 
     useEffect(() => {
-        if (userInfo) {
+        if (user) {
             history.push(redirect)
         }
-    }, [history, userInfo, redirect])
+    }, [history, user, redirect])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -34,27 +31,39 @@ function RegisterScreen({ location, history }) {
         if (password !== confirmPassword) {
             setMessage('Passwords do not match')
         } else {
-            dispatch(register(name, email, password))
+            register({firstName, lastName, email, password})
         }
-
     }
 
     return (
         <FormContainer>
             <h1>Sign In</h1>
             {message && <Message variant='danger'>{message}</Message>}
-            {error && <Message variant='danger'>{error}</Message>}
-            {loading && <Loader />}
+            {isError && <Message variant='danger'>{error}</Message>}
+            {isLoading && <Loader />}
             <Form onSubmit={submitHandler}>
-
-                <Form.Group controlId='name'>
-                    <Form.Label>Name</Form.Label>
+                <Form.Group controlId='firstName'>
+                    <Form.Label>First name</Form.Label>
                     <Form.Control
                         required
-                        type='name'
-                        placeholder='Enter name'
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        type='firstName'
+                        placeholder='Enter first name'
+                        autoComplete='new-firstName'
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                    >
+                    </Form.Control>
+                </Form.Group>
+
+                <Form.Group controlId='lastName'>
+                    <Form.Label>Last name</Form.Label>
+                    <Form.Control
+                        required
+                        type='lastName'
+                        placeholder='Enter last name'
+                        autoComplete='new-lastName'
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
                     >
                     </Form.Control>
                 </Form.Group>
@@ -65,6 +74,7 @@ function RegisterScreen({ location, history }) {
                         required
                         type='email'
                         placeholder='Enter Email'
+                        autoComplete='new-email'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     >
@@ -77,6 +87,7 @@ function RegisterScreen({ location, history }) {
                         required
                         type='password'
                         placeholder='Enter Password'
+                        autoComplete='new-password'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     >
@@ -89,6 +100,7 @@ function RegisterScreen({ location, history }) {
                         required
                         type='password'
                         placeholder='Confirm Password'
+                        autoComplete='new-password'
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     >

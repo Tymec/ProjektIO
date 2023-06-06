@@ -34,7 +34,7 @@ export const productApi = api.injectEndpoints({
         }),
         updateProduct: build.mutation({
             query: updatedProduct => ({
-                url: `/products/${updatedProduct.id}/`,
+                url: `/products/${updatedProduct._id}/`,
                 method: 'PUT',
                 body: updatedProduct
             })

@@ -11,7 +11,7 @@ import { useListProductsQuery } from '../features/product'
 
 function HomeScreen({ history }) {
     const {search, page} = queryString.parse(history.location.search)
-    const { data, isLoading, isError, error } = useListProductsQuery({search, page, orderBy: 'createdAt'})
+    const { data, isLoading, isError, error } = useListProductsQuery({keyword: search, page, orderBy: 'createdAt'})
 
     return (
         <div>

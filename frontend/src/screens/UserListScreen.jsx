@@ -1,49 +1,41 @@
 import React, { useEffect } from 'react'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import Paginate from '../components/Paginate'
-import { listUsers, deleteUser } from '../actions/userActions'
+import queryString from 'query-string';
+import { useListUsersQuery, useDeleteUserMutation } from '../features/user'
 
 function UserListScreen({ history }) {
+    const { page = 1 } = queryString.parse(history.location.search)
 
-    const dispatch = useDispatch()
-
-    const userList = useSelector(state => state.userList)
-    const { loading, error, users, pages, page } = userList
-
-    const userLogin = useSelector(state => state.userLogin)
-    const { userInfo } = userLogin
-
-    const userDelete = useSelector(state => state.userDelete)
-    const { success: successDelete } = userDelete
-
+    const { data, isLoading, isError, error, refetch } = useListUsersQuery(page)
+    const { user } = useSelector(state => state.userState)
+    const [deleteUser, { isLoading: isLoadingDelete, isError: isErrorDelete, error: errorDelete, isSuccess: successDelete }] = useDeleteUserMutation()
 
     useEffect(() => {
-        if (userInfo && userInfo.isAdmin) {
-            dispatch(listUsers())
-        } else {
+        if (!(user && user.isAdmin)) {
             history.push('/login')
         }
-
-    }, [dispatch, history, successDelete, userInfo])
-
+        if (successDelete) {
+            refetch()
+        }
+    }, [history, user, successDelete])
 
     const deleteHandler = (id) => {
-
         if (window.confirm('Are you sure you want to delete this user?')) {
-            dispatch(deleteUser(id))
+            deleteUser(id)
         }
     }
 
     return (
         <div>
             <h1>Users</h1>
-            {loading
+            {isLoading
                 ? (<Loader />)
-                : error
+                : isError
                     ? (<Message variant='danger'>{error}</Message>)
                     : (
                         <div>
@@ -59,7 +51,7 @@ function UserListScreen({ history }) {
                                 </thead>
 
                                 <tbody>
-                                    {users.map(user => (
+                                    {data.users.map(user => (
                                         <tr key={user._id}>
                                             <td>{user._id}</td>
                                             <td>{user.name}</td>
@@ -85,7 +77,7 @@ function UserListScreen({ history }) {
                                     ))}
                                 </tbody>
                             </Table>
-                            <Paginate pages={pages} page={page} isAdmin={true} />
+                            <Paginate pages={data.pages} page={data.page} isAdmin={true} />
                         </div>
                     )}
         </div>
