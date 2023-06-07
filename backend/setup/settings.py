@@ -185,7 +185,7 @@ GRAPH_MODELS = {"all_applications": True, "group_models": True}
 ### REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "app.backends.NumberedPaginationBackend",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 12,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
