@@ -47,6 +47,15 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_view_name(self):
         return "Products"
 
+    def get_queryset(self):
+        queryset = Product.objects.all()
+        ids = self.request.query_params.get("ids")
+        if ids and ids != "":
+            ids = ids.split(",")
+            queryset = queryset.filter(_id__in=ids)
+
+        return queryset
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
