@@ -33,6 +33,8 @@ class ProductSerializer(ModelSerializer):
         ret = super().to_representation(instance)
         ret["_id"] = str(ret["_id"])
         ret["user"] = str(ret["user"])
+        ret["price"] = float(ret["price"])
+        ret["rating"] = float(ret["rating"])
         return ret
 
     def get_reviews(self, obj):
@@ -51,6 +53,7 @@ class OrderItemSerializer(ModelSerializer):
         ret["_id"] = str(ret["_id"])
         ret["product"] = str(ret["product"])
         ret["order"] = str(ret["order"])
+        ret["price"] = float(ret["price"])
         return ret
 
 
@@ -62,6 +65,7 @@ class ShippingAddressSerializer(ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret["_id"] = str(ret["_id"])
+        ret["shippingPrice"] = float(ret["shippingPrice"])
         return ret
 
 
@@ -77,6 +81,9 @@ class OrderSerializer(ModelSerializer):
         ret = super().to_representation(instance)
         ret["user"] = str(ret["user"])
         ret["_id"] = str(ret["_id"])
+        ret["taxPrice"] = float(ret["taxPrice"])
+        ret["shippingPrice"] = float(ret["shippingPrice"])
+        ret["totalPrice"] = float(ret["totalPrice"])
         return ret
 
     def get_orderItems(self, obj):
