@@ -9,15 +9,20 @@ import { useDispatch } from 'react-redux'
 
 function Header() {
     const dispatch = useDispatch();
+
     const {user} = useSelector((state) => state.userState);
 
     const logoutHandler = () => {
         dispatch(logout())
     }
 
+    const openInNewTab = (url) => {
+        console.log(url)
+        window.open(url, "_blank", "noreferrer");
+    };
+
     return (
         <header>
-
             <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
                 <Container>
                     <LinkContainer to='/'>
@@ -50,20 +55,25 @@ function Header() {
 
 
                             {user && user.isAdmin && (
-                                <NavDropdown title='Admin' id='adminmenue'>
-                                    <LinkContainer to='/admin/userlist'>
-                                        <NavDropdown.Item>Users</NavDropdown.Item>
-                                    </LinkContainer>
+                                <LinkContainer onClick={
+                                    () => openInNewTab("http://localhost:8000/admin")
+                                } to={window.location.pathname}>
+                                    <Nav.Link><i className="fas fa-user"></i>Admin</Nav.Link>
+                                </LinkContainer>
+                                // <NavDropdown title='Admin' id='adminmenue'>
+                                //     <LinkContainer to='/admin/userlist'>
+                                //         <NavDropdown.Item>Users</NavDropdown.Item>
+                                //     </LinkContainer>
 
-                                    <LinkContainer to='/admin/productlist'>
-                                        <NavDropdown.Item>Products</NavDropdown.Item>
-                                    </LinkContainer>
+                                //     <LinkContainer to='/admin/productlist'>
+                                //         <NavDropdown.Item>Products</NavDropdown.Item>
+                                //     </LinkContainer>
 
-                                    <LinkContainer to='/admin/orderlist'>
-                                        <NavDropdown.Item>Orders</NavDropdown.Item>
-                                    </LinkContainer>
+                                //     <LinkContainer to='/admin/orderlist'>
+                                //         <NavDropdown.Item>Orders</NavDropdown.Item>
+                                //     </LinkContainer>
 
-                                </NavDropdown>
+                                // </NavDropdown>
                             )}
 
 
