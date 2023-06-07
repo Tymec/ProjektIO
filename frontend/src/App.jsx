@@ -18,11 +18,6 @@ import ProductListScreen from './screens/ProductListScreen'
 import ProductEditScreen from './screens/ProductEditScreen'
 import OrderListScreen from './screens/OrderListScreen'
 import ChatBox from './components/ChatBox'
-import {Elements} from '@stripe/react-stripe-js';
-import {loadStripe} from '@stripe/stripe-js';
-
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
 
 function App() {
@@ -31,7 +26,6 @@ function App() {
       <Header />
       <main className="py-3">
         <Container>
-        <Elements stripe={stripePromise}>
           <Route path='/' component={HomeScreen} exact />
           <Route path='/login' component={LoginScreen} />
           <Route path='/register' component={RegisterScreen} />
@@ -47,7 +41,6 @@ function App() {
           <Route path='/admin/productlist' component={ProductListScreen} />
           <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
           <Route path='/admin/orderlist' component={OrderListScreen} />
-          </Elements>
         </Container>
       </main>
       <ChatBox />

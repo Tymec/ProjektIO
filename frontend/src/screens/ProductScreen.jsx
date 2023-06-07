@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Row, Col, Image, ListGroup, Button, Card, Form } from 'react-bootstrap'
 import Rating from '../components/Rating'
@@ -7,7 +7,6 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import {useGetProductQuery} from '../features/product'
 import {useCreateReviewMutation} from '../features/review'
-import {useStripe} from '@stripe/react-stripe-js';
 
 
 function ProductScreen({ match, history }) {
@@ -16,7 +15,6 @@ function ProductScreen({ match, history }) {
     const [comment, setComment] = useState('')
     const [status, setStatus] = useState(false)
 
-    const stripe = useStripe();
 
     const { data: product, isLoading, isError, error, refetch } = useGetProductQuery(match.params.id)
     const {user} = useSelector((state) => state.userState);
@@ -27,19 +25,9 @@ function ProductScreen({ match, history }) {
         history.push(`/cart/${match.params.id}?qty=${qty}`)
     }
 
-    const stripeHandler = async () => {
-
-        const checkoutOptions = {
-            mode: 'payment',
-            successUrl: `${window.location.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancelUrl: `${window.location.origin}/cancel`,
-            lineItems: [{
-                price: 'price_1NG633KRk4JVwerryNmqRxiq',
-                quantity: 1
-            }]
-        }
-
-        const { error } = await stripe.redirectToCheckout(checkoutOptions);
+    const buyNowHandler = async () => {
+        // TODO: Implement
+        return;
     }
 
     const submitHandler = (e) => {
@@ -154,11 +142,11 @@ function ProductScreen({ match, history }) {
 
                                             <ListGroup.Item>
                                                 <Button
-                                                    onClick={stripeHandler}
+                                                    onClick={buyNowHandler}
                                                     className='btn-block'
                                                     disabled={product.countInStock === 0}
                                                     type='button'>
-                                                    Buy
+                                                    Buy now
                                                 </Button>
                                             </ListGroup.Item>
                                         </ListGroup>
