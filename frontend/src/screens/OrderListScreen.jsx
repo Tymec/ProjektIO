@@ -28,7 +28,7 @@ function OrderListScreen({ history }) {
             {isLoading
                 ? (<Loader />)
                 : isError
-                    ? (<Message variant='danger'>{error}</Message>)
+                    ? (<Message variant='danger'>{error.data?.detail || "Error"}</Message>)
                     : (
                         <div>
                             <Table striped bordered hover responsive className='table-sm'>
@@ -79,7 +79,7 @@ function OrderListScreen({ history }) {
                                     ))}
                                 </tbody>
                             </Table>
-                            <Paginate pages={data.pages} page={data.page} isAdmin={true} />
+                            <Paginate pages={data.pages} page={data.page} path={`/admin/productlist/`} />
                         </div>
                     )}
         </div>

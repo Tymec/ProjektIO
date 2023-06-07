@@ -1,25 +1,21 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap'
 import Message from '../components/Message'
-import { addToCart } from '../features/cart'
-import queryString from 'query-string';
+import { addToCart, removeFromCart } from '../features/cart'
+import { useListProductsQuery } from '../features/product'
+import Paginate from '../components/Paginate'
+import queryString from 'query-string'
+import Loader from '../components/Loader'
 
-function CartScreen({ match, location, history }) {
-    const productId = match.params.id
-    const { qty = 1 } = queryString.parse(history.location.search)
+function CartScreen({ history }) {
     const dispatch = useDispatch()
+    const {page = 1} = queryString.parse(history.location.search)
 
     const cart = useSelector(state => state.cartState)
-    const { cartItems } = cart
-
-    useEffect(() => {
-        if (productId) {
-            dispatch(addToCart(productId, qty))
-        }
-    }, [dispatch, productId, qty])
-
+    const cardIds = cart.items.map(item => item.id)
+    const { data, isLoading, isFetching, isSuccess, isError, error } = useListProductsQuery({ ids: cardIds, page })
 
     const removeFromCartHandler = (id) => {
         dispatch(removeFromCart(id))
@@ -33,35 +29,37 @@ function CartScreen({ match, location, history }) {
         <Row>
             <Col md={8}>
                 <h1>Shopping Cart</h1>
-                {cartItems.length === 0 ? (
+                {cart.items.length === 0 ? (
                     <Message variant='info'>
                         Your cart is empty <Link to='/'>Go Back</Link>
                     </Message>
                 ) : (
+                    (isLoading || isFetching) ? <Loader />
+                        : isError ? <Message variant='danger'>{error.data?.dtail || "Error"}</Message>
+                            :
                         <ListGroup variant='flush'>
-                            {cartItems.map(item => (
-                                <ListGroup.Item key={item.product}>
+                            {data.products.map(product => (
+                                <ListGroup.Item key={product._id}>
                                     <Row>
                                         <Col md={2}>
-                                            <Image src={item.image} alt={item.name} fluid rounded />
+                                            <Image src={product.image} alt={product.name} fluid rounded />
                                         </Col>
                                         <Col md={3}>
-                                            <Link to={`/product/${item.product}`}>{item.name}</Link>
+                                            <Link to={`/product/${product._id}`}>{product.name}</Link>
                                         </Col>
 
                                         <Col md={2}>
-                                            ${item.price}
+                                            ${product.price}
                                         </Col>
 
                                         <Col md={3}>
                                             <Form.Control
                                                 as="select"
-                                                value={item.qty}
-                                                onChange={(e) => dispatch(addToCart(item.product, Number(e.target.value)))}
+                                                value={cart.items.find(item => item.id === product._id).qty}
+                                                onChange={(e) => dispatch(addToCart({id: product._id, qty: Number(e.target.value)}))}
                                             >
                                                 {
-
-                                                    [...Array(item.countInStock).keys()].map((x) => (
+                                                    [...Array(product.countInStock).keys()].map((x) => (
                                                         <option key={x + 1} value={x + 1}>
                                                             {x + 1}
                                                         </option>
@@ -75,7 +73,7 @@ function CartScreen({ match, location, history }) {
                                             <Button
                                                 type='button'
                                                 variant='light'
-                                                onClick={() => removeFromCartHandler(item.product)}
+                                                onClick={() => removeFromCartHandler(product._id)}
                                             >
                                                 <i className='fas fa-trash'></i>
                                             </Button>
@@ -83,7 +81,9 @@ function CartScreen({ match, location, history }) {
                                     </Row>
                                 </ListGroup.Item>
                             ))}
+                            <Paginate page={data.page} pages={data.pages} path="/cart?" />
                         </ListGroup>
+
                     )}
             </Col>
 
@@ -91,8 +91,18 @@ function CartScreen({ match, location, history }) {
                 <Card>
                     <ListGroup variant='flush'>
                         <ListGroup.Item>
-                            <h2>Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)}) items</h2>
-                            ${cartItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2)}
+                            <h2>Subtotal ({
+                                cart.items.reduce((acc, item) => acc + item.qty, 0)
+                                }) items</h2>
+                            ${isSuccess && cart.items.reduce((acc, item) => {
+                                const product = data.products.find(product => product._id === item.id)
+                                try {
+                                    return acc + Number(product.price) * item.qty
+                                } catch (e) {
+                                    return acc
+                                }
+                            }, 0).toFixed(2)}
+                            {!isSuccess && '0.00'}
                         </ListGroup.Item>
                     </ListGroup>
 
@@ -100,7 +110,7 @@ function CartScreen({ match, location, history }) {
                         <Button
                             type='button'
                             className='btn-block'
-                            disabled={cartItems.length === 0}
+                            disabled={cart.items.length === 0}
                             onClick={checkoutHandler}
                         >
                             Proceed To Checkout

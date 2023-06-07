@@ -5,13 +5,13 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
 import { useLoginMutation } from '../features/user'
+import queryString from 'query-string';
 
 function LoginScreen({ location, history }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const redirect = location.search ? location.search.split('=')[1] : '/'
-
+    const { redirect = '/' } = queryString.parse(location.search)
     const [loginUser, { isLoading, isSuccess, isError, error }] = useLoginMutation();
 
     useEffect(() => {
@@ -28,10 +28,9 @@ function LoginScreen({ location, history }) {
     return (
         <FormContainer>
             <h1>Sign In</h1>
-            {isError && <Message variant='danger'>{error}</Message>}
+            {isError && <Message variant='danger'>{error.data?.detail || "Login error"}</Message>}
             {isLoading && <Loader />}
             <Form onSubmit={submitHandler}>
-
                 <Form.Group controlId='email'>
                     <Form.Label>Email Address</Form.Label>
                     <Form.Control
@@ -43,7 +42,6 @@ function LoginScreen({ location, history }) {
                     >
                     </Form.Control>
                 </Form.Group>
-
 
                 <Form.Group controlId='password'>
                     <Form.Label>Password</Form.Label>

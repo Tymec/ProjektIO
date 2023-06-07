@@ -10,16 +10,16 @@ import { useListProductsQuery } from '../features/product'
 
 
 function HomeScreen({ history }) {
-    const {search, page} = queryString.parse(history.location.search)
-    const { data, isLoading, isError, error } = useListProductsQuery({keyword: search, page, orderBy: 'createdAt'})
+    const {search = '', page = 1} = queryString.parse(history.location.search)
+    const { data, isLoading, isFetching, isError, error } = useListProductsQuery({keyword: search, page, orderBy: 'createdAt'})
 
     return (
         <div>
             {!search && <ProductCarousel />}
 
             <h1>Latest Products</h1>
-            {isLoading ? <Loader />
-                : isError ? <Message variant='danger'>{error}</Message>
+            {(isLoading || isFetching) ? <Loader />
+                : isError ? <Message variant='danger'>{error.data?.detail || "Error"}</Message>
                     :
                     <div>
                         <Row>
@@ -29,7 +29,7 @@ function HomeScreen({ history }) {
                                 </Col>
                             ))}
                         </Row>
-                        <Paginate page={data.page} pages={data.pages} keyword={search} />
+                        <Paginate page={data.page} pages={data.pages} path={`/?search=${search}`} />
                     </div>
             }
         </div>

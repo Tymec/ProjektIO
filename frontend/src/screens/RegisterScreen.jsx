@@ -39,7 +39,7 @@ function RegisterScreen({ location, history }) {
         <FormContainer>
             <h1>Sign In</h1>
             {message && <Message variant='danger'>{message}</Message>}
-            {isError && <Message variant='danger'>{error}</Message>}
+            {isError && <Message variant='danger'>{error.data?.detail || "Error"}</Message>}
             {isLoading && <Loader />}
             <Form onSubmit={submitHandler}>
                 <Form.Group controlId='firstName'>

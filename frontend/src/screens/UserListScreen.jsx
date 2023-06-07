@@ -36,7 +36,7 @@ function UserListScreen({ history }) {
             {isLoading
                 ? (<Loader />)
                 : isError
-                    ? (<Message variant='danger'>{error}</Message>)
+                    ? (<Message variant='danger'>{error.data?.detail || "Error"}</Message>)
                     : (
                         <div>
                             <Table striped bordered hover responsive className='table-sm'>

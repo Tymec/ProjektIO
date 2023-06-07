@@ -48,9 +48,9 @@ function UserEditScreen({ match, history }) {
             <FormContainer>
                 <h1>Edit User</h1>
                 {isUpdateLoading && <Loader />}
-                {isUpdateError && <Message variant='danger'>{updateError}</Message>}
+                {isUpdateError && <Message variant='danger'>{updateError.data?.detail || "Error"}</Message>}
 
-                {isLoading ? <Loader /> : isError ? <Message variant='danger'>{error}</Message>
+                {isLoading ? <Loader /> : isError ? <Message variant='danger'>{error.data?.detail || "Error"}</Message>
                     : (
                         <Form onSubmit={submitHandler}>
                             <Form.Group controlId='firstName'>

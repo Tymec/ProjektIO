@@ -88,9 +88,9 @@ function ProductEditScreen({ match, history }) {
             <FormContainer>
                 <h1>Edit Product</h1>
                 {isLoadingUpdate && <Loader />}
-                {isErrorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
+                {isErrorUpdate && <Message variant='danger'>{errorUpdate.data?.detail}</Message>}
 
-                {isLoading ? <Loader /> : isError ? <Message variant='danger'>{error}</Message>
+                {isLoading ? <Loader /> : isError ? <Message variant='danger'>{error.data?.detail || "Error"}</Message>
                     : (
                         <Form onSubmit={submitHandler}>
                             <Form.Group controlId='name'>

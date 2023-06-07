@@ -56,16 +56,16 @@ function ProductListScreen({ history, match }) {
             </Row>
 
             {isLoadingDelete && <Loader />}
-            {isErrorDelete && <Message variant='danger'>{errorDelete}</Message>}
+            {isErrorDelete && <Message variant='danger'>{errorDelete.data?.detail}</Message>}
 
 
             {isLoadingCreate && <Loader />}
-            {isErrorCreate && <Message variant='danger'>{errorCreate}</Message>}
+            {isErrorCreate && <Message variant='danger'>{errorCreate.data?.detail}</Message>}
 
             {isLoading
                 ? (<Loader />)
                 : isError
-                    ? (<Message variant='danger'>{error}</Message>)
+                    ? (<Message variant='danger'>{error.data?.detail || "Error"}</Message>)
                     : (
                         <div>
                             <Table striped bordered hover responsive className='table-sm'>
@@ -104,7 +104,7 @@ function ProductListScreen({ history, match }) {
                                     ))}
                                 </tbody>
                             </Table>
-                            <Paginate pages={data.pages} page={data.page} isAdmin={true} />
+                            <Paginate pages={data.pages} page={data.page} path={`/admin/productlist/`} />
                         </div>
                     )}
         </div>
