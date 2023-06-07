@@ -1,29 +1,41 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+const getFromLocalStorage = (key, def = '') => {
+    const value = localStorage.getItem(key)
+    if (value) {
+        return JSON.parse(value)
+    }
+    return def
+}
+
 export const cartSlice = createSlice({
     name: 'cart',
     initialState: {
-        cartItems: localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [],
-        shippingAddress: localStorage.getItem('shippingAddress') ? JSON.parse(localStorage.getItem('shippingAddress')) : {},
-        paymentMethod: localStorage.getItem('paymentMethod') ? JSON.parse(localStorage.getItem('paymentMethod')) : '',
+        items: getFromLocalStorage('cartItems', []),
+        shippingAddress: getFromLocalStorage('shippingAddress', {}),
+        paymentMethod: getFromLocalStorage('paymentMethod', ''),
     },
     reducers: {
         addToCart: (state, action) => {
-            const item = {
-                quantity: action.payload.qty,
-                id: action.payload.product,
-            }
-            const existItem = state.cartItems.find(x => x.product === item.product)
+            const { qty, id, increment = false } = action.payload
+
+            const existItem = state.items.find(x => x.id === id)
             if (existItem) {
-                existItem.qty += item.qty
+                state.items = state.items.map(x => {
+                    let item = x
+                    if (x.id === existItem.id) {
+                        item = increment ? {id, qty: x.qty + 1} : {id, qty}
+                    }
+                    return item
+                })
             } else {
-                state.cartItems.push(item)
+                state.items.push({id, qty})
             }
-            localStorage.setItem('cartItems', JSON.stringify(state.cartItems))
+            localStorage.setItem('cartItems', JSON.stringify(state.items))
         },
         removeFromCart: (state, action) => {
-            state.cartItems = state.cartItems.filter(x => x.product !== action.payload)
-            localStorage.setItem('cartItems', JSON.stringify(state.cartItems))
+            state.items = state.items.filter(x => x.id !== action.payload)
+            localStorage.setItem('cartItems', JSON.stringify(state.items))
         },
         saveShippingAddress: (state, action) => {
             state.shippingAddress = action.payload
@@ -33,8 +45,8 @@ export const cartSlice = createSlice({
             state.paymentMethod = action.payload
             localStorage.setItem('paymentMethod', JSON.stringify(state.paymentMethod))
         },
-        resetCart: (state, action) => {
-            state.cartItems = []
+        resetCart: (state) => {
+            state.items = []
             state.shippingAddress = {}
             state.paymentMethod = ''
             localStorage.removeItem('cartItems')
