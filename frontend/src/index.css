@@ -2,6 +2,10 @@ main{
     min-height: 80vh;
 }
 
+.navbar-dark{
+    background-color: black;
+}
+
 h1{
   font-size: 1.8rem;
   padding:1rem 0;
@@ -36,14 +40,15 @@ h3{
 }
 
 .carousel img {
-  display:block;
-  height: 300px;
-  padding: 30px;
-  margin: 40px;
-  border-radius: 50%;
-  margin-left: auto;
-  margin-right: auto;
-}
+    display:block;
+    height: 300px;
+    padding: 30px;
+    margin: 40px;
+    border-radius: 10%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
 .carousel a {
   margin: 0 auto;
 }

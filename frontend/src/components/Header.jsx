@@ -4,7 +4,6 @@ import SearchBox from './SearchBox'
 import { logout } from '../features'
 import { useSelector, useDispatch } from 'react-redux'
 
-
 function Header() {
     const dispatch = useDispatch();
 
@@ -14,14 +13,18 @@ function Header() {
         dispatch(logout())
     }
 
-    const openInNewTab = (url) => {
-        console.log(url)
-        window.open(url, "_blank", "noreferrer");
-    };
+    const themeChangeHandler = () => {
+        const link1 = document.getElementById('theme-link-1');
+        const link2 = document.getElementById('theme-link-2');
+        
+        link1.disabled = !link1.disabled;
+        link2.disabled = !link2.disabled;
+    }
+    
 
     return (
         <header>
-            <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
+            <Navbar style={{opacity : "0.85"}}  bg="pimary" variant="dark" expand="lg" collapseOnSelect>
                 <Container>
                     <LinkContainer to='/'>
                         <Navbar.Brand>PromptWorld</Navbar.Brand>
@@ -33,7 +36,7 @@ function Header() {
                         <Nav className="ml-auto">
 
                             <LinkContainer to='/cart'>
-                                <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
+                                <Nav.Link><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
                             </LinkContainer>
 
                             {user ? (
@@ -43,14 +46,12 @@ function Header() {
                                     </LinkContainer>
 
                                     <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
-
                                 </NavDropdown>
                             ) : (
-                                    <LinkContainer to='/login'>
-                                        <Nav.Link><i className="fas fa-user"></i>Login</Nav.Link>
-                                    </LinkContainer>
-                                )}
-
+                                <LinkContainer to='/login'>
+                                    <Nav.Link><i className="fas fa-user"></i>Login</Nav.Link>
+                                </LinkContainer>
+                            )}
 
                             {user && user.isAdmin && (
                                 <LinkContainer onClick={
@@ -74,6 +75,7 @@ function Header() {
                                 // </NavDropdown>
                             )}
 
+                            <Nav.Link onClick={themeChangeHandler}><i className="fas fa-palette"></i></Nav.Link>
 
                         </Nav>
                     </Navbar.Collapse>
