@@ -25,4 +25,5 @@ router.register(
     r"shipping-addresses", ShippingAddressViewSet, basename="shipping-address"
 )
 
+
 urlpatterns = [path("", include(router.urls))]

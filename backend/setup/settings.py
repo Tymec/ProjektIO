@@ -32,8 +32,14 @@ if not USE_PIPENV:
 ### Quick-start development settings - unsuitable for production
 ### See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 SECRET_KEY = os.getenv("DJANGO_SECRET")
+STRIPE_SK = os.getenv("STRIPE_SK")
+STRIPE_WH = os.getenv("STRIPE_WH")
 DEBUG = ENV == "development"
 ALLOWED_HOSTS = []
+
+
+### Custom definitions
+DEFAULT_CURRENCY = "USD"
 
 
 ### Application definition
@@ -48,7 +54,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
+    "djmoney",
     "users",
+    "payments",
     "app",
 ]
 
