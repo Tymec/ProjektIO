@@ -20,7 +20,7 @@ function Header() {
 
   return (
     <header>
-      <Navbar bg="primary" variant="dark" expand="lg" collapseOnSelect>
+      <Navbar bg="primary" variant="dark" expand="lg" style={{opacity : "0.95"}} collapseOnSelect>
         <Container>
           <LinkContainer to="/">
             <Navbar.Brand>PromptWorld</Navbar.Brand>
