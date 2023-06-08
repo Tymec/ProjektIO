@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button, Row, Col } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import Paginate from '../components/Paginate'
-import queryString from 'query-string';
-import { useListProductsQuery, useDeleteProductMutation, useCreateProductMutation } from '../features/product'
+import { Loader, Message, Paginate } from '../components'
+import { useListProductsQuery, useDeleteProductMutation, useCreateProductMutation } from '../features'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
-function ProductListScreen({ history, match }) {
-    const { keyword = '', page = 1 } = queryString.parse(history.location.search)
+export default function ProductListPage() {
+    const navigate = useNavigate()
+
+    const [searchParams] = useSearchParams()
+    const keyword = searchParams.get('keyword') || ''
+    const page = searchParams.get('page') || 1
 
     const { data, isLoading, isError, error } = useListProductsQuery({ search: keyword, page, orderBy: 'createdAt' })
     const [deleteProduct, { isLoading: isLoadingDelete, isError: isErrorDelete, isSuccess: isSuccessDelete, error: errorDelete }] = useDeleteProductMutation()
@@ -18,11 +20,11 @@ function ProductListScreen({ history, match }) {
 
     useEffect(() => {
         if (!user.isAdmin) {
-            history.push('/login')
+            navigate('/login')
         }
 
         if (isSuccessCreate) {
-            history.push(`/admin/product/${dataCreate._id}/edit`)
+            navigate(`/admin/product/${dataCreate._id}/edit`)
         }
     }, [history, user, isSuccessCreate, dataCreate])
 
@@ -56,16 +58,16 @@ function ProductListScreen({ history, match }) {
             </Row>
 
             {isLoadingDelete && <Loader />}
-            {isErrorDelete && <Message variant='danger'>{errorDelete}</Message>}
+            {isErrorDelete && <Message variant='danger'>{errorDelete.data?.detail}</Message>}
 
 
             {isLoadingCreate && <Loader />}
-            {isErrorCreate && <Message variant='danger'>{errorCreate}</Message>}
+            {isErrorCreate && <Message variant='danger'>{errorCreate.data?.detail}</Message>}
 
             {isLoading
                 ? (<Loader />)
                 : isError
-                    ? (<Message variant='danger'>{error}</Message>)
+                    ? (<Message variant='danger'>{error.data?.detail || "Error"}</Message>)
                     : (
                         <div>
                             <Table striped bordered hover responsive className='table-sm'>
@@ -104,11 +106,9 @@ function ProductListScreen({ history, match }) {
                                     ))}
                                 </tbody>
                             </Table>
-                            <Paginate pages={data.pages} page={data.page} isAdmin={true} />
+                            <Paginate pages={data.pages} page={data.page} path={`/admin/productlist/`} />
                         </div>
                     )}
         </div>
     )
 }
-
-export default ProductListScreen

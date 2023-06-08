@@ -1,82 +1,34 @@
-import React, { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import Message from '../components/Message'
-import Loader from '../components/Loader'
-import { getOrderDetails, payOrder, deliverOrder } from '../actions/orderActions'
-import { ORDER_PAY_RESET, ORDER_DELIVER_RESET } from '../constants/orderConstants'
-
-// TODO: Replace with Stripe
-function OrderScreen({ match, history }) {
-    const orderId = match.params.id
-    const dispatch = useDispatch()
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { Message, Loader } from '../components'
+import { useGetOrderQuery } from '../features'
 
 
-    const [sdkReady, setSdkReady] = useState(false)
+export default function OrderPage() {
+    const navigate = useNavigate()
+    const { orderId } = useParams()
 
-    const orderDetails = useSelector(state => state.orderDetails)
-    const { order, error, loading } = orderDetails
+    const { user } = useSelector(state => state.userState)
+    const { data: order, isLoading, isError, error } = useGetOrderQuery(orderId)
+    console.log(order)
 
-    const orderPay = useSelector(state => state.orderPay)
-    const { loading: loadingPay, success: successPay } = orderPay
-
-    const orderDeliver = useSelector(state => state.orderDeliver)
-    const { loading: loadingDeliver, success: successDeliver } = orderDeliver
-
-    const userLogin = useSelector(state => state.userLogin)
-    const { userInfo } = userLogin
-
-
-    if (!loading && !error) {
-        order.itemsPrice = order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0).toFixed(2)
-    }
-
-
-    const addPayPalScript = () => {
-        const script = document.createElement('script')
-        script.type = 'text/javascript'
-        script.src = 'https://www.paypal.com/sdk/js?client-id=AeDXja18CkwFUkL-HQPySbzZsiTrN52cG13mf9Yz7KiV2vNnGfTDP0wDEN9sGlhZHrbb_USawcJzVDgn'
-        script.async = true
-        script.onload = () => {
-            setSdkReady(true)
-        }
-        document.body.appendChild(script)
-    }
+    const loadingPay = false
+    const loadingDeliver = false
 
     useEffect(() => {
-
-        if (!userInfo) {
-            history.push('/login')
+        if (!user) {
+            navigate('/login')
         }
+    }, [user])
 
-        if (!order || successPay || order._id !== Number(orderId) || successDeliver) {
-            dispatch({ type: ORDER_PAY_RESET })
-            dispatch({ type: ORDER_DELIVER_RESET })
+    const deliverHandler = () => {}
 
-            dispatch(getOrderDetails(orderId))
-        } else if (!order.isPaid) {
-            if (!window.paypal) {
-                addPayPalScript()
-            } else {
-                setSdkReady(true)
-            }
-        }
-    }, [dispatch, order, orderId, successPay, successDeliver, history, userInfo])
-
-
-    const successPaymentHandler = (paymentResult) => {
-        dispatch(payOrder(orderId, paymentResult))
-    }
-
-    const deliverHandler = () => {
-        dispatch(deliverOrder(order))
-    }
-
-    return loading ? (
+    return isLoading ? (
         <Loader />
-    ) : error ? (
-        <Message variant='danger'>{error}</Message>
+    ) : isError ? (
+        <Message variant='danger'>{error.data?.detail || "Error"}</Message>
     ) : (
                 <div>
                     <h1>Order: {order.Id}</h1>
@@ -158,7 +110,9 @@ function OrderScreen({ match, history }) {
                                     <ListGroup.Item>
                                         <Row>
                                             <Col>Items:</Col>
-                                            <Col>${order.itemsPrice}</Col>
+                                            <Col>${
+                                                order.orderItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2)
+                                            }</Col>
                                         </Row>
                                     </ListGroup.Item>
 
@@ -188,20 +142,11 @@ function OrderScreen({ match, history }) {
                                         <ListGroup.Item>
                                             {loadingPay && <Loader />}
 
-                                            {!sdkReady ? (
-                                                <Loader />
-                                            ) : (
-                                                    // <PayPalButton
-                                                    //     amount={order.totalPrice}
-                                                    //     onSuccess={successPaymentHandler}
-                                                    // />
-                                                    <></> // TODO: Will use Stripe anyways
-                                                )}
                                         </ListGroup.Item>
                                     )}
                                 </ListGroup>
                                 {loadingDeliver && <Loader />}
-                                {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                                {user && user.isAdmin && order.isPaid && !order.isDelivered && (
                                     <ListGroup.Item>
                                         <Button
                                             type='button'
@@ -218,5 +163,3 @@ function OrderScreen({ match, history }) {
                 </div>
             )
 }
-
-export default OrderScreen

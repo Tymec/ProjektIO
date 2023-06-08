@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Form, Button, Row, Col, Table } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import { getUserDetails, updateUserProfile } from '../actions/userActions'
-import { USER_UPDATE_PROFILE_RESET } from '../constants/userConstants'
-import { listMyOrders } from '../actions/orderActions'
-import { useUpdateUserMutation } from '../features/user'
+import { Loader, Message } from '../components'
+import { useUpdateUserMutation, useMyOrdersQuery } from '../features'
 import { useSelector } from 'react-redux'
-import { useMyOrdersQuery } from '../features/order'
+import { useNavigate } from 'react-router-dom'
 
-function ProfileScreen({ history }) {
+export default function ProfilePage() {
+    const navigate = useNavigate()
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -19,16 +17,16 @@ function ProfileScreen({ history }) {
     const { user } = useSelector((state) => state.userState);
 
     const [updateUser, { isLoading: isUserLoading, isError: isUserError, error: userError }] = useUpdateUserMutation();
-    const {data: orders, isLoading: isOrdersLoading, isSuccess: isOrdersSuccess, isError: isOrdersError, error: ordersError, refetch: ordersRefetch } = useMyOrdersQuery({});
+    const {data: orders, isLoading: isOrdersLoading, isError: isOrdersError, error: ordersError, refetch: ordersRefetch } = useMyOrdersQuery({});
 
     useEffect(() => {
         if (!user) {
-            history.push('/login')
+            navigate('/login')
         } else {
             setEmail(user.email)
             ordersRefetch()
         }
-    }, [history, user])
+    }, [user])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -51,7 +49,7 @@ function ProfileScreen({ history }) {
                 <h2>User Profile</h2>
 
                 {message && <Message variant='danger'>{message}</Message>}
-                {isUserError && <Message variant='danger'>{userError}</Message>}
+                {isUserError && <Message variant='danger'>{userError.data?.detail || "Error"}</Message>}
                 {isUserLoading && <Loader />}
                 <Form onSubmit={submitHandler}>
                     <Form.Group controlId='name'>
@@ -115,7 +113,7 @@ function ProfileScreen({ history }) {
                 {isOrdersLoading ? (
                     <Loader />
                 ) : isOrdersError ? (
-                    <Message variant='danger'>{ordersError}</Message>
+                    <Message variant='danger'>{ordersError.data?.detail || "Error"}</Message>
                 ) : (
                             <Table striped responsive className='table-sm'>
                                 <thead>
@@ -152,5 +150,3 @@ function ProfileScreen({ history }) {
         </Row>
     )
 }
-
-export default ProfileScreen

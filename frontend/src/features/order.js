@@ -1,7 +1,6 @@
 import { api } from './api'
 
 export const orderApi = api.injectEndpoints({
-    tagTypes: ['Order'],
     endpoints: build => ({
         listOrders: build.query({
             query: params => ({
@@ -16,23 +15,32 @@ export const orderApi = api.injectEndpoints({
                 page: response.pagination.page,
                 pages: response.pagination.pages
             }),
-            providesTags: ['Order']
+            providesTags: (result) => result
+            ? [...result.orders.map(({ _id: id }) => ({ type: 'Order', id })), 'Order']
+            : ['Order'],
         }),
         myOrders: build.query({
-            query: params => ({
+            query: () => ({
                 url: "/orders/me/"
             }),
+            providesTags: (result) => result
+            ? [...result.map(({ _id: id }) => ({ type: 'Order', id })), 'Order']
+            : ['Order'],
         }),
         getOrder: build.query({
             query: orderId => `/orders/${orderId}/`,
-            providesTags: ['Order']
+            providesTags: (result) => result
+            ? [{ type: 'Order', id: result._id }, 'Order']
+            : ['Order'],
         }),
         deleteOrder: build.mutation({
             query: orderId => ({
                 url: `/orders/${orderId}/`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['Order']
+            invalidatesTags: (result) => result
+            ? [{ type: 'Order', id: result._id }, 'Order']
+            : ['Order'],
         }),
         createOrder: build.mutation({
             query: newOrder => ({
@@ -40,7 +48,9 @@ export const orderApi = api.injectEndpoints({
                 method: 'POST',
                 body: newOrder
             }),
-            invalidatesTags: ['Order']
+            invalidatesTags: (result) => result
+            ? [{ type: 'Order', id: result._id }, 'Order']
+            : ['Order'],
         }),
         updateOrder: build.mutation({
             query: updatedOrder => ({
@@ -48,14 +58,18 @@ export const orderApi = api.injectEndpoints({
                 method: 'PUT',
                 body: updatedOrder
             }),
-            invalidatesTags: ['Order']
+            invalidatesTags: (result) => result
+            ? [{ type: 'Order', id: result._id }, 'Order']
+            : ['Order'],
         }),
         deliverOrder: build.mutation({
             query: orderId => ({
                 url: `/orders/${orderId}/deliver/`,
                 method: 'PUT',
             }),
-            invalidatesTags: ['Order']
+            invalidatesTags: (result) => result
+            ? [{ type: 'Order', id: result._id }, 'Order']
+            : ['Order'],
         }),
         payOrder: build.mutation({
             query: (orderId, paymentResult) => ({
@@ -63,7 +77,9 @@ export const orderApi = api.injectEndpoints({
                 method: 'PUT',
                 body: paymentResult
             }),
-            invalidatesTags: ['Order']
+            invalidatesTags: (result) => result
+            ? [{ type: 'Order', id: result._id }, 'Order']
+            : ['Order'],
         }),
     })
 })

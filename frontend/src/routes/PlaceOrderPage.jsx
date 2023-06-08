@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import Message from '../components/Message'
-import CheckoutSteps from '../components/CheckoutSteps'
-import { createOrder } from '../actions/orderActions'
-import { ORDER_CREATE_RESET } from '../constants/orderConstants'
+import { Message, CheckoutSteps } from '../components'
 
-function PlaceOrderScreen({ history }) {
+export default function PlaceOrderPage() {
+    const navigate = useNavigate()
 
     const orderCreate = useSelector(state => state.orderCreate)
     const { order, error, success } = orderCreate
@@ -24,13 +22,12 @@ function PlaceOrderScreen({ history }) {
 
 
     if (!cart.paymentMethod) {
-        history.push('/payment')
+        navigate('/payment')
     }
 
     useEffect(() => {
         if (success) {
-            history.push(`/order/${order._id}`)
-            dispatch({ type: ORDER_CREATE_RESET })
+            navigate(`/order/${order._id}`)
         }
     }, [success, history, dispatch, order])
 
@@ -162,5 +159,3 @@ function PlaceOrderScreen({ history }) {
         </div>
     )
 }
-
-export default PlaceOrderScreen

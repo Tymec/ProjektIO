@@ -1,7 +1,6 @@
 import { api } from './api'
 
 export const reviewApi = api.injectEndpoints({
-    tagTypes: ['Review'],
     endpoints: build => ({
         listReviews: build.query({
             query: params => ({
@@ -16,18 +15,24 @@ export const reviewApi = api.injectEndpoints({
                 page: response.pagination.page,
                 pages: response.pagination.pages
             }),
-            providesTags: ['Review']
+            providesTags: (result) => result
+            ? [...result.reviews.map(({ _id: id }) => ({ type: 'Review', id })), 'Review']
+            : ['Review'],
         }),
         getReview: build.query({
             query: reviewId => `/reviews/${reviewId}/`,
-            providesTags: ['Review']
+            providesTags: (result) => result
+            ? [{ type: 'Review', id: result._id }, 'Review']
+            : ['Review'],
         }),
         deleteReview: build.mutation({
             query: reviewId => ({
                 url: `/reviews/${reviewId}/`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['Review']
+            invalidatesTags: (result) => result
+            ? [{ type: 'Review', id: result._id }, 'Review']
+            : ['Review'],
         }),
         createReview: build.mutation({
             query: newReview => ({
@@ -35,7 +40,9 @@ export const reviewApi = api.injectEndpoints({
                 method: 'POST',
                 body: newReview
             }),
-            invalidatesTags: ['Review']
+            invalidatesTags: (result) => result
+            ? [{ type: 'Review', id: result._id }, 'Review']
+            : ['Review'],
         }),
         updateReview: build.mutation({
             query: updatedReview => ({
@@ -43,7 +50,9 @@ export const reviewApi = api.injectEndpoints({
                 method: 'PUT',
                 body: updatedReview
             }),
-            invalidatesTags: ['Review']
+            invalidatesTags: (result) => result
+            ? [{ type: 'Review', id: result._id }, 'Review']
+            : ['Review'],
         }),
     })
 })

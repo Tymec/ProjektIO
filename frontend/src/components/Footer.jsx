@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Container, Row, Col, Form, Button } from 'react-bootstrap'
+import { useRegisterNewsletterMutation } from '../features'
 
 function Footer() {
   const [email, setEmail] = useState('')
+  const [registerNewsletter, { isSuccess, isError }] = useRegisterNewsletterMutation()
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Here, you can add the code to send the email address to your database
-    console.log(email)
+    registerNewsletter(email)
     setEmail('')
   }
 
@@ -21,8 +22,8 @@ function Footer() {
                 <Form.Label></Form.Label>
                 <Form.Control type="email" placeholder="Newsletter" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </Form.Group>
-              <Button variant="primary" type="submit" block>
-                Subscribe
+              <Button variant={isSuccess ? 'success' : isError ? 'danger' : 'primary'} type="submit" block disabled={isSuccess || isError}>
+                {isSuccess ? 'Subscribed' : isError ? 'Error' : 'Subscribe'}
               </Button>
             </Form>
           </Col>

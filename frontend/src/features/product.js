@@ -7,37 +7,53 @@ export const productApi = api.injectEndpoints({
                 url: "/products/?" + new URLSearchParams({
                     search: params?.keyword || '',
                     ordering: `${(params?.asc || false) ? '' : '-'}${params?.orderBy || 'rating'}`,
-                    page: params?.page || 1
+                    page: params?.page || 1,
+                    ids: params?.ids || '',
                 })
             }),
             transformResponse: response => ({
                 products: response.results,
                 page: response.pagination.page,
                 pages: response.pagination.pages
-            })
+            }),
+            providesTags: (result) => result
+            ? [...result.products.map(({ _id: id }) => ({ type: 'Product', id })), 'Product']
+            : ['Product'],
         }),
         getProduct: build.query({
-            query: productId => `/products/${productId}/`
+            query: productId => `/products/${productId}/`,
+            providesTags: (result) => result
+            ? [{ type: 'Product', id: result._id }, 'Product']
+            : ['Product'],
         }),
         deleteProduct: build.mutation({
             query: productId => ({
                 url: `/products/${productId}/`,
                 method: 'DELETE',
-            })
+            }),
+            invalidatesTags: (result) => result
+            ? [{ type: 'Product', id: result._id }, 'Product']
+            : ['Product'],
         }),
         createProduct: build.mutation({
             query: newProduct => ({
                 url: `/products/`,
                 method: 'POST',
                 body: newProduct
-            })
+            }),
+            invalidatesTags: (result) => result
+            ? [{ type: 'Product', id: result._id }, 'Product']
+            : ['Product'],
         }),
         updateProduct: build.mutation({
             query: updatedProduct => ({
                 url: `/products/${updatedProduct._id}/`,
                 method: 'PUT',
                 body: updatedProduct
-            })
+            }),
+            invalidatesTags: (result) => result
+            ? [{ type: 'Product', id: result._id }, 'Product']
+            : ['Product'],
         }),
     })
 })

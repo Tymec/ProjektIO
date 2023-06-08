@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import FormContainer from '../components/FormContainer'
-import { useLoginMutation } from '../features/user'
+import { Loader, Message, FormContainer } from '../components'
+import { useLoginMutation } from '../features'
 
-function LoginScreen({ location, history }) {
+export default function LoginPage() {
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const redirect = location.search ? location.search.split('=')[1] : '/'
-
+    const redirect = searchParams.get('redirect') || '/'
     const [loginUser, { isLoading, isSuccess, isError, error }] = useLoginMutation();
 
     useEffect(() => {
         if (isSuccess) {
-            history.push(redirect)
+            navigate(redirect)
         }
-    }, [history, isSuccess, redirect])
+    }, [isSuccess, redirect])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -28,10 +27,9 @@ function LoginScreen({ location, history }) {
     return (
         <FormContainer>
             <h1>Sign In</h1>
-            {isError && <Message variant='danger'>{error}</Message>}
+            {isError && <Message variant='danger'>{error.data?.detail || "Login error"}</Message>}
             {isLoading && <Loader />}
             <Form onSubmit={submitHandler}>
-
                 <Form.Group controlId='email'>
                     <Form.Label>Email Address</Form.Label>
                     <Form.Control
@@ -43,7 +41,6 @@ function LoginScreen({ location, history }) {
                     >
                     </Form.Control>
                 </Form.Group>
-
 
                 <Form.Group controlId='password'>
                     <Form.Label>Password</Form.Label>
@@ -74,5 +71,3 @@ function LoginScreen({ location, history }) {
         </FormContainer>
     )
 }
-
-export default LoginScreen

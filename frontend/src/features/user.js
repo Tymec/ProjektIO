@@ -17,7 +17,7 @@ export const userSlice = createSlice({
             }
             localStorage.setItem('user', JSON.stringify(state.user))
         },
-        logout: (state, action) => {
+        logout: (state) => {
             state.user = null
             localStorage.removeItem('user')
         }
@@ -38,7 +38,9 @@ export const userApi = api.injectEndpoints({
                 try {
                     const { data } = await queryFulfilled;
                     dispatch(setUser(data));
-                } catch (error) {}
+                } catch (error) {
+                    console.error(error)
+                }
             },
         }),
         register: build.mutation({
@@ -51,24 +53,36 @@ export const userApi = api.injectEndpoints({
                 try {
                     const { data } = await queryFulfilled;
                     dispatch(setUser(data));
-                } catch (error) {}
-            }
+                } catch (error) {
+                    console.log(error)
+                }
+            },
+            invalidatesTags: ['User']
         }),
         getUser: build.query({
-            query: userId => `/users/${userId}/`
+            query: userId => `/users/${userId}/`,
+            providesTags: (result) => result
+            ? [{ type: 'User', id: result._id }, 'User']
+            : ['User'],
         }),
         updateUser: build.mutation({
             query: updatedUser => ({
                 url: `/users/${updatedUser._id}/`,
                 method: 'PUT',
                 body: updatedUser
-            })
+            }),
+            invalidatesTags: (result) => result
+            ? [{ type: 'User', id: result._id }, 'User']
+            : ['User'],
         }),
         deleteUser: build.mutation({
             query: userId => ({
                 url: `/users/${userId}/`,
                 method: 'DELETE',
-            })
+            }),
+            invalidatesTags: (result) => result
+            ? [{ type: 'User', id: result._id }, 'User']
+            : ['User'],
         }),
         listUsers: build.query({
             query: page => `/users/?page=${page}`,
@@ -76,7 +90,10 @@ export const userApi = api.injectEndpoints({
                 users: response.results,
                 page: response.pagination.page,
                 pages: response.pagination.pages
-            })
+            }),
+            providesTags: (result) => result
+            ? [...result.users.map(({ _id: id }) => ({ type: 'User', id })), 'User']
+            : ['User'],
         })
     })
 })

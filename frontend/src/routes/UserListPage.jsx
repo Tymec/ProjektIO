@@ -1,28 +1,28 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import Paginate from '../components/Paginate'
-import queryString from 'query-string';
-import { useListUsersQuery, useDeleteUserMutation } from '../features/user'
+import { Loader, Message, Paginate } from '../components'
+import { useListUsersQuery, useDeleteUserMutation } from '../features'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
-function UserListScreen({ history }) {
-    const { page = 1 } = queryString.parse(history.location.search)
+export default function UserListPage() {
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+    const page = searchParams.get('page') || 1
 
     const { data, isLoading, isError, error, refetch } = useListUsersQuery(page)
     const { user } = useSelector(state => state.userState)
-    const [deleteUser, { isLoading: isLoadingDelete, isError: isErrorDelete, error: errorDelete, isSuccess: successDelete }] = useDeleteUserMutation()
+    const [deleteUser, { isSuccess: successDelete }] = useDeleteUserMutation()
 
     useEffect(() => {
         if (!(user && user.isAdmin)) {
-            history.push('/login')
+            navigate('/login')
         }
         if (successDelete) {
             refetch()
         }
-    }, [history, user, successDelete])
+    }, [user, successDelete])
 
     const deleteHandler = (id) => {
         if (window.confirm('Are you sure you want to delete this user?')) {
@@ -36,7 +36,7 @@ function UserListScreen({ history }) {
             {isLoading
                 ? (<Loader />)
                 : isError
-                    ? (<Message variant='danger'>{error}</Message>)
+                    ? (<Message variant='danger'>{error.data?.detail || "Error"}</Message>)
                     : (
                         <div>
                             <Table striped bordered hover responsive className='table-sm'>
@@ -83,5 +83,3 @@ function UserListScreen({ history }) {
         </div>
     )
 }
-
-export default UserListScreen
