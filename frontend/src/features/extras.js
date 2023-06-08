@@ -23,3 +23,4 @@ export const {
     useRegisterNewsletterMutation,
     useChatMutation,
 } = extrasApi
+
