@@ -37,7 +37,7 @@ export default function ProductListPage() {
     const createProductHandler = () => {
         createProduct({
             "name": "Sample name",
-            "category": "Sample category",
+                "category": "Sample category",
             "brand": "Sample brand",
             "price": 0,
         })
