@@ -38,11 +38,12 @@ export const userApi = api.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
+          if (data?.detail) throw new Error({ error: data.detail });
           dispatch(setUser(data));
         } catch (error) {
           console.error(error);
         }
-      }
+      },
     }),
     register: build.mutation({
       query: (authData) => ({
@@ -55,7 +56,7 @@ export const userApi = api.injectEndpoints({
           const { data } = await queryFulfilled;
           dispatch(setUser(data));
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       },
       invalidatesTags: ['User']

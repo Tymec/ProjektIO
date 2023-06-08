@@ -14,12 +14,11 @@ export default function LoginPage() {
   const redirect = searchParams.get('redirect') || '/';
   const [loginUser, { data: loginData, isLoading, isSuccess, isError, error }] = useLoginMutation();
 
-  console.log(loginData)
 
   useEffect(() => {
-    // FIX: if user is invalid, redirect to login page
     if (isSuccess) {
-      navigate(redirect);
+      console.log(loginData)
+      //navigate(redirect);
     }
   }, [isSuccess, redirect]);
 

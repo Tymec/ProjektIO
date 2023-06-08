@@ -13,8 +13,8 @@ export const api = createApi({
     validateStatus: (response) => {
       // if unauthorized, logout user
       if (response.status === 401) {
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+        //localStorage.removeItem('user');
+        //window.location.href = '/login';
       }
       return response.status < 500;
     }
