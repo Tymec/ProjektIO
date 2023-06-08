@@ -6,7 +6,6 @@ import { logout } from '../features/user'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 
-
 function Header() {
     const dispatch = useDispatch();
     const {user} = useSelector((state) => state.userState);
@@ -15,9 +14,19 @@ function Header() {
         dispatch(logout())
     }
 
+    const themeChangeHandler = () => {
+       
+        const currentTheme = document.getElementById('theme-link').getAttribute('href');
+
+        if (currentTheme === 'bootstrap.min.css') {
+            document.getElementById('theme-link').setAttribute('href', 'bootstrap2.min.css');
+        } else {
+            document.getElementById('theme-link').setAttribute('href', 'bootstrap.min.css');
+        }
+    }
+
     return (
         <header>
-
             <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
                 <Container>
                     <LinkContainer to='/'>
@@ -30,7 +39,7 @@ function Header() {
                         <Nav className="ml-auto">
 
                             <LinkContainer to='/cart'>
-                                <Nav.Link ><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
+                                <Nav.Link><i className="fas fa-shopping-cart"></i>Cart</Nav.Link>
                             </LinkContainer>
 
                             {user ? (
@@ -40,14 +49,12 @@ function Header() {
                                     </LinkContainer>
 
                                     <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
-
                                 </NavDropdown>
                             ) : (
-                                    <LinkContainer to='/login'>
-                                        <Nav.Link><i className="fas fa-user"></i>Login</Nav.Link>
-                                    </LinkContainer>
-                                )}
-
+                                <LinkContainer to='/login'>
+                                    <Nav.Link><i className="fas fa-user"></i>Login</Nav.Link>
+                                </LinkContainer>
+                            )}
 
                             {user && user.isAdmin && (
                                 <NavDropdown title='Admin' id='adminmenue'>
@@ -62,10 +69,10 @@ function Header() {
                                     <LinkContainer to='/admin/orderlist'>
                                         <NavDropdown.Item>Orders</NavDropdown.Item>
                                     </LinkContainer>
-
                                 </NavDropdown>
                             )}
 
+                            <Nav.Link onClick={themeChangeHandler}><i className="fas fa-palette"></i></Nav.Link>
 
                         </Nav>
                     </Navbar.Collapse>

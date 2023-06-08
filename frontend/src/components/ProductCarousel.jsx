@@ -25,7 +25,6 @@ function ProductCarousel() {
                     ))}
                 </Carousel>
             )
-
     )
 }
 
