@@ -15,15 +15,13 @@ function Header() {
     }
 
     const themeChangeHandler = () => {
-       
-        const currentTheme = document.getElementById('theme-link').getAttribute('href');
-
-        if (currentTheme === 'bootstrap.min.css') {
-            document.getElementById('theme-link').setAttribute('href', 'bootstrap2.min.css');
-        } else {
-            document.getElementById('theme-link').setAttribute('href', 'bootstrap.min.css');
-        }
+        const link1 = document.getElementById('theme-link-1');
+        const link2 = document.getElementById('theme-link-2');
+        
+        link1.disabled = !link1.disabled;
+        link2.disabled = !link2.disabled;
     }
+    
 
     return (
         <header>
