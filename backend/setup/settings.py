@@ -62,6 +62,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.cache.UpdateCacheMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
     # "app.middlewares.DebugRequestsMiddleware",
 ]
 
@@ -172,6 +175,19 @@ else:
     }
 
 STATICFILES_DIRS = [BASE_DIR / STATIC_LOCATION]
+
+
+### Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 5 * 60
+CACHE_MIDDLEWARE_KEY_PREFIX = ""
+
 
 ### Default primary key field type
 ### https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

@@ -12,7 +12,6 @@ from .serializers import (
 )
 
 
-# Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
     """
     User view.
@@ -43,6 +42,9 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.request.user
 
         return super().get_object()
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
