@@ -185,7 +185,7 @@ GRAPH_MODELS = {"all_applications": True, "group_models": True}
 ### REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "app.backends.NumberedPaginationBackend",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 12,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
@@ -227,11 +227,11 @@ SIMPLE_JWT = {
 
 ### CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:5173",
     "http://localhost:8000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:5173",
     "http://localhost:8000",
 ]
