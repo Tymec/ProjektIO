@@ -1,18 +1,20 @@
 import React from 'react';
 import { Col, Dropdown, Row } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { Loader, Message, Paginate, Product, ProductCarousel } from '../components';
 import { useListProductsQuery } from '../features';
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const page = searchParams.get('page') || 1;
+  const orderBy = searchParams.get('orderBy') || 'createdAt';
   const { data, isLoading, isFetching, isError, error } = useListProductsQuery({
     keyword: search,
     page,
-    orderBy: 'createdAt'
+    orderBy
   });
 
   const sortOptions = [
@@ -22,11 +24,14 @@ export default function HomePage() {
     {name: 'Name', value: 'name'},
     {name: 'Number of Reviews', value: 'numReviews'},
     {name: 'Count in Stock', value: 'countInStock'}
-]
+  ]
 
-const handleSortChange = (value) => {
-  history.push(`/?${queryString.stringify({keyword: search, page, orderBy: value})}`)
-}
+  const handleSortChange = (value) => {
+    navigate({
+      pathname: '/',
+      search: `?search=${search}&page=${page}&orderBy=${value}`
+    })
+  }
 
   return (
     <div>
