@@ -33,24 +33,14 @@ class ProductSerializer(ModelSerializer):
         ret = super().to_representation(instance)
         ret["_id"] = str(ret["_id"])
         ret["user"] = str(ret["user"])
+        ret["price"] = float(ret["price"])
+        ret["rating"] = float(ret["rating"])
         return ret
 
     def get_reviews(self, obj):
         reviews = obj.review_set.all()
         serializer = ReviewSerializer(reviews, many=True)
         return serializer.data
-
-
-class OrderSerializer(ModelSerializer):
-    class Meta:
-        model = Order
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret["user"] = str(ret["user"])
-        ret["_id"] = str(ret["_id"])
-        return ret
 
 
 class OrderItemSerializer(ModelSerializer):
@@ -63,12 +53,11 @@ class OrderItemSerializer(ModelSerializer):
         ret["_id"] = str(ret["_id"])
         ret["product"] = str(ret["product"])
         ret["order"] = str(ret["order"])
+        ret["price"] = float(ret["price"])
         return ret
 
 
 class ShippingAddressSerializer(ModelSerializer):
-    order = OrderSerializer(read_only=True)
-
     class Meta:
         model = ShippingAddress
         fields = "__all__"
@@ -76,4 +65,35 @@ class ShippingAddressSerializer(ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret["_id"] = str(ret["_id"])
+        ret["shippingPrice"] = float(ret["shippingPrice"])
         return ret
+
+
+class OrderSerializer(ModelSerializer):
+    orderItems = SerializerMethodField(read_only=True)
+    shippingAddress = SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret["user"] = str(ret["user"])
+        ret["_id"] = str(ret["_id"])
+        ret["taxPrice"] = float(ret["taxPrice"])
+        ret["shippingPrice"] = float(ret["shippingPrice"])
+        ret["totalPrice"] = float(ret["totalPrice"])
+        return ret
+
+    def get_orderItems(self, obj):
+        items = obj.orderitem_set.all()
+        serializer = OrderItemSerializer(items, many=True)
+        return serializer.data
+
+    def get_shippingAddress(self, obj):
+        try:
+            address = ShippingAddressSerializer(obj.shippingaddress, many=False).data
+        except:
+            address = False
+        return address

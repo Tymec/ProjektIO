@@ -12,7 +12,6 @@ from .serializers import (
 )
 
 
-# Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
     """
     User view.
@@ -44,6 +43,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return super().get_object()
 
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -73,8 +75,8 @@ def register(request):
 
     user = User.objects.create_user(
         email=data["email"],
-        first_name=data["first_name"],
-        last_name=data["last_name"],
+        first_name=data["firstName"],
+        last_name=data["lastName"],
         password=data["password"],
     )
 
