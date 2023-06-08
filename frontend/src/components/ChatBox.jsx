@@ -15,10 +15,12 @@ const ChatBox = () => {
         setMessage(event.target.value);
     };
 
+
+    //const [useChatMutation, {isLoading, isFetching, isSuccess, isError, error}] = useChatMutation(); 
     // wrap handleFormSubmit in useCallback to prevent infinite loop
     const handleFormSubmit = useCallback(async (event) => {
         event.preventDefault();
-        if (message.trim()) {
+        if (message.trim()) {``
             setChatHistory((prevChatHistory) => [
                 ...prevChatHistory,
                 { text: message, sender: "User" },
@@ -31,7 +33,7 @@ const ChatBox = () => {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer YOUR_OPENAI_API_KEY`,
+                        Authorization: `Bearer OPENAI_API_KEY`,
                     },
                 })
                 .then(async res => setChatHistory((prevChatHistory) => [
