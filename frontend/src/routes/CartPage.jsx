@@ -1,17 +1,14 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Row, Col, ListGroup, Image, Form, Button, Card } from 'react-bootstrap'
-import Message from '../components/Message'
-import { addToCart, removeFromCart } from '../features/cart'
-import { useListProductsQuery } from '../features/product'
-import Paginate from '../components/Paginate'
-import queryString from 'query-string'
-import Loader from '../components/Loader'
+import { addToCart, removeFromCart, useListProductsQuery } from '../features'
+import { Message, Paginate, Loader } from '../components'
 
-function CartScreen({ history }) {
+export default function CartPage() {
     const dispatch = useDispatch()
-    const {page = 1} = queryString.parse(history.location.search)
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+    const page = searchParams.get('page') || 1
 
     const cart = useSelector(state => state.cartState)
     const cardIds = cart.items.map(item => item.id)
@@ -22,7 +19,10 @@ function CartScreen({ history }) {
     }
 
     const checkoutHandler = async () => {
-        history.push('/login?redirect=shipping')
+        navigate({
+            pathname: '/login',
+            search: 'redirect=shipping'
+        })
     }
 
     return (
@@ -81,7 +81,7 @@ function CartScreen({ history }) {
                                     </Row>
                                 </ListGroup.Item>
                             ))}
-                            <Paginate page={data.page} pages={data.pages} path="/cart?" />
+                            <Paginate page={data.page} pages={data.pages} path="/cart" />
                         </ListGroup>
 
                     )}
@@ -123,5 +123,3 @@ function CartScreen({ history }) {
         </Row>
     )
 }
-
-export default CartScreen

@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import Message from '../components/Message'
-import Loader from '../components/Loader'
-import { useGetOrderQuery } from '../features/order'
+import { Message, Loader } from '../components'
+import { useGetOrderQuery } from '../features'
 
 
-function OrderScreen({ match, history }) {
-    const orderId = match.params.id
+export default function OrderPage() {
+    const navigate = useNavigate()
+    const { orderId } = useParams()
 
     const { user } = useSelector(state => state.userState)
     const { data: order, isLoading, isError, error } = useGetOrderQuery(orderId)
@@ -19,9 +19,9 @@ function OrderScreen({ match, history }) {
 
     useEffect(() => {
         if (!user) {
-            history.push('/login')
+            navigate('/login')
         }
-    }, [history, user])
+    }, [user])
 
     const deliverHandler = () => {}
 
@@ -163,5 +163,3 @@ function OrderScreen({ match, history }) {
                 </div>
             )
 }
-
-export default OrderScreen

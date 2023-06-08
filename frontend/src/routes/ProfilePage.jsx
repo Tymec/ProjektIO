@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Form, Button, Row, Col, Table } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import { useUpdateUserMutation } from '../features/user'
+import { Loader, Message } from '../components'
+import { useUpdateUserMutation, useMyOrdersQuery } from '../features'
 import { useSelector } from 'react-redux'
-import { useMyOrdersQuery } from '../features/order'
+import { useNavigate } from 'react-router-dom'
 
-function ProfileScreen({ history }) {
+export default function ProfilePage() {
+    const navigate = useNavigate()
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -20,12 +21,12 @@ function ProfileScreen({ history }) {
 
     useEffect(() => {
         if (!user) {
-            history.push('/login')
+            navigate('/login')
         } else {
             setEmail(user.email)
             ordersRefetch()
         }
-    }, [history, user])
+    }, [user])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -149,5 +150,3 @@ function ProfileScreen({ history }) {
         </Row>
     )
 }
-
-export default ProfileScreen

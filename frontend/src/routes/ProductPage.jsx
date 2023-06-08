@@ -1,31 +1,30 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Row, Col, Image, ListGroup, Button, Card, Form } from 'react-bootstrap'
-import Rating from '../components/Rating'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import {useGetProductQuery} from '../features/product'
-import {useCreateReviewMutation} from '../features/review'
-import { addToCart } from '../features/cart'
+import { Rating, Loader, Message } from '../components'
+import { useGetProductQuery, useCreateReviewMutation, addToCart } from '../features'
 
 
-function ProductScreen({ match, history }) {
+export default function ProductPage() {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const { productId } = useParams()
 
     const [qty, setQty] = useState(1)
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
     const [status, setStatus] = useState(false)
 
-    const { data: product, isLoading, isError, error, refetch } = useGetProductQuery(match.params.id)
+    const { data: product, isLoading, isError, error, refetch } = useGetProductQuery(productId)
     const { user } = useSelector(state => state.userState);
 
     const [createReview, {isLoading: isReviewLoading, isError: isReviewError, isSuccess: isReviewSuccess, error: reviewError}] = useCreateReviewMutation()
 
     const addToCartHandler = () => {
         dispatch(addToCart({id: product._id, qty, increment: true}))
-        history.push(`/cart`)
+        navigate(`/cart`)
     }
 
     const buyNowHandler = async () => {
@@ -35,7 +34,7 @@ function ProductScreen({ match, history }) {
 
     const submitHandler = (e) => {
         e.preventDefault()
-        createReview({product: match.params.id, rating, comment, name: user.name})
+        createReview({product: productId, rating, comment, name: user.name})
     }
 
     useEffect(() => {
@@ -232,5 +231,3 @@ function ProductScreen({ match, history }) {
         </div >
     )
 }
-
-export default ProductScreen

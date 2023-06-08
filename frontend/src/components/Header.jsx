@@ -1,10 +1,8 @@
-import React from 'react'
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
 import SearchBox from './SearchBox'
-import { logout } from '../features/user'
-import { useSelector } from 'react-redux'
-import { useDispatch } from 'react-redux'
+import { logout } from '../features'
+import { useSelector, useDispatch } from 'react-redux'
 
 
 function Header() {

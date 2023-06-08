@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import FormContainer from '../components/FormContainer'
-import {useRegisterMutation} from '../features/user'
+import { Loader, Message, FormContainer } from '../components'
+import {useRegisterMutation} from '../features'
 
-function RegisterScreen({ location, history }) {
+export default function RegisterPage() {
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
@@ -15,15 +15,15 @@ function RegisterScreen({ location, history }) {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [message, setMessage] = useState('')
 
-    const redirect = location.search ? location.search.split('=')[1] : '/'
+    const redirect = searchParams.get('redirect') || '/'
 
-    const [register, {data: user, isLoading, isError, isSuccess, error}] = useRegisterMutation()
+    const [register, {data: user, isLoading, isError, error}] = useRegisterMutation()
 
     useEffect(() => {
         if (user) {
-            history.push(redirect)
+            navigate(redirect)
         }
-    }, [history, user, redirect])
+    }, [user, redirect])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -124,5 +124,3 @@ function RegisterScreen({ location, history }) {
         </FormContainer >
     )
 }
-
-export default RegisterScreen

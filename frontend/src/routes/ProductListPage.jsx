@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button, Row, Col } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import Paginate from '../components/Paginate'
-import queryString from 'query-string';
-import { useListProductsQuery, useDeleteProductMutation, useCreateProductMutation } from '../features/product'
+import { Loader, Message, Paginate } from '../components'
+import { useListProductsQuery, useDeleteProductMutation, useCreateProductMutation } from '../features'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
-function ProductListScreen({ history, match }) {
-    const { keyword = '', page = 1 } = queryString.parse(history.location.search)
+export default function ProductListPage() {
+    const navigate = useNavigate()
+
+    const [searchParams] = useSearchParams()
+    const keyword = searchParams.get('keyword') || ''
+    const page = searchParams.get('page') || 1
 
     const { data, isLoading, isError, error } = useListProductsQuery({ search: keyword, page, orderBy: 'createdAt' })
     const [deleteProduct, { isLoading: isLoadingDelete, isError: isErrorDelete, isSuccess: isSuccessDelete, error: errorDelete }] = useDeleteProductMutation()
@@ -18,11 +20,11 @@ function ProductListScreen({ history, match }) {
 
     useEffect(() => {
         if (!user.isAdmin) {
-            history.push('/login')
+            navigate('/login')
         }
 
         if (isSuccessCreate) {
-            history.push(`/admin/product/${dataCreate._id}/edit`)
+            navigate(`/admin/product/${dataCreate._id}/edit`)
         }
     }, [history, user, isSuccessCreate, dataCreate])
 
@@ -110,5 +112,3 @@ function ProductListScreen({ history, match }) {
         </div>
     )
 }
-
-export default ProductListScreen

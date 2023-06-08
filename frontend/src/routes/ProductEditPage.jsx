@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Form, Button } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import FormContainer from '../components/FormContainer'
 import { useGetProductQuery, useUpdateProductMutation } from '../features/product'
 
-function ProductEditScreen({ match, history }) {
+export default function ProductEditPage({ match, history }) {
     const productId = match.params.id
 
     const [name, setName] = useState('')
@@ -189,5 +188,3 @@ function ProductEditScreen({ match, history }) {
 
     )
 }
-
-export default ProductEditScreen

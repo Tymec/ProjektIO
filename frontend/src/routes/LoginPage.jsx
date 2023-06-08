@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Form, Button, Row, Col } from 'react-bootstrap'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import FormContainer from '../components/FormContainer'
-import { useLoginMutation } from '../features/user'
-import queryString from 'query-string';
+import { Loader, Message, FormContainer } from '../components'
+import { useLoginMutation } from '../features'
 
-function LoginScreen({ location, history }) {
+export default function LoginPage() {
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const { redirect = '/' } = queryString.parse(location.search)
+    const redirect = searchParams.get('redirect') || '/'
     const [loginUser, { isLoading, isSuccess, isError, error }] = useLoginMutation();
 
     useEffect(() => {
         if (isSuccess) {
-            history.push(redirect)
+            navigate(redirect)
         }
-    }, [history, isSuccess, redirect])
+    }, [isSuccess, redirect])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -72,5 +71,3 @@ function LoginScreen({ location, history }) {
         </FormContainer>
     )
 }
-
-export default LoginScreen

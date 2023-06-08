@@ -1,15 +1,16 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import Paginate from '../components/Paginate'
-import queryString from 'query-string';
-import { useListOrdersQuery } from '../features/order'
+import { Loader, Message, Paginate } from '../components'
+import { useListOrdersQuery } from '../features'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
-function OrderListScreen({ history }) {
-    const { page = 1 } = queryString.parse(history.location.search)
+export default function OrderListPage() {
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+
+    const page = searchParams.get('page') || 1
     const { data, isLoading, isError, error, refetch } = useListOrdersQuery({ page })
     const { user } = useSelector(state => state.userState)
 
@@ -17,10 +18,10 @@ function OrderListScreen({ history }) {
         if (user && user.isAdmin) {
             refetch()
         } else {
-            history.push('/login')
+            navigate('/login')
         }
 
-    }, [refetch, history, user])
+    }, [refetch, user])
 
     return (
         <div>
@@ -85,5 +86,3 @@ function OrderListScreen({ history }) {
         </div>
     )
 }
-
-export default OrderListScreen

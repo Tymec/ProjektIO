@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 
 const ChatBox = () => {

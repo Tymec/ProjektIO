@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Container, Row, Col, Form, Button } from 'react-bootstrap'
-import { useRegisterNewsletterMutation } from '../features/extras'
+import { useRegisterNewsletterMutation } from '../features'
 
 function Footer() {
   const [email, setEmail] = useState('')

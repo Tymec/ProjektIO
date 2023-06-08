@@ -1,16 +1,20 @@
 import React from 'react'
 import { Row, Col } from 'react-bootstrap'
-import Product from '../components/Product'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
-import Paginate from '../components/Paginate'
-import ProductCarousel from '../components/ProductCarousel'
-import queryString from 'query-string';
-import { useListProductsQuery } from '../features/product'
+import {
+    Product,
+    Loader,
+    Message,
+    Paginate,
+    ProductCarousel,
+} from '../components'
+import { useListProductsQuery } from '../features'
+import { useSearchParams } from 'react-router-dom'
 
 
-function HomeScreen({ history }) {
-    const {search = '', page = 1} = queryString.parse(history.location.search)
+export default function HomePage() {
+    const [searchParams] = useSearchParams()
+    const search = searchParams.get('search') || ''
+    const page = searchParams.get('page') || 1
     const { data, isLoading, isFetching, isError, error } = useListProductsQuery({keyword: search, page, orderBy: 'createdAt'})
 
     return (
@@ -29,11 +33,9 @@ function HomeScreen({ history }) {
                                 </Col>
                             ))}
                         </Row>
-                        <Paginate page={data.page} pages={data.pages} path={`/?search=${search}`} />
+                        <Paginate page={data.page} pages={data.pages} path="/" args={{ search }} />
                     </div>
             }
         </div>
     )
 }
-
-export default HomeScreen
