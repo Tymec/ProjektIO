@@ -32,7 +32,7 @@ function HomeScreen({ history }) {
             <h1>Our Prompts</h1>
 
             <Dropdown onSelect={handleSortChange}>
-                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                <Dropdown.Toggle variant="primary" id="dropdown-basic">
                     Sort By
                 </Dropdown.Toggle>
 
