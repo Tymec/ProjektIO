@@ -1,6 +1,6 @@
 import pytest
-
 from app.models import Product
+from django.core.cache import cache
 
 pytestmark = pytest.mark.django_db
 
@@ -23,3 +23,8 @@ def test_add_product(product_count):
 
     assert product.image.url == "/media/placeholder.png"
     assert product.name == "Test Product"
+
+
+def test_cache():
+    cache.set("test", "test")
+    assert cache.get("test") == "test"
