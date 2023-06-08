@@ -12,7 +12,7 @@ function ProductCarousel() {
         : isError
             ? <Message variant='danger'>{error}</Message>
             : (
-                <Carousel pause='hover' className='bg-dark'>
+                <Carousel pause='hover' className='bg-primary' style={{opacity : "0.95", transition: "all 0.3s ease-in-out"}} >
                     {data.products.map(product => (
                         <Carousel.Item key={product._id}>
                             <Link to={`/product/${product._id}`}>
