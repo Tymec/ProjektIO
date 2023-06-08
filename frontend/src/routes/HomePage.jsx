@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Dropdown, Row } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 
 import { Loader, Message, Paginate, Product, ProductCarousel } from '../components';
@@ -35,17 +35,15 @@ const handleSortChange = (value) => {
       <h1>Our Prompts</h1>
 
       <Dropdown onSelect={handleSortChange}>
-                <Dropdown.Toggle variant="primary" id="dropdown-basic">
-                    Sort By
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                    {sortOptions.map(option => (
-                        <Dropdown.Item href="#" eventKey={option.value}>{option.name}</Dropdown.Item>
-                    ))}
-                </Dropdown.Menu>
-        </Dropdown>
-
+        <Dropdown.Toggle variant="primary" id="dropdown-basic">
+          Sort By
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          {sortOptions.map(option => (
+            <Dropdown.Item href="#" eventKey={option.value} key={option.value}>{option.name}</Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
 
       {isLoading || isFetching ? (
         <Loader />
