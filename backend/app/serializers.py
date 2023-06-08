@@ -33,7 +33,6 @@ class ProductSerializer(ModelSerializer):
         ret = super().to_representation(instance)
         ret["_id"] = str(ret["_id"])
         ret["user"] = str(ret["user"])
-        ret["price"] = float(ret["price"])
         ret["rating"] = float(ret["rating"])
         return ret
 
@@ -44,6 +43,8 @@ class ProductSerializer(ModelSerializer):
 
 
 class OrderItemSerializer(ModelSerializer):
+    product = SerializerMethodField(read_only=True)
+
     class Meta:
         model = OrderItem
         fields = "__all__"
@@ -51,10 +52,13 @@ class OrderItemSerializer(ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret["_id"] = str(ret["_id"])
-        ret["product"] = str(ret["product"])
         ret["order"] = str(ret["order"])
-        ret["price"] = float(ret["price"])
         return ret
+
+    def get_product(self, obj):
+        product = obj.product
+        serializer = ProductSerializer(product, many=False)
+        return serializer.data
 
 
 class ShippingAddressSerializer(ModelSerializer):
@@ -65,7 +69,6 @@ class ShippingAddressSerializer(ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         ret["_id"] = str(ret["_id"])
-        ret["shippingPrice"] = float(ret["shippingPrice"])
         return ret
 
 
@@ -79,11 +82,9 @@ class OrderSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret["user"] = str(ret["user"])
         ret["_id"] = str(ret["_id"])
-        ret["taxPrice"] = float(ret["taxPrice"])
-        ret["shippingPrice"] = float(ret["shippingPrice"])
-        ret["totalPrice"] = float(ret["totalPrice"])
+        ret["user"] = str(ret["user"])
+        ret["sessionId"] = str(ret["sessionId"])
         return ret
 
     def get_orderItems(self, obj):
@@ -93,7 +94,7 @@ class OrderSerializer(ModelSerializer):
 
     def get_shippingAddress(self, obj):
         try:
-            address = ShippingAddressSerializer(obj.shippingaddress, many=False).data
+            address = ShippingAddressSerializer(obj.shippingAddress, many=False).data
         except:
             address = False
         return address
