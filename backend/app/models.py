@@ -46,7 +46,7 @@ class Review(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
-        return str(self.rating)
+        return f"{self.name} {self.rating} - {self.comment}"
 
 
 class ShippingAddress(models.Model):
@@ -59,7 +59,7 @@ class ShippingAddress(models.Model):
     country = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return str(self._id)
+        return f"{self.fullName} - {self.country}"
 
 
 class Order(models.Model):
@@ -106,7 +106,7 @@ class Order(models.Model):
     updatedAt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self._id)
+        return f"{self.user} - {self.createdAt} - {self.totalPrice}"
 
 
 class OrderItem(models.Model):
@@ -117,4 +117,4 @@ class OrderItem(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self._id)
+        return f"{self.order} - {self.quantity}"

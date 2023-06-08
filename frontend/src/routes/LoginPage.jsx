@@ -17,7 +17,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isSuccess) {
-      // FIXME: do not login if user does not exist
       navigate(redirect);
     }
   }, [isSuccess, redirect]);
