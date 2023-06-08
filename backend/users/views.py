@@ -75,8 +75,8 @@ def register(request):
 
     user = User.objects.create_user(
         email=data["email"],
-        first_name=data["first_name"],
-        last_name=data["last_name"],
+        first_name=data["firstName"],
+        last_name=data["lastName"],
         password=data["password"],
     )
 
