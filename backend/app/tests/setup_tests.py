@@ -1,6 +1,7 @@
 import pytest
-from app.models import Product
 from django.core.cache import cache
+
+from app.models import Product
 
 pytestmark = pytest.mark.django_db
 

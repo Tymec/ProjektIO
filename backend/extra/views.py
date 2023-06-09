@@ -1,4 +1,3 @@
-import os
 import re
 import smtplib
 import ssl
@@ -7,8 +6,6 @@ from base64 import b64decode
 from email.message import EmailMessage
 
 import openai
-from app.models import Product
-from app.serializers import ProductSerializer
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -17,6 +14,8 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+
+from app.models import Product
 
 from .models import ImageGeneration, NewsletterUser
 from .serializers import ImageGenerationSerializer
@@ -217,7 +216,7 @@ def newsletter_send(request):
 
     try:
         valid_html = bool(BeautifulSoup(content, "html.parser").find())
-    except:
+    except Exception:
         valid_html = False
 
     if not valid_html:

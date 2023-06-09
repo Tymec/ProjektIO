@@ -1,13 +1,14 @@
 from datetime import datetime, timezone
 
 import stripe
-from app.models import Order, OrderItem, Product, ShippingAddress
 from django.conf import settings
 from requests.models import PreparedRequest
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from app.models import Order, OrderItem, Product, ShippingAddress
 
 from .models import Customer
 from .serializers import CustomerSerializer
@@ -160,11 +161,11 @@ class StripeWebhookView(APIView):
             event = stripe.Webhook.construct_event(
                 payload, sig_header, settings.STRIPE_WH
             )
-        except ValueError as e:
+        except ValueError:
             # Invalid payload
             print("Invalid payload")
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        except stripe.error.SignatureVerificationError as e:
+        except stripe.error.SignatureVerificationError:
             # Invalid signature
             print("Invalid signature")
             return Response(status=status.HTTP_400_BAD_REQUEST)
