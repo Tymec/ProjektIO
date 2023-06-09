@@ -19,6 +19,7 @@ django-storages = "*"
 boto3 = "*"
 django-cors-headers = "*"
 django-money = "*"
+bs4 = "*"
 
 [dev-packages]
 black = "*"
