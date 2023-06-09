@@ -38,7 +38,6 @@ export const userApi = api.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          if (data?.detail) throw new Error({ error: data.detail });
           dispatch(setUser(data));
         } catch (error) {
           console.error(error);

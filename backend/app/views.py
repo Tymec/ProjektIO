@@ -77,10 +77,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["GET"])
     def hasUserBought(self, request, pk=None):
         if not request.user.is_authenticated:
-            return Response(
-                {"message": "You are not authorized to perform this action"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            return Response({"hasBought": False}, status=status.HTTP_200_OK)
 
         product = self.get_object()
         orders = Order.objects.filter(user=request.user)

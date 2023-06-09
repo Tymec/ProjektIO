@@ -10,14 +10,6 @@ export const api = createApi({
       }
       return headers;
     },
-    validateStatus: (response) => {
-      // if unauthorized, logout user
-      if (response.status === 401) {
-        //localStorage.removeItem('user');
-        //window.location.href = '/login';
-      }
-      return response.status < 500;
-    }
   }),
   tagTypes: ['Product', 'Order', 'Review', 'User'],
   endpoints: () => ({})

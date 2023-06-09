@@ -17,8 +17,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(loginData)
-      //navigate(redirect);
+      navigate(redirect);
     }
   }, [isSuccess, redirect]);
 

@@ -58,14 +58,14 @@ export default function ProductPage() {
   }, [isCheckoutSuccess, checkoutData, success, orderId, userBoughtSuccess]);
 
   const addToCartHandler = () => {
-    dispatch(addToCart({ id: product._id, qty, increment: true }));
+    dispatch(addToCart({ id: productId, qty, increment: true }));
     navigate(`/cart`);
   };
 
   const buyNowHandler = async () => {
     createCheckoutSession({
-      cartItems: [{ id: product._id, qty }],
-      path: `product/${product._id}`
+      cartItems: [{ id: productId, qty }],
+      path: `product/${productId}`
     });
   };
 
@@ -85,7 +85,7 @@ export default function ProductPage() {
     }
 
     setStatus(true);
-  }, [isReviewSuccess, refetch]);
+  }, [isReviewSuccess]);
 
   return (
     <div>
