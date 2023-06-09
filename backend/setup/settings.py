@@ -21,6 +21,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ENV = os.getenv("ENV", "development")
 CI = os.getenv("CI") == "1"
 USE_PIPENV = os.getenv("PIPENV_ACTIVE") == "1"
+SECRET_KEY = os.getenv("DJANGO_SECRET")
+STRIPE_SK = os.getenv("STRIPE_SK")
+STRIPE_WH = os.getenv("STRIPE_WH")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+SMTP_HOST = os.getenv("SMTP_HOST")
+SMTP_PORT = os.getenv("SMTP_PORT")
+SMTP_USER = os.getenv("SMTP_USER")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+FRONTNED_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 if not USE_PIPENV:
     print("Not using pipenv, manually loading .env file")
@@ -31,14 +40,8 @@ if not USE_PIPENV:
 
 ### Quick-start development settings - unsuitable for production
 ### See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-SECRET_KEY = os.getenv("DJANGO_SECRET")
-STRIPE_SK = os.getenv("STRIPE_SK")
-STRIPE_WH = os.getenv("STRIPE_WH")
 DEBUG = ENV == "development"
 ALLOWED_HOSTS = []
-
-
-### Custom definitions
 DEFAULT_CURRENCY = "USD"
 
 
@@ -57,6 +60,7 @@ INSTALLED_APPS = [
     "djmoney",
     "users",
     "payments",
+    "extra",
     "app",
 ]
 

@@ -191,3 +191,9 @@ pip-selfcheck.json
 
 ### VisualStudioCode ###
 .vscode
+
+
+### Media ###
+media/*
+!media/placeholder*
+static
