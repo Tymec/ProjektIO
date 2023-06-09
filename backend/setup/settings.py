@@ -40,6 +40,7 @@ ALLOWED_HOSTS = []
 
 ### Custom definitions
 DEFAULT_CURRENCY = "USD"
+FRONTNED_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 
 ### Application definition
