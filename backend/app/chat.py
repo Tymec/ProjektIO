@@ -1,3 +1,6 @@
+
+# trzeba podlaczyc
+
 import openai
 import os
 from django.shortcuts import render
