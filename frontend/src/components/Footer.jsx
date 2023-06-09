@@ -1,16 +1,35 @@
-import { useState } from 'react'
-import { Container, Row, Col, Form, Button } from 'react-bootstrap'
-import { useRegisterNewsletterMutation } from '../features'
+import { useEffect, useState } from 'react'
+import { Button, Col, Container, Form, Row } from 'react-bootstrap'
+
+import { useSubscribeNewsletterMutation } from '../features'
 
 function Footer() {
   const [email, setEmail] = useState('')
-  const [registerNewsletter, { isSuccess, isError }] = useRegisterNewsletterMutation()
+  const [blockButton, setBlockButton] = useState(false)
+  const [status, setStatus] = useState('Subscribe')
+  const [subscribe, { isSuccess, isError, error }] = useSubscribeNewsletterMutation()
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    registerNewsletter(email)
+    subscribe(email)
     setEmail('')
   }
+
+  useEffect(() => {
+    if (isError) {
+      setBlockButton(true)
+      setStatus(error.data?.detail || "Error")
+      setTimeout(() => {
+        setBlockButton(false)
+        setStatus('Subscribe')
+      }, 3000)
+    }
+
+    if (isSuccess) {
+      setBlockButton(true)
+      setStatus('Subscribed')
+    }
+  }, [isSuccess, isError])
 
   return (
     <footer>
@@ -22,8 +41,7 @@ function Footer() {
                 <Form.Label></Form.Label>
                 <Form.Control type="email" placeholder="Newsletter" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </Form.Group>
-              <Button variant={isSuccess ? 'success' : isError ? 'danger' : 'primary'} type="submit" block disabled={isSuccess || isError}>
-                {isSuccess ? 'Subscribed' : isError ? 'Error' : 'Subscribe'}
+              <Button variant={status === "Subscribed" ? 'success' : status === "Subscribe" ? 'primary' : 'danger'} type="submit" block disabled={blockButton}>{status}
               </Button>
             </Form>
           </Col>

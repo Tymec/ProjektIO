@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import ValidationError, validate_email
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -72,6 +73,14 @@ def register(request):
         )
     except User.DoesNotExist:
         pass
+
+    try:
+        validate_email(email)
+    except ValidationError as e:
+        return Response(
+            {"detail": "Please enter a valid email address."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     user = User.objects.create_user(
         email=data["email"],

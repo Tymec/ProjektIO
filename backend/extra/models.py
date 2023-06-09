@@ -21,3 +21,16 @@ class NewsletterUser(models.Model):
 
     def __str__(self):
         return f"[{'ACTIVE' if self.active else 'INACTIVE'}] {self.email}"
+
+
+class ChatConversationContext(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+    )
+    init_message = models.TextField(max_length=1000, blank=False)
+    context = models.JSONField(default=dict)
+    createdAt = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return init_message

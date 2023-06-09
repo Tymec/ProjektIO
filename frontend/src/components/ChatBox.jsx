@@ -1,11 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { skipToken } from '@reduxjs/toolkit/dist/query';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 
+import { Loader, Product, } from '../components';
+import { useChatMutation, useListProductsQuery } from '../features';
+
+
 const ChatBox = () => {
+  const [contextId, setContextId] = useState('')
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState([
+    { text: "Welcome to the chatbot, I will help you find the best product for you", sender: 'Bot' }
+  ]);
+  const [sendMessage, { data: chatData, isSuccess, isError, isLoading, error }] = useChatMutation()
   const chatBoxRef = useRef(null);
+
+  const [productIds, setProductIds] = useState(skipToken);
+  const { data, isSuccess: isProductsSuccess } = useListProductsQuery(productIds)
 
   const toggleChatBox = () => {
     setIsOpen(!isOpen);
@@ -15,38 +27,48 @@ const ChatBox = () => {
     setMessage(event.target.value);
   };
 
-  // wrap handleFormSubmit in useCallback to prevent infinite loop
-  const handleFormSubmit = useCallback(
-    async (event) => {
-      event.preventDefault();
-      if (message.trim()) {
-        setChatHistory((prevChatHistory) => [
-          ...prevChatHistory,
-          { text: message, sender: 'User' }
-        ]);
-        setMessage('');
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (message.trim()) {
+      setChatHistory((prevChatHistory) => [
+        ...prevChatHistory,
+        { text: message, sender: 'User' }
+      ]);
+      sendMessage({userMessage: message, contextId})
 
-        // Send the message to the GPT-3 API
-        try {
-          fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer YOUR_OPENAI_API_KEY`
-            }
-          }).then(async (res) =>
-            setChatHistory((prevChatHistory) => [
-              ...prevChatHistory,
-              { text: res.json().data.choices[0].text, sender: 'Bot' }
-            ])
-          );
-        } catch (error) {
-          console.error('There was an error in making the request: ', error);
-        }
+      setMessage('');
+    }
+  };
+
+  useEffect(() => {
+    if (isError) {
+      setChatHistory((prevChatHistory) => [
+        ...prevChatHistory,
+        { text: error.data?.detail || "Error", sender: 'System' }
+      ]);
+    }
+
+    if (isSuccess) {
+      let botMessage = chatData.message;
+      console.log(botMessage)
+      const re = /\b\d{18}\b/g;
+
+      if (re.test(botMessage)) {
+        const match = botMessage.match(re);
+        botMessage = botMessage.replace(re, '');
+
+        setProductIds({ ids: match });
       }
-    },
-    [message]
-  );
+
+      setChatHistory((prevChatHistory) => [
+        ...prevChatHistory,
+        { text: botMessage, sender: 'Bot' }
+      ]);
+      if (!contextId) {
+        setContextId(chatData.contextId)
+      }
+    }
+  }, [isSuccess, isError])
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -90,20 +112,28 @@ const ChatBox = () => {
           <Card.Body style={{ maxHeight: '400px', overflowY: 'scroll' }}>
             {chatHistory.map((msg, idx) => (
               <p key={idx}>
-                <b>{msg.sender}:</b> {msg.text}
+                <strong>{msg.sender}:</strong> {msg.text}
               </p>
             ))}
+            {productIds && isProductsSuccess &&
+              data.products.map((product) => (
+                <Product key={product.id} product={product} />
+              ))
+            }
           </Card.Body>
           <Form onSubmit={handleFormSubmit} className="d-flex flex-column">
+            {isLoading && <Loader />}
+            {!isLoading && (
             <Form.Group className="m-2">
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={message}
-                onChange={handleInputChange}
-                style={{ resize: 'none' }}
-              />
-            </Form.Group>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={message}
+              onChange={handleInputChange}
+              style={{ resize: 'none' }}
+            />
+          </Form.Group>
+            )}
             <div className="d-flex justify-content-center">
               <Button variant="primary" type="submit" className="m-2" style={{ width: '300px' }}>
                 Send

@@ -29,7 +29,6 @@ SMTP_HOST = os.getenv("SMTP_HOST")
 SMTP_PORT = os.getenv("SMTP_PORT")
 SMTP_USER = os.getenv("SMTP_USER")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-FRONTNED_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 if not USE_PIPENV:
     print("Not using pipenv, manually loading .env file")

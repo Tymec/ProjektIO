@@ -6,18 +6,18 @@ from base64 import b64decode
 from email.message import EmailMessage
 
 import openai
+from app.models import Product
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.base import ContentFile
+from django.core.validators import ValidationError, validate_email
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from app.models import Product
-
-from .models import ImageGeneration, NewsletterUser
+from .models import ChatConversationContext, ImageGeneration, NewsletterUser
 from .serializers import ImageGenerationSerializer
 
 
@@ -38,20 +38,20 @@ def image_gen(request):
     user = request.user
     if not user.is_authenticated:
         return Response(
-            {"error": "Authentication credentials were not provided."},
+            {"detail": "Authentication credentials were not provided."},
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
     prompt = data.get("prompt", None)
     if not prompt:
         return Response(
-            {"error": "Prompt is required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Prompt is required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     size = data.get("size", 256)
     if size not in [256, 512, 1024]:
         return Response(
-            {"error": "Size must be one of 256, 512, 1024"},
+            {"detail": "Size must be one of 256, 512, 1024"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -85,21 +85,27 @@ def text_chat(request):
     message = data.get("message", None)
     if not message:
         return Response(
-            {"error": "Message is required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Message is required"}, status=status.HTTP_400_BAD_REQUEST
         )
-    conversation = data.get("conversation", [])
-    if not isinstance(conversation, list):
-        return Response(
-            {"error": "Conversation must be a list"},
-            status=status.HTTP_400_BAD_REQUEST,
+
+    context_id = data.get("contextId", None)
+    context = None
+    if context_id:
+        try:
+            context = ChatConversationContext.objects.get(_id=context_id)
+        except Exception:
+            pass
+
+    if not context:
+        context = ChatConversationContext.objects.create(
+            init_message=message, context={"conversation": []}
         )
 
     user = request.user
-    user = (
-        {"id": "0", "name": "Anonymous"}
-        if not user
-        else {"id": user.id, "name": user.email}
-    )
+    if user.is_authenticated:
+        user = {"id": user.id, "name": user.email}
+    else:
+        user = {"id": "0", "name": "Anonymous"}
 
     products = list(Product.objects.filter(countInStock__gt=0).values())
     products = [
@@ -117,30 +123,32 @@ def text_chat(request):
                 "content": f"""
                 You are a chatbot assistant that helps users find the best product for them.
                 Here are the available products in the form of (id|name|description|rating): {', '.join(products)}
-                When recommending a product, always include the URL to the product page which is '{settings.FRONTNED_URL}/product/<product_id>/'
-                and NEVER include the product id in the message unless it's part of the URL.
-
-                Do not include the product id in the message outright, but you can include it in the URL to the product page.
+                When recommending products make sure to include the id of the product in the message (the ID will be extracted with regex, so make sure when the ID is removed the message still makes sense and is formatted correctly).
+                Never share any URLs or personal information.
                 """,
             },
             {
                 "role": "assistant",
                 "content": "Welcome to the chatbot, I will help you find the best product for you",
             },
-            *[message for message in conversation if message],
+            *[message for message in context.context["conversation"] if message],
             {"role": "user", "content": message},
         ],
         max_tokens=100,
         user=f"{user['id']}-{user['name']}",
     )
+    message_response = response["choices"][0]["message"]["content"]
 
-    message_response = response["choices"][0]["message"]
+    conversation = context.context["conversation"] + [
+        {"role": "user", "content": message},
+        {"role": "assistant", "content": message_response},
+    ]
+
+    context.context = {"conversation": conversation}
+    context.save()
+
     return Response(
-        {
-            "message": message_response["content"],
-            "conversation": conversation
-            + [{"role": "user", "content": message}, message_response],
-        },
+        {"message": message_response, "contextId": str(context._id)},
         status=status.HTTP_200_OK,
     )
 
@@ -153,7 +161,15 @@ def newsletter_subscribe(request):
     email = data.get("email", None)
     if not email:
         return Response(
-            {"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Email is required"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        validate_email(email)
+    except ValidationError as e:
+        return Response(
+            {"detail": "Please enter a valid email address."},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
     try:
@@ -165,7 +181,7 @@ def newsletter_subscribe(request):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(
-            {"error": "Email already subscribed"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Email already subscribed"}, status=status.HTTP_400_BAD_REQUEST
         )
     except NewsletterUser.DoesNotExist:
         pass
@@ -182,7 +198,15 @@ def newsletter_unsubscribe(request):
     email = data.get("email", None)
     if not email:
         return Response(
-            {"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Email is required"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        validate_email(email)
+    except ValidationError as e:
+        return Response(
+            {"detail": "Please enter a valid email address."},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
     try:
@@ -191,7 +215,7 @@ def newsletter_unsubscribe(request):
         newsletter_user.save()
     except NewsletterUser.DoesNotExist:
         return Response(
-            {"error": "Email not subscribed"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Email not subscribed"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     return Response(status=status.HTTP_204_NO_CONTENT)
@@ -205,13 +229,13 @@ def newsletter_send(request):
     subject = data.get("subject", None)
     if not subject:
         return Response(
-            {"error": "Subject is required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Subject is required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     content = data.get("content", None)
     if not content:
         return Response(
-            {"error": "Content is required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Content is required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
@@ -223,13 +247,13 @@ def newsletter_send(request):
         template = data.get("template", None)
         if not template:
             return Response(
-                {"error": "Content is not valid HTML and no template was specified"},
+                {"detail": "Content is not valid HTML and no template was specified"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         if not isinstance(content, dict):
             return Response(
-                {"error": "Content must be a dictionary if using a template"},
+                {"detail": "Content must be a dictionary if using a template"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -245,7 +269,7 @@ def newsletter_send(request):
         except Exception as e:
             print(e)
             return Response(
-                {"error": "Template is not valid or does not exist"},
+                {"detail": "Template is not valid or does not exist"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -254,7 +278,7 @@ def newsletter_send(request):
 
     if not recievers:
         return Response(
-            {"error": "No active newsletter users"},
+            {"detail": "No active newsletter users"},
             status=status.HTTP_200_OK,
         )
 
