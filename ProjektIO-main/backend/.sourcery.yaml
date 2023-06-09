@@ -1,0 +1,13 @@
+version: '1'
+ignore:
+- .env
+rule_settings:
+  enable:
+  - default
+  - gpsg
+  disable: []
+  rule_types:
+  - refactoring
+  - suggestion
+  - comment
+  python_version: '3.10'
