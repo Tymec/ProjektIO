@@ -14,16 +14,32 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-### Build path and environment variables
+import dj_database_url
+
+### Environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV = os.getenv("ENV", "development")
+CI = os.getenv("CI") == "1"
+USE_PIPENV = os.getenv("PIPENV_ACTIVE") == "1"
+
+if not USE_PIPENV:
+    print("Not using pipenv, manually loading .env file")
+    from dotenv import load_dotenv
+
+    load_dotenv(BASE_DIR / ".env")
 
 
 ### Quick-start development settings - unsuitable for production
 ### See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 SECRET_KEY = os.getenv("DJANGO_SECRET")
+STRIPE_SK = os.getenv("STRIPE_SK")
+STRIPE_WH = os.getenv("STRIPE_WH")
 DEBUG = ENV == "development"
 ALLOWED_HOSTS = []
+
+
+### Custom definitions
+DEFAULT_CURRENCY = "USD"
 
 
 ### Application definition
@@ -35,14 +51,19 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
+    "djmoney",
     "users",
+    "payments",
     "app",
     "extra",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -50,6 +71,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.cache.UpdateCacheMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
+    # "app.middlewares.DebugRequestsMiddleware",
 ]
 
 ROOT_URLCONF = "setup.urls"
@@ -75,12 +100,19 @@ WSGI_APPLICATION = "setup.wsgi.application"
 
 ### Database
 ### https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if not CI:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.getenv("DATABASE_URL"), engine="django_cockroachdb"
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 ### Password validation
@@ -115,25 +147,70 @@ USE_TZ = True
 
 ### Static files (CSS, JavaScript, Images)
 ### https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = "static/"
+STATIC_LOCATION = "static"
+MEDIA_LOCATION = "media"
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+if not CI:
+    AWS_ACCESS_KEY_ID = os.getenv("S3_ACCESS")
+    AWS_SECRET_ACCESS_KEY = os.getenv("S3_SECRET")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("S3_BUCKET")
+    AWS_DEFAULT_ACL = None
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
 
-MEDIA_URL = "media/"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
 
-MEDIA_ROOT = BASE_DIR / "media"
+    STORAGES = {
+        "default": {"BACKEND": "app.backends.MediaStorageBackend"},
+        "staticfiles": {"BACKEND": "app.backends.StaticStorageBackend"},
+    }
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": BASE_DIR / MEDIA_LOCATION,
+                "base_url": f"/{MEDIA_LOCATION}/",
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            "OPTIONS": {
+                "location": BASE_DIR / STATIC_LOCATION,
+                "base_url": f"/{STATIC_LOCATION}/",
+            },
+        },
+    }
+
+STATICFILES_DIRS = [BASE_DIR / STATIC_LOCATION]
+
+
+### Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 5 * 60
+CACHE_MIDDLEWARE_KEY_PREFIX = ""
+
 
 ### Default primary key field type
 ### https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
 ### Django extensions
 GRAPH_MODELS = {"all_applications": True, "group_models": True}
 
+
 ### REST Framework
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,
+    "DEFAULT_PAGINATION_CLASS": "app.backends.NumberedPaginationBackend",
+    "PAGE_SIZE": 12,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
@@ -172,3 +249,14 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+### CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:8000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:8000",
+]

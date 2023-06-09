@@ -14,10 +14,10 @@ migrate:
 	pipenv run python manage.py migrate
 
 test:
-	pipenv run pytest
+	pipenv run pytest -W ignore::DeprecationWarning
 
 coverage:
-	pipenv run pytest --cov=. --cov-report term --cov-report xml:docs/coverage.xml
+	pipenv run pytest --cov=. --cov-report term --cov-report xml:docs/coverage.xml -W ignore::DeprecationWarning
 
 black:
 	pipenv run black .
@@ -41,7 +41,10 @@ requirements:
 audit:
 	pipenv check --audit-and-monitor --save-json docs/audit.json
 
-.PHONY: default dev run migrate test coverage black isort flake8 lint uml requirements audit
+secrets:
+	doppler secrets download --no-file --format env > .env
+
+.PHONY: default dev run migrate test coverage black isort flake8 lint uml requirements audit secrets
 
 .EXPORT_ALL_VARIABLES:
 PIPENV_VERBOSITY = -1

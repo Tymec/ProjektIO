@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework import status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -12,7 +12,6 @@ from .serializers import (
 )
 
 
-# Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
     """
     User view.
@@ -20,6 +19,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
+
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["id", "email", "name"]
+    ordering = ["-id"]
 
     def get_view_name(self):
         return "User"
@@ -39,6 +42,9 @@ class UserViewSet(viewsets.ModelViewSet):
             return self.request.user
 
         return super().get_object()
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -69,8 +75,8 @@ def register(request):
 
     user = User.objects.create_user(
         email=data["email"],
-        first_name=data["first_name"],
-        last_name=data["last_name"],
+        first_name=data["firstName"],
+        last_name=data["lastName"],
         password=data["password"],
     )
 

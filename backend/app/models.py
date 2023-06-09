@@ -1,24 +1,33 @@
 from django.conf import settings
 from django.db import models
+from djmoney.models.fields import MoneyField
+
+from .utils import upload_to
 
 
-# Create your models here.
 class Product(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
+
     name = models.CharField(max_length=200)
-    image = models.ImageField(null=True, blank=True, default="/placeholder.png")
     brand = models.CharField(max_length=200)
     category = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    rating = models.DecimalField(max_digits=7, decimal_places=2)
+    rating = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     numReviews = models.IntegerField(default=0)
-    price = models.DecimalField(max_digits=7, decimal_places=2)
+    price = MoneyField(
+        max_digits=19, decimal_places=4, default_currency=settings.DEFAULT_CURRENCY
+    )
     countInStock = models.IntegerField(default=0)
+    image = models.ImageField(
+        null=True, blank=True, default="placeholder.png", upload_to=upload_to
+    )
+
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-    _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
         return self.name
@@ -37,54 +46,75 @@ class Review(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
-        return str(self.rating)
-
-
-class Order(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
-    )
-    paymentMethod = models.CharField(max_length=200)
-    taxPrice = models.DecimalField(max_digits=7, decimal_places=2)
-    shippingPrice = models.DecimalField(max_digits=7, decimal_places=2)
-    totalPrice = models.DecimalField(max_digits=7, decimal_places=2)
-    isPaid = models.BooleanField(default=False)
-    paidAt = models.DateTimeField(auto_now_add=False, null=True, blank=True)
-    isDelivered = models.BooleanField(default=False)
-    deliveredAt = models.DateTimeField(auto_now_add=False, null=True, blank=True)
-    createdAt = models.DateTimeField(auto_now_add=True)
-    updatedAt = models.DateTimeField(auto_now=True)
-    _id = models.AutoField(primary_key=True, editable=False)
-
-    def __str__(self):
-        return str(self.createdAt)
-
-
-class OrderItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=200)
-    qty = models.IntegerField(default=0)
-    price = models.DecimalField(max_digits=7, decimal_places=2)
-    image = models.CharField(max_length=200, null=True, blank=True)
-    createdAt = models.DateTimeField(auto_now_add=True)
-    updatedAt = models.DateTimeField(auto_now=True)
-    _id = models.AutoField(primary_key=True, editable=False)
-
-    def __str__(self):
-        return str(self.name)
+        return f"{self.name} {self.rating} - {self.comment}"
 
 
 class ShippingAddress(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, null=True, blank=True)
+    _id = models.AutoField(primary_key=True, editable=False)
+    fullName = models.CharField(max_length=200, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
     city = models.CharField(max_length=200, null=True, blank=True)
     postalCode = models.CharField(max_length=200, null=True, blank=True)
+    state = models.CharField(max_length=200, null=True, blank=True)
     country = models.CharField(max_length=200, null=True, blank=True)
-    shippingPrice = models.DecimalField(max_digits=7, decimal_places=2)
-    createdAt = models.DateTimeField(auto_now_add=True)
-    updatedAt = models.DateTimeField(auto_now=True)
-    _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
-        return str(self.address)
+        return f"{self.fullName} - {self.country}"
+
+
+class Order(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+    )
+    sessionId = models.CharField(max_length=200, null=True)
+
+    taxPrice = MoneyField(
+        max_digits=19,
+        decimal_places=4,
+        default_currency=settings.DEFAULT_CURRENCY,
+        null=True,
+    )
+    shippingPrice = MoneyField(
+        max_digits=19,
+        decimal_places=4,
+        default_currency=settings.DEFAULT_CURRENCY,
+        null=True,
+    )
+    totalPrice = MoneyField(
+        max_digits=19,
+        decimal_places=4,
+        default_currency=settings.DEFAULT_CURRENCY,
+        null=True,
+    )
+
+    shippingAddress = models.ForeignKey(
+        ShippingAddress, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    paymentIntentId = models.CharField(
+        max_length=200, null=True, blank=True, db_index=True
+    )
+    invoiceId = models.CharField(max_length=200, null=True, blank=True, db_index=True)
+
+    isPaid = models.BooleanField(default=False)
+    paidAt = models.DateTimeField(auto_now_add=False, null=True, blank=True)
+
+    isDelivered = models.BooleanField(default=False)
+    deliveredAt = models.DateTimeField(auto_now_add=False, null=True, blank=True)
+
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.createdAt} - {self.totalPrice}"
+
+
+class OrderItem(models.Model):
+    _id = models.AutoField(primary_key=True, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(default=0)
+    createdAt = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.order} - {self.quantity}"

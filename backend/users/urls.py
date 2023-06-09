@@ -1,5 +1,4 @@
 from django.urls import path
-
 from users.views import CustomTokenObtainPairView, UserViewSet, register
 
 user_list = UserViewSet.as_view({"get": "list", "post": "create"})

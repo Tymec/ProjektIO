@@ -12,6 +12,13 @@ pillow = "*"
 djangorestframework-simplejwt = "*"
 django-extensions = "*"
 openai = "*"
+dj-database-url = "*"
+django-cockroachdb = "==4.2.*"
+psycopg = {extras = ["binary"], version = "*"}
+django-storages = "*"
+boto3 = "*"
+django-cors-headers = "*"
+django-money = "*"
 
 [dev-packages]
 black = "*"
@@ -20,6 +27,7 @@ flake8 = "*"
 pytest = "*"
 pytest-django = "*"
 pytest-cov = "*"
+stripe = "*"
 
 [requires]
 python_version = "3.10"
