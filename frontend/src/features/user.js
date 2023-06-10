@@ -42,7 +42,7 @@ export const userApi = api.injectEndpoints({
         } catch (error) {
           console.error(error);
         }
-      },
+      }
     }),
     register: build.mutation({
       query: (authData) => ({

@@ -149,7 +149,8 @@ export default function ProductPage() {
                           <Form.Control
                             as="select"
                             value={qty}
-                            onChange={(e) => setQty(e.target.value)}>
+                            onChange={(e) => setQty(e.target.value)}
+                          >
                             {[...Array(product.countInStock).keys()].map((x) => (
                               <option key={x + 1} value={x + 1}>
                                 {x + 1}
@@ -166,7 +167,8 @@ export default function ProductPage() {
                       onClick={addToCartHandler}
                       className="btn-block"
                       disabled={product.countInStock === 0}
-                      type="button">
+                      type="button"
+                    >
                       Add to Cart
                     </Button>
                   </ListGroup.Item>
@@ -176,7 +178,8 @@ export default function ProductPage() {
                       onClick={buyNowHandler}
                       className="btn-block"
                       disabled={product.countInStock === 0}
-                      type="button">
+                      type="button"
+                    >
                       Buy now
                     </Button>
                   </ListGroup.Item>
@@ -218,7 +221,8 @@ export default function ProductPage() {
                         <Form.Control
                           as="select"
                           value={rating}
-                          onChange={(e) => setRating(e.target.value)}>
+                          onChange={(e) => setRating(e.target.value)}
+                        >
                           <option value="">Select...</option>
                           <option value="1">1 - Poor</option>
                           <option value="2">2 - Fair</option>
@@ -234,7 +238,8 @@ export default function ProductPage() {
                           as="textarea"
                           row="5"
                           value={comment}
-                          onChange={(e) => setComment(e.target.value)}></Form.Control>
+                          onChange={(e) => setComment(e.target.value)}
+                        ></Form.Control>
                       </Form.Group>
 
                       <Button disabled={isReviewLoading} type="submit" variant="primary">

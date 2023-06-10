@@ -55,7 +55,8 @@ function Header() {
               {user && user.isAdmin && (
                 <LinkContainer
                   onClick={() => openInNewTab('http://localhost:8000/admin')}
-                  to={window.location.pathname}>
+                  to={window.location.pathname}
+                >
                   <Nav.Link>
                     <i className="fas fa-user"></i>Admin
                   </Nav.Link>

@@ -18,20 +18,20 @@ export default function HomePage() {
   });
 
   const sortOptions = [
-    {name: 'Created At', value: 'createdAt'},
-    {name: 'Price', value: 'price'},
-    {name: 'Rating', value: 'rating'},
-    {name: 'Name', value: 'name'},
-    {name: 'Number of Reviews', value: 'numReviews'},
-    {name: 'Count in Stock', value: 'countInStock'}
-  ]
+    { name: 'Created At', value: 'createdAt' },
+    { name: 'Price', value: 'price' },
+    { name: 'Rating', value: 'rating' },
+    { name: 'Name', value: 'name' },
+    { name: 'Number of Reviews', value: 'numReviews' },
+    { name: 'Count in Stock', value: 'countInStock' }
+  ];
 
   const handleSortChange = (value) => {
     navigate({
       pathname: '/',
       search: `?search=${search}&page=${page}&orderBy=${value}`
-    })
-  }
+    });
+  };
 
   return (
     <div>
@@ -44,8 +44,10 @@ export default function HomePage() {
           Sort By
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          {sortOptions.map(option => (
-            <Dropdown.Item href="#" eventKey={option.value} key={option.value}>{option.name}</Dropdown.Item>
+          {sortOptions.map((option) => (
+            <Dropdown.Item href="#" eventKey={option.value} key={option.value}>
+              {option.name}
+            </Dropdown.Item>
           ))}
         </Dropdown.Menu>
       </Dropdown>

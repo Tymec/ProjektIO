@@ -1,27 +1,27 @@
-main{
-    min-height: 80vh;
+main {
+  min-height: 80vh;
 }
 
-.navbar-dark{
-    background-color: black;
+.navbar-dark {
+  background-color: black;
 }
 
-h1{
+h1 {
   font-size: 1.8rem;
-  padding:1rem 0;
+  padding: 1rem 0;
 }
 
-h2{
+h2 {
   font-size: 1.4rem;
-  padding:0.5rem 0;
+  padding: 0.5rem 0;
 }
 
-h3{
-    padding:1rem 0;
+h3 {
+  padding: 1rem 0;
 }
 
-.rating span{
-  margin:0.1rem;
+.rating span {
+  margin: 0.1rem;
 }
 
 /* carousel */
@@ -40,15 +40,15 @@ h3{
 }
 
 .carousel img {
-    display:block;
-    height: 300px;
-    padding: 30px;
-    margin: 40px;
-    border-radius: 10%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
+  display: block;
+  height: 300px;
+  padding: 30px;
+  margin: 40px;
+  border-radius: 10%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .carousel a {
   margin: 0 auto;
 }
@@ -57,4 +57,3 @@ h3{
     font-size: 2.5vw;
   }
 }
-
