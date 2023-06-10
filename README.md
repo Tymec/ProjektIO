@@ -3,7 +3,7 @@ Skład zespołu: Konrad Sitek, Tymoteusz Grabowski, Mikołaj Grycz
 
 Projekt: Sklep internetowy
 
-# Funkcjonalność
+# Opis funkcjonalny
 
 Strona internetowa skupia się na dostarczaniu użytkownikom narzędzi i inspiracji do
 twórczego samogenerowania obrazów przy pomocy algorytmów stable diffusion.
@@ -118,12 +118,19 @@ dane, takie jak konta użytkowników, hasła, prompty i obrazki.
 ![image](https://github.com/Tymec/ProjektIO/assets/69002597/3c90841f-fae5-4fcb-ae01-43dd3afe6ee8)
 
 
+# Diagram klas
 
-Plan funkcjonalności:
-- płatności
-- sortowanie produktów
-- newsletter
-- wirtualny asystent
-- baza danych produktów
-- logowanie klientów
+![image](https://github.com/Tymec/ProjektIO/assets/69002597/b261ffca-bbf8-4728-802e-ffbda5af5a03)
+
+# Diagram przypadków użycia
+
+[Blank_diagram-3.pdf](https://github.com/Tymec/ProjektIO/files/11713145/Blank_diagram-3.pdf)
+
+# Testy jednostkowe
+
+![image](https://github.com/Tymec/ProjektIO/assets/69002597/fdda7ba1-5883-4448-ae48-6cd220908a98)
+
+
+
+
 
