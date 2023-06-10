@@ -8,14 +8,14 @@ import SearchBox from './SearchBox';
 function Header() {
   const dispatch = useDispatch();
 
-  const { user } = useSelector((state) => state.userState);
+  const { user } = useSelector((state) => state.userState); // Extract the user from the Redux store
 
   const logoutHandler = () => {
-    dispatch(logout());
+    dispatch(logout()); // Dispatch the logout action
   };
 
   const openInNewTab = (url) => {
-    window.open(url, '_blank', 'noreferrer');
+    window.open(url, '_blank', 'noreferrer'); // Open the given URL in a new tab
   };
 
   return (
@@ -28,7 +28,7 @@ function Header() {
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <SearchBox />
+            <SearchBox /> {/* Render the SearchBox component */}
             <Nav className="ml-auto">
               <LinkContainer to="/cart">
                 <Nav.Link>

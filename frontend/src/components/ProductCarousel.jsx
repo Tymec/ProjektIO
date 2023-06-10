@@ -6,11 +6,11 @@ import Loader from './Loader';
 import Message from './Message';
 
 function ProductCarousel() {
-  const { data, isLoading, isError, error } = useListProductsQuery({});
+  const { data, isLoading, isError, error } = useListProductsQuery({}); // Query for fetching product data
 
-  return isLoading ? (
+  return isLoading ? ( // Display loader while data is being fetched
     <Loader />
-  ) : isError ? (
+  ) : isError ? ( // Display error message if an error occurs
     <Message variant="danger">{error.data?.detail || 'Error'}</Message>
   ) : (
     <Carousel
@@ -21,7 +21,7 @@ function ProductCarousel() {
         transition: 'all 0.3s ease-in-out'
       }}
     >
-      {data.products.map((product) => (
+      {data.products.map((product) => ( // Render carousel items for each product
         <Carousel.Item key={product._id}>
           <Link to={`/product/${product._id}`}>
             <Image src={product.image} alt={product.name} fluid />

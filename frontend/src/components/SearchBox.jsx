@@ -10,16 +10,17 @@ function SearchBox() {
   const submitHandler = (e) => {
     e.preventDefault();
     if (keyword) {
-      navigate(`/?search=${keyword}&page=1`);
+      navigate(`/?search=${keyword}&page=1`); // Navigate to the search results page with the provided keyword
     }
   };
+
   return (
     <Form onSubmit={submitHandler} inline>
       <Form.Control
         data-testid="search-box-input"
         type="text"
         name="q"
-        onChange={(e) => setKeyword(e.target.value)}
+        onChange={(e) => setKeyword(e.target.value)} // Update the keyword state on input change
         className="mr-sm-2 ml-sm-5"
       ></Form.Control>
 
@@ -28,7 +29,7 @@ function SearchBox() {
         type="submit"
         variant="outline-success"
         className="p-2"
-        disabled={!keyword}
+        disabled={!keyword} // Disable the button if there is no keyword
       >
         Submit
       </Button>
