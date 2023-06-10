@@ -5,26 +5,27 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader, Message, Paginate, Product, ProductCarousel } from '../components';
 import { useListProductsQuery } from '../features';
 
+const sortOptions = [
+  { name: 'Created At', value: '-createdAt,-name' },
+  { name: 'Price', value: '-price,-rating' },
+  { name: 'Rating', value: '-rating,-numReviews' },
+  { name: 'Name', value: '-name' },
+  { name: 'Number of Reviews', value: '-numReviews,-rating' },
+  { name: 'Count in Stock', value: '-countInStock,-name' }
+];
+
 export default function HomePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const page = searchParams.get('page') || 1;
-  const orderBy = searchParams.get('orderBy') || 'createdAt';
+  const orderBy = searchParams.get('orderBy') || sortOptions[0].value;
   const { data, isLoading, isFetching, isError, error } = useListProductsQuery({
     keyword: search,
     page,
-    orderBy
+    orderBy,
+    asc: true
   });
-
-  const sortOptions = [
-    { name: 'Created At', value: 'createdAt' },
-    { name: 'Price', value: 'price' },
-    { name: 'Rating', value: 'rating' },
-    { name: 'Name', value: 'name' },
-    { name: 'Number of Reviews', value: 'numReviews' },
-    { name: 'Count in Stock', value: 'countInStock' }
-  ];
 
   const handleSortChange = (value) => {
     navigate({

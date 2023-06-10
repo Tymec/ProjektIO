@@ -8,6 +8,7 @@ import {
   addToCart,
   useCreateCheckoutSessionMutation,
   useCreateReviewMutation,
+  useDeleteProductMutation,
   useGetProductQuery,
   useHasUserBoughtProductQuery
 } from '../features';
@@ -46,6 +47,10 @@ export default function ProductPage() {
 
   const [createCheckoutSession, { data: checkoutData, isSuccess: isCheckoutSuccess }] =
     useCreateCheckoutSessionMutation();
+  const [
+    deleteProduct,
+    { isSuccess: isDeleteSuccess, isError: isDeleteError, error: deleteError }
+  ] = useDeleteProductMutation();
 
   useEffect(() => {
     if (success) {
@@ -63,6 +68,15 @@ export default function ProductPage() {
     }
   }, [user, isCheckoutSuccess, checkoutData, success, orderId, userBoughtSuccess]);
 
+  useEffect(() => {
+    if (isDeleteSuccess) {
+      navigate('/');
+    }
+    if (isDeleteError) {
+      console.error(deleteError);
+    }
+  }, [isDeleteSuccess, isDeleteError]);
+
   const addToCartHandler = () => {
     dispatch(addToCart({ id: productId, qty, increment: true }));
     navigate(`/cart`);
@@ -77,6 +91,10 @@ export default function ProductPage() {
       cartItems: [{ id: productId, qty }],
       path: `product/${productId}`
     });
+  };
+
+  const deleteHandler = () => {
+    deleteProduct(productId);
   };
 
   const submitHandler = (e) => {
@@ -208,6 +226,13 @@ export default function ProductPage() {
                       Buy now
                     </Button>
                   </ListGroup.Item>
+                  {user && user.isAdmin && (
+                    <ListGroup.Item>
+                      <Button onClick={deleteHandler} className="btn-block" type="button">
+                        Delete
+                      </Button>
+                    </ListGroup.Item>
+                  )}
                 </ListGroup>
               </Card>
             </Col>
