@@ -6,20 +6,20 @@ export const extraApi = api.injectEndpoints({
       query: (email) => ({
         url: `/extra/newsletter/subscribe/`,
         method: 'POST',
-        body: { email }
+        body: { email } // Pass the email in the request body
       })
     }),
     unsubscribeNewsletter: build.mutation({
       query: (email) => ({
         url: `/extra/newsletter/unsubscribe/`,
         method: 'POST',
-        body: { email }
+        body: { email } // Pass the email in the request body
       })
     }),
     getSubscriber: build.query({
       query: (id) => ({
         url: `/extra/newsletter/${id}/`,
-        method: 'GET'
+        method: 'GET' // Make a GET request to retrieve subscriber data with the specified ID
       })
     }),
     sendNewsletter: build.mutation({
@@ -37,19 +37,19 @@ export const extraApi = api.injectEndpoints({
             link: data.link,
             unsubscribe_url: `${window.location.origin}/newsletter/unsubscribe/me`
           }
-        }
+        } // Pass the newsletter data in the request body
       })
     }),
     imageList: build.query({
       query: () => ({
         url: `/extra/image/`,
-        method: 'GET'
+        method: 'GET' // Make a GET request to retrieve a list of images
       })
     }),
     imageGet: build.query({
       query: (id) => ({
         url: `/extra/image/${id}/`,
-        method: 'GET'
+        method: 'GET' // Make a GET request to retrieve an image with the specified ID
       })
     }),
     imageGenerate: build.mutation({
@@ -59,7 +59,7 @@ export const extraApi = api.injectEndpoints({
         body: {
           prompt: data.prompt,
           size: data.size
-        }
+        } // Pass the prompt and size in the request body for image generation
       })
     }),
     chat: build.mutation({
@@ -70,7 +70,7 @@ export const extraApi = api.injectEndpoints({
           message: data.userMessage,
           contextId: data.contextId,
           model: 'gpt-4'
-        }
+        } // Pass the chat message, context ID, and model in the request body for chat functionality
       })
     })
   })

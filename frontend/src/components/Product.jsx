@@ -10,7 +10,7 @@ function Product({ product, rounded = false }) {
       className="my-3"
       style={{
         border: 'none',
-        borderRadius: rounded ? '0.5rem 0.5rem 0.5rem 0.5rem' : '0.3rem',
+        borderRadius: rounded ? '0.5rem 0.5rem 0.5rem 0.5rem' : '0.3rem', // Set border radius based on 'rounded' prop
         height: '100%'
       }}
     >
@@ -22,7 +22,7 @@ function Product({ product, rounded = false }) {
             aspectRatio: '1 / 1',
             objectFit: 'cover',
             objectPosition: 'right',
-            borderRadius: rounded ? '0.5rem 0.5rem 0 0' : '0.3rem 0.3rem 0 0'
+            borderRadius: rounded ? '0.5rem 0.5rem 0 0' : '0.3rem 0.3rem 0 0' // Set image border radius based on 'rounded' prop
           }}
         />
       </Link>
@@ -44,7 +44,7 @@ function Product({ product, rounded = false }) {
           </div>
         </Card.Text>
 
-        <Card.Text as="h3">{moneyFormat(product.price)}</Card.Text>
+        <Card.Text as="h3">{moneyFormat(product.price)}</Card.Text> {/* Format the product price using the 'moneyFormat' utility function */}
       </Card.Body>
     </Card>
   );

@@ -4,16 +4,15 @@ export const reviewApi = api.injectEndpoints({
   endpoints: (build) => ({
     listReviews: build.query({
       query: (params) => ({
-        url:
-          '/reviews/?' +
-          new URLSearchParams({
-            search: params?.keyword || '',
-            ordering: `${params?.asc || false ? '' : '-'}${params?.orderBy || 'createdAt'}`,
-            page: params?.page || 1
-          })
+        url: '/reviews/', // Make a GET request to fetch reviews
+        params: {
+          search: params?.keyword || '',
+          ordering: `${params?.asc || false ? '' : '-'}${params?.orderBy || 'createdAt'}`,
+          page: params?.page || 1
+        }
       }),
       transformResponse: (response) => ({
-        reviews: response.results,
+        reviews: response.results, // Transform the response to include the reviews, page, and pages properties
         page: response.pagination.page,
         pages: response.pagination.pages
       }),
@@ -23,14 +22,14 @@ export const reviewApi = api.injectEndpoints({
           : ['Review']
     }),
     getReview: build.query({
-      query: (reviewId) => `/reviews/${reviewId}/`,
+      query: (reviewId) => `/reviews/${reviewId}/`, // Make a GET request to fetch a specific review
       providesTags: (result) =>
         result ? [{ type: 'Review', id: result._id }, 'Review'] : ['Review']
     }),
     deleteReview: build.mutation({
       query: (reviewId) => ({
         url: `/reviews/${reviewId}/`,
-        method: 'DELETE'
+        method: 'DELETE' // Make a DELETE request to delete a review
       }),
       invalidatesTags: (result) =>
         result ? [{ type: 'Review', id: result._id }, 'Review'] : ['Review']
@@ -38,7 +37,7 @@ export const reviewApi = api.injectEndpoints({
     createReview: build.mutation({
       query: (newReview) => ({
         url: `/reviews/`,
-        method: 'POST',
+        method: 'POST', // Make a POST request to create a new review
         body: newReview
       }),
       invalidatesTags: (result) =>
@@ -47,7 +46,7 @@ export const reviewApi = api.injectEndpoints({
     updateReview: build.mutation({
       query: (updatedReview) => ({
         url: `/reviews/${updatedReview.id}/`,
-        method: 'PUT',
+        method: 'PUT', // Make a PUT request to update a review
         body: updatedReview
       }),
       invalidatesTags: (result) =>
