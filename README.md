@@ -124,7 +124,8 @@ dane, takie jak konta użytkowników, hasła, prompty i obrazki.
 
 # Diagram przypadków użycia
 
-[Blank_diagram-3.pdf](https://github.com/Tymec/ProjektIO/files/11713145/Blank_diagram-3.pdf)
+![image](https://github.com/Tymec/ProjektIO/assets/69002597/e590b9d4-8537-4dcb-b646-33a677366f89)
+
 
 # Testy jednostkowe
 
