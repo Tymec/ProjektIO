@@ -1,5 +1,5 @@
 # ProjektIO
-<br>
+
 ## Skład zespołu
 - Konrad Sitek
 - Tymoteusz Grabowski
