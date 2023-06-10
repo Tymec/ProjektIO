@@ -111,7 +111,7 @@ export default function ProductPage() {
       </Link>
       {isLoading ? (
         <Loader />
-      ) : (isError || internalError) ? (
+      ) : isError || internalError ? (
         <Message variant="danger">{error.data?.detail || 'Error'}</Message>
       ) : (
         <div>
@@ -214,19 +214,22 @@ export default function ProductPage() {
           </Row>
 
           <Row>
-            <Col md={5} className="py-4">
+            <Col md={5} className="py-2">
               <h4>Reviews</h4>
-              {product?.reviews && product.reviews.length === 0 && <Message variant="info">No Reviews</Message>}
+              {product?.reviews && product.reviews.length === 0 && (
+                <Message variant="info">No Reviews</Message>
+              )}
 
               <ListGroup variant="flush">
-                {product?.reviews && product?.reviews.map((review) => (
-                  <ListGroup.Item key={review._id}>
-                    <strong>{review.name}</strong>
-                    <Rating value={review.rating} color="#f8e825" />
-                    <p>{review.createdAt.substring(0, 10)}</p>
-                    <p>{review.comment}</p>
-                  </ListGroup.Item>
-                ))}
+                {product?.reviews &&
+                  product?.reviews.map((review) => (
+                    <ListGroup.Item key={review._id}>
+                      <strong>{review.name}</strong>
+                      <Rating value={review.rating} color="#f8e825" />
+                      <p>{review.createdAt.substring(0, 10)}</p>
+                      <p>{review.comment}</p>
+                    </ListGroup.Item>
+                  ))}
 
                 <ListGroup.Item className="py-3">
                   <h4>Write a review</h4>

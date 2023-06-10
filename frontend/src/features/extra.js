@@ -13,7 +13,7 @@ const getFromLocalStorage = (key, def = '') => {
 export const extraSlice = createSlice({
   name: 'extra',
   initialState: {
-    chatbotContextId: getFromLocalStorage('chatbotContextId', ''),
+    chatbotContextId: getFromLocalStorage('chatbotContextId', '')
   },
   reducers: {
     setChatbotContextId: (state, action) => {
@@ -98,16 +98,17 @@ export const extraApi = api.injectEndpoints({
         body: {
           message: data.userMessage,
           contextId: data.contextId,
-          model: 'gpt-4',
+          model: 'gpt-4'
         }
       })
     }),
     generateProduct: build.mutation({
-      query: prompt => ({
+      query: (prompt) => ({
         url: `/extra/product/`,
         method: 'POST',
         body: { prompt }
-      })
+      }),
+      invalidatesTags: ['Product']
     })
   })
 });

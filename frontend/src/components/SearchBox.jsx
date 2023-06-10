@@ -4,11 +4,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { useGenerateProductMutation } from '../features';
 
-export default function SearchBox({user = null}) {
+export default function SearchBox({ user = null }) {
   let navigate = useNavigate();
 
   const [keyword, setKeyword] = useState('');
-  const [generateProduct, { isLoading: isGenerating, isError: isGenerationError, error: generationError }] = useGenerateProductMutation();
+  const [
+    generateProduct,
+    { isLoading: isGenerating, isError: isGenerationError, error: generationError }
+  ] = useGenerateProductMutation();
 
   useEffect(() => {
     if (isGenerationError) {
@@ -19,6 +22,7 @@ export default function SearchBox({user = null}) {
   const onClickGenerate = () => {
     if (keyword.trim()) {
       generateProduct(keyword);
+      setKeyword('');
     }
   };
 
@@ -35,7 +39,7 @@ export default function SearchBox({user = null}) {
         data-testid="search-box-input"
         type="text"
         name="q"
-        onChange={(e) =>setKeyword(e.target.value)}
+        onChange={(e) => setKeyword(e.target.value)}
         className="mr-sm-2 ml-sm-5"
       ></Form.Control>
       <Button
@@ -48,23 +52,23 @@ export default function SearchBox({user = null}) {
         Submit
       </Button>
       {user && user.isAdmin && (
-      <Button
-      data-testid="generate-button"
-      variant="outline-warning"
-      className={"p-2 ml-2 px-3" + (isGenerating ? 'lds-ripple' : '')}
-      onClick={onClickGenerate}
-      disabled={isGenerating || isGenerationError}
-    >
-      {isGenerationError ? (
-        <span>⚠</span>
-      ) : isGenerating ? (
-        <Spinner animation="border" role="status" size="sm">
-          <span className="sr-only">Loading...</span>
-        </Spinner>
-      ) : (
-        <span>+</span>
-      )}
-    </Button>
+        <Button
+          data-testid="generate-button"
+          variant="outline-warning"
+          className={'p-2 ml-2 px-3' + (isGenerating ? 'lds-ripple' : '')}
+          onClick={onClickGenerate}
+          disabled={isGenerating || isGenerationError}
+        >
+          {isGenerationError ? (
+            <span>⚠</span>
+          ) : isGenerating ? (
+            <Spinner animation="border" role="status" size="sm">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          ) : (
+            <span>+</span>
+          )}
+        </Button>
       )}
     </Form>
   );

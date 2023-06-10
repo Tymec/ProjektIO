@@ -16,8 +16,6 @@ export default function OrderPage() {
   const [deliverOrder, { isLoading: loadingDeliver, isSuccess: successDeliver }] =
     useDeliverOrderMutation();
 
-  console.log(order)
-
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -57,17 +55,15 @@ export default function OrderPage() {
                     {order.shippingAddress.address.line || ''}
                     {order.shippingAddress.address?.line2
                       ? `, ${order.shippingAddress.address?.line2}`
-                      : ''},
-                    {'  '}
+                      : ''}
+                    ,{'  '}
                     {order.shippingAddress.postalCode} {order.shippingAddress.city}, {'  '}
                     {order.shippingAddress.country}{' '}
                     {order.shippingAddress?.state ? `, ${order.shippingAddress?.state}` : ''}
                   </span>
                 )}
                 {!order.shippingAddress?.address && (
-                  <span>
-                    No shipping information available at this moment.
-                  </span>
+                  <span>No shipping information available at this moment.</span>
                 )}
               </p>
 
@@ -83,7 +79,7 @@ export default function OrderPage() {
             <ListGroup.Item>
               <h2>Payment Method</h2>
               <p>
-                {(order.paymentMethod && order.paymentMethod?.type === 'card') ? (
+                {order.paymentMethod && order.paymentMethod?.type === 'card' ? (
                   <span>
                     <strong>{order.paymentMethod.brand.toUpperCase()}</strong>
                     {'  '}
@@ -94,12 +90,15 @@ export default function OrderPage() {
                     <strong>{order.paymentMethod?.type?.toUpperCase()}</strong>
                   </span>
                 )}
-                {!order.paymentMethod && <span>No payment information available at this moment.</span>}
+                {!order.paymentMethod && (
+                  <span>No payment information available at this moment.</span>
+                )}
               </p>
               <p>
                 {order.paymentMethod?.expMonth && order.paymentMethod?.expYear && (
                   <span>
-                    <strong>EXP:</strong> {order.paymentMethod?.expMonth} / {order.paymentMethod?.expYear}
+                    <strong>EXP:</strong> {order.paymentMethod?.expMonth} /{' '}
+                    {order.paymentMethod?.expYear}
                   </span>
                 )}
               </p>
@@ -152,9 +151,7 @@ export default function OrderPage() {
               <ListGroup.Item>
                 <Row>
                   <Col>Items:</Col>
-                  <Col>
-                    {moneyFormat((order.totalPrice / 100))}
-                  </Col>
+                  <Col>{moneyFormat(order.totalPrice / 100)}</Col>
                 </Row>
               </ListGroup.Item>
 
@@ -175,9 +172,9 @@ export default function OrderPage() {
               <ListGroup.Item>
                 <Row>
                   <Col>Total:</Col>
-                  <Col>{moneyFormat(
-                      (order.totalPrice / 100) + order.shippingPrice + order.taxPrice
-                    )}</Col>
+                  <Col>
+                    {moneyFormat(order.totalPrice / 100 + order.shippingPrice + order.taxPrice)}
+                  </Col>
                 </Row>
               </ListGroup.Item>
 

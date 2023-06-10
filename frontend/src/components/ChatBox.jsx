@@ -4,7 +4,12 @@ import { Button, Card, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Loader, Product } from '../components';
-import { resetChatbotContextId, setChatbotContextId, useChatMutation, useListProductsQuery } from '../features';
+import {
+  resetChatbotContextId,
+  setChatbotContextId,
+  useChatMutation,
+  useListProductsQuery
+} from '../features';
 
 const ChatBox = () => {
   const dispatch = useDispatch();
@@ -45,7 +50,10 @@ const ChatBox = () => {
   const resetContext = () => {
     dispatch(resetChatbotContextId());
     setChatHistory([
-      { text: 'Welcome to the chatbot, I will help you find the best product for you', sender: 'Bot' }
+      {
+        text: 'Welcome to the chatbot, I will help you find the best product for you',
+        sender: 'Bot'
+      }
     ]);
     setMessage('');
   };
@@ -161,7 +169,12 @@ const ChatBox = () => {
               <Button variant="primary" type="submit" className="m-2" style={{ width: '300px' }}>
                 Send
               </Button>
-              <Button variant="primary" className="m-2" style={{ width: '100px' }} onClick={resetContext}>
+              <Button
+                variant="primary"
+                className="m-2"
+                style={{ width: '100px' }}
+                onClick={resetContext}
+              >
                 Reset
               </Button>
             </div>
