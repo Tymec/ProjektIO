@@ -1,6 +1,6 @@
 name: Backend CI
 
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
   test:
@@ -37,14 +37,14 @@ jobs:
           thresholds: '60 80'
 
       - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
         if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
           recreate: true
           path: code-coverage-results.md
 
   docs:
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true }}
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: development

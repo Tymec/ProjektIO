@@ -11,6 +11,7 @@ runs:
       with:
         python-version: '3.10'
         cache: 'pipenv'
+        cache-dependency-path: backend/Pipfile.lock
 
     - name: Install pipenv
       shell: bash
