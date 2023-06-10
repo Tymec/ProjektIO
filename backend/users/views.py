@@ -59,7 +59,8 @@ def register(request):
     data = request.data
 
     try:
-        data["email"], data["password"]
+        email = data["email"]
+        password = data["password"]
 
         User.objects.get(email=data["email"])
         return Response(
@@ -76,17 +77,17 @@ def register(request):
 
     try:
         validate_email(email)
-    except ValidationError as e:
+    except ValidationError:
         return Response(
             {"detail": "Please enter a valid email address."},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
     user = User.objects.create_user(
-        email=data["email"],
+        email=email,
         first_name=data["firstName"],
         last_name=data["lastName"],
-        password=data["password"],
+        password=password,
     )
 
     serializer = UserSerializerWithToken(user, many=False)

@@ -23,7 +23,7 @@ describe('Rating', () => {
   test('renders correctly with custom color', () => {
     const { container } = render(<Rating value={5} color="#123456" />);
     const stars = container.querySelectorAll('.fas.fa-star');
-    stars.forEach(star => {
+    stars.forEach((star) => {
       expect(star).toHaveStyle({ color: '#123456' });
     });
   });

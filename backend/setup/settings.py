@@ -16,8 +16,9 @@ from pathlib import Path
 
 import dj_database_url
 
-### Environment variables
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+### Environment variables
 ENV = os.getenv("ENV", "development")
 CI = os.getenv("CI") == "1"
 USE_PIPENV = os.getenv("PIPENV_ACTIVE") == "1"
@@ -42,7 +43,7 @@ if not USE_PIPENV:
 DEBUG = ENV == "development"
 ALLOWED_HOSTS = []
 DEFAULT_CURRENCY = "USD"
-
+SITE_ID = 1
 
 ### Application definition
 INSTALLED_APPS = [
@@ -73,9 +74,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.cache.UpdateCacheMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.cache.FetchFromCacheMiddleware",
+    # "django.middleware.cache.UpdateCacheMiddleware",
+    # "django.middleware.common.CommonMiddleware",
+    # "django.middleware.cache.FetchFromCacheMiddleware",
     # "app.middlewares.DebugRequestsMiddleware",
 ]
 
@@ -189,15 +190,15 @@ STATICFILES_DIRS = [BASE_DIR / STATIC_LOCATION]
 
 
 ### Cache
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-    }
-}
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+#     }
+# }
 
-CACHE_MIDDLEWARE_ALIAS = "default"
-CACHE_MIDDLEWARE_SECONDS = 5 * 60
-CACHE_MIDDLEWARE_KEY_PREFIX = ""
+# CACHE_MIDDLEWARE_ALIAS = "default"
+# CACHE_MIDDLEWARE_SECONDS = 5 * 60
+# CACHE_MIDDLEWARE_KEY_PREFIX = ""
 
 
 ### Default primary key field type

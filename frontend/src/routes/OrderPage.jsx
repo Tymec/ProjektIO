@@ -13,14 +13,8 @@ export default function OrderPage() {
 
   const { user } = useSelector((state) => state.userState);
   const { data: order, isLoading, isError, error, refetch } = useGetOrderQuery(orderId);
-  const [
-    deliverOrder,
-    { isLoading: loadingDeliver, isSuccess: successDeliver, isFetching: fetchingDeliver }
-  ] = useDeliverOrderMutation();
-
-  console.log(successDeliver, loadingDeliver, fetchingDeliver);
-
-  console.log(order);
+  const [deliverOrder, { isLoading: loadingDeliver, isSuccess: successDeliver }] =
+    useDeliverOrderMutation();
 
   useEffect(() => {
     if (!user) {
@@ -56,10 +50,13 @@ export default function OrderPage() {
               </p>
               <p>
                 <strong>Shipping: </strong>
-                {order.shippingAddress.address}, {order.shippingAddress.city}
+                {order.shippingAddress.address.line}{' '}
+                {order.shippingAddress.address.line2
+                  ? `, ${order.shippingAddress.address.line2}`
+                  : ''}
                 {'  '}
-                {order.shippingAddress.postalCode},{'  '}
-                {order.shippingAddress.country}
+                {order.shippingAddress.postalCode} {order.shippingAddress.city},{'  '}
+                {order.shippingAddress.country}{' '}
                 {order.shippingAddress.state ? `, ${order.shippingAddress.state}` : ''}
               </p>
 
@@ -75,8 +72,11 @@ export default function OrderPage() {
             <ListGroup.Item>
               <h2>Payment Method</h2>
               <p>
-                <strong>Method: </strong>
-                {order.paymentMethod}
+                <strong>{order.paymentMethod.brand.toUpperCase()}</strong> ••••{' '}
+                {order.paymentMethod.last4}
+              </p>
+              <p>
+                <strong>EXP:</strong> {order.paymentMethod.expMonth} / {order.paymentMethod.expYear}
               </p>
               {order.isPaid ? (
                 <Message variant="success">

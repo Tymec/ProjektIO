@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.models import Order, OrderItem, Product, ShippingAddress
+from app.models import Order, OrderItem, Product
 
 from .models import Customer
 from .serializers import CustomerSerializer
@@ -126,6 +126,7 @@ class StripeCheckoutView(APIView):
                 payment_intent_data={
                     "receipt_email": request.user.email,
                     "setup_future_usage": "off_session",
+                    "metadata": {"orderId": order._id},
                 },
                 payment_method_types=["card"],
                 success_url=success_url,
@@ -177,29 +178,21 @@ class StripeWebhookView(APIView):
             # Fulfill the purchase...
             try:
                 order = Order.objects.get(_id=session["client_reference_id"])
-                order.taxPrice = session.total_details.amount_tax
-                order.shippingPrice = session.shipping_cost
-                order.totalPrice = session.amount_total
-                order.isPaid = session.payment_status == "paid"
-                order.paidAt = datetime.now(tz=timezone.utc)
+                order.taxPrice = session.total_details.amount_tax or 0.0
+                order.shippingPrice = session.shipping_cost or 0.0
 
                 shipping_details = session.shipping_details.address
-                address_line = shipping_details.line1
-                if shipping_details.line2:
-                    address_line += f", {shipping_details.line2}"
-                shipping_address = ShippingAddress.objects.create(
-                    fullName=session.shipping_details.name,
-                    address=address_line,
-                    city=shipping_details.city,
-                    postalCode=shipping_details.postal_code,
-                    country=shipping_details.country,
-                )
-                shipping_address.save()
-
-                # TODO: prevent from creating multiple shipping addresses
-
-                order.shippingAddress = shipping_address
-                order.paymentIntentId = session.payment_intent
+                order.shippingAddress = {
+                    "fullName": session.shipping_details.name,
+                    "address": {
+                        "line": shipping_details.line1,
+                        "line2": shipping_details.line2 or "",
+                    },
+                    "city": shipping_details.city,
+                    "postalCode": shipping_details.postal_code,
+                    "country": shipping_details.country,
+                    "state": shipping_details.state or "",
+                }
                 order.invoiceId = session.invoice
 
                 order.save()
@@ -214,5 +207,29 @@ class StripeWebhookView(APIView):
                     user=order.user, stripeCustomerId=session.customer
                 )
                 customer.save()
+
+        if event.type == "charge.succeeded":
+            charge = event["data"]["object"]
+
+            # Fulfill the purchase...
+            try:
+                order_id = charge.metadata.orderId
+                order = Order.objects.get(_id=order_id)
+                order.isPaid = charge.paid
+                order.paidAt = datetime.now(tz=timezone.utc)
+                order.totalPrice = charge.amount
+
+                payment_details = charge.payment_method_details.card
+                order.paymentMethod = {
+                    "brand": payment_details.brand,
+                    "last4": payment_details.last4,
+                    "expMonth": payment_details.exp_month,
+                    "expYear": payment_details.exp_year,
+                    "type": charge.payment_method_details.type or "card",
+                }
+
+                order.save()
+            except Order.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(status=status.HTTP_200_OK)

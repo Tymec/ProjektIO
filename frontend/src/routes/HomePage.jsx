@@ -65,7 +65,13 @@ export default function HomePage() {
               </Col>
             ))}
           </Row>
-          <Paginate className="py-3" page={data.page} pages={data.pages} path="/" args={{ search }} />
+          <Paginate
+            className="py-3"
+            page={data.page}
+            pages={data.pages}
+            path="/"
+            args={{ search }}
+          />
         </div>
       )}
     </div>

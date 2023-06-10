@@ -6,7 +6,6 @@ from base64 import b64decode
 from email.message import EmailMessage
 
 import openai
-from app.models import Product
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -17,8 +16,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
+from app.models import Product
+
 from .models import ChatConversationContext, ImageGeneration, NewsletterUser
-from .serializers import ImageGenerationSerializer
+from .serializers import ImageGenerationSerializer, NewsletterUserSerializer
 
 
 class ImageGenerationViewSet(viewsets.ModelViewSet):
@@ -160,7 +161,7 @@ def get_subscriber(request, pk):
         subscriber = NewsletterUser.objects.get(pk=pk)
         serializer = NewsletterUserSerializer(subscriber, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    except:
+    except Exception:
         return Response(
             {"detail": "Subscriber does not exist"}, status=status.HTTP_400_BAD_REQUEST
         )
@@ -179,7 +180,7 @@ def newsletter_subscribe(request):
 
     try:
         validate_email(email)
-    except ValidationError as e:
+    except ValidationError:
         return Response(
             {"detail": "Please enter a valid email address."},
             status=status.HTTP_400_BAD_REQUEST,
@@ -216,7 +217,7 @@ def newsletter_unsubscribe(request):
 
     try:
         validate_email(email)
-    except ValidationError as e:
+    except ValidationError:
         return Response(
             {"detail": "Please enter a valid email address."},
             status=status.HTTP_400_BAD_REQUEST,

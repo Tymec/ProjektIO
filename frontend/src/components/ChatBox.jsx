@@ -63,8 +63,6 @@ const ChatBox = () => {
         setContextId(chatData.contextId);
       }
     }
-
-
   }, [isSuccess, isError]);
 
   useEffect(() => {
@@ -77,7 +75,6 @@ const ChatBox = () => {
       }
     }
   }, [isProductsSuccess]);
-
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -124,13 +121,13 @@ const ChatBox = () => {
             {chatHistory.map((msg, idx) => {
               if (msg.sender === 'Product') {
                 const product = msg.text;
-                return (<Product key={idx} product={product} />)
+                return <Product key={idx} product={product} />;
               }
               return (
                 <p key={idx}>
                   <strong>{msg.sender}: </strong> {msg.text}
                 </p>
-              )
+              );
             })}
           </Card.Body>
           <Form onSubmit={handleFormSubmit} className="d-flex flex-column">

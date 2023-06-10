@@ -6,7 +6,6 @@ import os
 import random
 
 import click
-import openai
 import requests
 
 
@@ -83,7 +82,7 @@ def send(session, data, reviews, names) -> bool:
         past_names.append(name)
 
         res = session.post(
-            f"http://localhost:8000/api/reviews/",
+            "http://localhost:8000/api/reviews/",
             json={
                 "name": f"{name['first_name']} {name['last_name']}",
                 "rating": int(float(review["rating"])),

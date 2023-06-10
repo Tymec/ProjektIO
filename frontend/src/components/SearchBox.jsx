@@ -23,7 +23,13 @@ function SearchBox() {
         className="mr-sm-2 ml-sm-5"
       ></Form.Control>
 
-      <Button data-testid="search-box-submit" type="submit" variant="outline-success" className="p-2" disabled={!keyword}>
+      <Button
+        data-testid="search-box-submit"
+        type="submit"
+        variant="outline-success"
+        className="p-2"
+        disabled={!keyword}
+      >
         Submit
       </Button>
     </Form>

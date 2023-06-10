@@ -6,7 +6,7 @@ import ProductCarousel from './ProductCarousel';
 test('renders ProductCarousel component', async () => {
   const { findByText, getByAltText } = render(
     <FullProviderWrapper route="/">
-        <ProductCarousel />
+      <ProductCarousel />
     </FullProviderWrapper>
   );
 

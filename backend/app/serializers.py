@@ -63,7 +63,6 @@ class OrderItemSerializer(ModelSerializer):
 
 class OrderSerializer(ModelSerializer):
     orderItems = SerializerMethodField(read_only=True)
-    shippingAddress = SerializerMethodField(read_only=True)
 
     class Meta:
         model = Order
@@ -80,10 +79,3 @@ class OrderSerializer(ModelSerializer):
         items = obj.orderitem_set.all()
         serializer = OrderItemSerializer(items, many=True)
         return serializer.data
-
-    def get_shippingAddress(self, obj):
-        try:
-            address = ShippingAddressSerializer(obj.shippingAddress, many=False).data
-        except Exception:
-            address = False
-        return address

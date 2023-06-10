@@ -101,11 +101,16 @@ export default function ProductPage() {
         <div>
           <Row>
             <Col md={5}>
-              <Image src={product.image} alt={product.name} fluid style={{
-              aspectRatio: '1 / 1',
-              objectFit: 'cover',
-              objectPosition: 'center',
-            }} />
+              <Image
+                src={product.image}
+                alt={product.name}
+                fluid
+                style={{
+                  aspectRatio: '1 / 1',
+                  objectFit: 'cover',
+                  objectPosition: 'center'
+                }}
+              />
             </Col>
             <Col md={3}>
               <ListGroup variant="flush">
@@ -190,7 +195,7 @@ export default function ProductPage() {
                 </ListGroup>
               </Card>
             </Col>
-            </Row>
+          </Row>
 
           <Row>
             <Col md={5} className="py-4">

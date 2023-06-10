@@ -9,4 +9,3 @@ export { default as Product } from './Product';
 export { default as ProductCarousel } from './ProductCarousel';
 export { default as Rating } from './Rating';
 export { default as SearchBox } from './SearchBox';
-

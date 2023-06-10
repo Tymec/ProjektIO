@@ -1,5 +1,6 @@
-import { handlers as productHandlers } from "./api/product"
+import { default as extraHandlers } from './api/extra';
+import { default as productHandlers } from './api/product';
 
-const handlers = [...productHandlers]
+const handlers = [...productHandlers, ...extraHandlers];
 
-export default handlers
+export default handlers;
