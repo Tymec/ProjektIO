@@ -14,13 +14,12 @@ from .serializers import (
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    User view.
-    """
+    """View for viewing and editing users"""
 
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
 
+    # Allow filtering and ordering
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["id", "email", "name"]
     ordering = ["-id"]
@@ -29,6 +28,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return "User"
 
     def get_permissions(self):
+        """Return the permission classes that apply to the current view"""
         if self.action == "me":
             permission_classes = [IsAuthenticated]
         else:
@@ -37,6 +37,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_object(self):
+        """Return the object the view is displaying"""
         pk = self.kwargs.get("pk", None)
 
         if pk == "me":
@@ -45,23 +46,29 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().get_object()
 
     def dispatch(self, request, *args, **kwargs):
+        """Override dispatch to allow users to view and edit their own profile"""
         return super().dispatch(request, *args, **kwargs)
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    """View for obtaining a token pair"""
+
     serializer_class = CustomTokenObtainPairSerializer
 
 
 @api_view(["POST"])
 @authentication_classes([])
 def register(request):
+    """Register a new user"""
     User = get_user_model()
     data = request.data
 
     try:
+        # Check if email and password are provided
         email = data["email"]
         password = data["password"]
 
+        # Check if user with this email already exists
         User.objects.get(email=data["email"])
         return Response(
             {"detail": "User with this email already exists."},
@@ -75,6 +82,7 @@ def register(request):
     except User.DoesNotExist:
         pass
 
+    # Validate email
     try:
         validate_email(email)
     except ValidationError:
@@ -83,6 +91,7 @@ def register(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    # Create user
     user = User.objects.create_user(
         email=email,
         first_name=data["firstName"],
@@ -90,5 +99,6 @@ def register(request):
         password=password,
     )
 
+    # Return serialized user data with token
     serializer = UserSerializerWithToken(user, many=False)
     return Response(serializer.data)

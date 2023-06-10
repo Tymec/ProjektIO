@@ -6,6 +6,7 @@ from base64 import b64decode
 from email.message import EmailMessage
 
 import openai
+from app.models import Product
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -16,24 +17,26 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from app.models import Product
-
 from .models import ChatConversationContext, ImageGeneration, NewsletterUser
 from .serializers import ImageGenerationSerializer, NewsletterUserSerializer
 
 
 class ImageGenerationViewSet(viewsets.ModelViewSet):
+    """View for listing and viewing image generations"""
+
     queryset = ImageGeneration.objects.all()
     serializer_class = ImageGenerationSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """Return only the image generations for the current user"""
         return ImageGeneration.objects.filter(user=self.request.user)
 
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def image_gen(request):
+    """Generate an image using DALL-E 2"""
     data = request.data
 
     user = request.user
@@ -65,6 +68,7 @@ def image_gen(request):
         user=f"{user.id}-{user.email}",
     )
 
+    # Convert the image into a file for storage
     image_data = b64decode(response["data"][0]["b64_json"])
     content = ContentFile(image_data, name=f"{user.id}-{uuid.uuid4()}.png")
 
@@ -74,6 +78,7 @@ def image_gen(request):
         image=content,
     )
 
+    # Return the newly created serialized entity from the database
     serializer = ImageGenerationSerializer(image, many=False)
     return Response(serializer.data)
 
@@ -81,6 +86,7 @@ def image_gen(request):
 @api_view(["POST"])
 @permission_classes([])
 def text_chat(request):
+    """Chat with GPT-3.5/GPT-4"""
     data = request.data
 
     message = data.get("message", None)
@@ -89,6 +95,8 @@ def text_chat(request):
             {"detail": "Message is required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
+    # The context allows us to store the conversation history, so that the frontend
+    # doesn't have to keep track of it
     context_id = data.get("contextId", None)
     context = None
     if context_id:
@@ -98,6 +106,7 @@ def text_chat(request):
             pass
 
     if not context:
+        # Create a new context if one doesn't exist
         context = ChatConversationContext.objects.create(
             init_message=message, context={"conversation": []}
         )
@@ -108,6 +117,7 @@ def text_chat(request):
     else:
         user = {"id": "0", "name": "Anonymous"}
 
+    # Fetch all available products and format them for the chatbot to use
     products = list(Product.objects.filter(countInStock__gt=0).values())
     products = [
         f"({product['_id']}|'{product['name']}|{product['description'].strip()}|{product['rating']})"
@@ -119,6 +129,7 @@ def text_chat(request):
     response = openai.ChatCompletion.create(
         model=request.POST.get("model", "gpt-3.5-turbo"),
         messages=[
+            # The system message is used to tell the chatbot what to do
             {
                 "role": "system",
                 "content": f"""
@@ -128,26 +139,33 @@ def text_chat(request):
                 Never share any URLs or personal information.
                 """,
             },
+            # Initial message
             {
                 "role": "assistant",
                 "content": "Welcome to the chatbot, I will help you find the best product for you",
             },
+            # Conversation history
             *[message for message in context.context["conversation"] if message],
+            # User message
             {"role": "user", "content": message},
         ],
-        max_tokens=100,
+        max_tokens=200,
         user=f"{user['id']}-{user['name']}",
     )
+    # Store the response
     message_response = response["choices"][0]["message"]["content"]
 
+    # Update the conversation history
     conversation = context.context["conversation"] + [
         {"role": "user", "content": message},
         {"role": "assistant", "content": message_response},
     ]
 
+    # Update the context
     context.context = {"conversation": conversation}
     context.save()
 
+    # Return the response
     return Response(
         {"message": message_response, "contextId": str(context._id)},
         status=status.HTTP_200_OK,
@@ -157,6 +175,7 @@ def text_chat(request):
 @api_view(["GET"])
 @permission_classes([])
 def get_subscriber(request, pk):
+    """Get a newsletter subscriber by ID"""
     try:
         subscriber = NewsletterUser.objects.get(pk=pk)
         serializer = NewsletterUserSerializer(subscriber, many=False)
@@ -170,6 +189,7 @@ def get_subscriber(request, pk):
 @api_view(["POST"])
 @permission_classes([])
 def newsletter_subscribe(request):
+    """Subscribe to the newsletter with an email"""
     data = request.data
 
     email = data.get("email", None)
@@ -189,6 +209,7 @@ def newsletter_subscribe(request):
     try:
         newsletter_user = NewsletterUser.objects.get(email=email)
 
+        # If the user already exists in the database, but is not active, activate them
         if not newsletter_user.active:
             newsletter_user.active = True
             newsletter_user.save()
@@ -207,6 +228,7 @@ def newsletter_subscribe(request):
 @api_view(["POST"])
 @permission_classes([])
 def newsletter_unsubscribe(request):
+    """Unsubscribe from the newsletter with an email"""
     data = request.data
 
     email = data.get("email", None)
@@ -227,6 +249,8 @@ def newsletter_unsubscribe(request):
         newsletter_user = NewsletterUser.objects.get(email=email)
         if not newsletter_user.active:
             raise NewsletterUser.DoesNotExist
+
+        # Instead of deleting the user, just set them to inactive (soft delete)
         newsletter_user.active = False
         newsletter_user.save()
     except NewsletterUser.DoesNotExist:
@@ -240,6 +264,7 @@ def newsletter_unsubscribe(request):
 @api_view(["POST"])
 @permission_classes([IsAdminUser])
 def newsletter_send(request):
+    """Send a newsletter to all subscribers"""
     data = request.data
 
     subject = data.get("subject", None)
@@ -254,6 +279,7 @@ def newsletter_send(request):
             {"detail": "Content is required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
+    # The content can either be a valid HTML string or a key-value pair dictionary along with a template name
     try:
         valid_html = bool(BeautifulSoup(content, "html.parser").find())
     except Exception:
@@ -274,11 +300,13 @@ def newsletter_send(request):
             )
 
         try:
+            # Fetch the template from the static files storage
             with staticfiles_storage.open(
                 f"templates/newsletter/{template}.html", mode="r"
             ) as f:
                 template = f.read()
 
+            # Format the template with the content
             for key, value in content.items():
                 template = template.replace("{{ " + key + " }}", value)
             content = re.sub(r"\{\{(.+?)\}\}", "", template)
@@ -289,6 +317,7 @@ def newsletter_send(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+    # Get all active newsletter users
     newsletter_users = NewsletterUser.objects.filter(active=True)
     recievers = [newsletter_user.email for newsletter_user in newsletter_users]
 
@@ -298,11 +327,13 @@ def newsletter_send(request):
             status=status.HTTP_200_OK,
         )
 
+    # Create the email
     email = EmailMessage()
     email["From"] = "PromptWorld Newsletter"
     email["Subject"] = subject
     email.set_content(content, subtype="html")
 
+    # Send the email
     with smtplib.SMTP_SSL(
         settings.SMTP_HOST, settings.SMTP_PORT, context=ssl.create_default_context()
     ) as smtp:

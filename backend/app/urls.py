@@ -10,7 +10,7 @@ from .views import (
 )
 
 
-# Create your urls here.
+# Create a router and register viewsets on it
 class Router(DefaultRouter):
     APIRootView = APIRootView
 
@@ -22,4 +22,5 @@ router.register(r"orders", OrderViewSet, basename="order")
 router.register(r"order-items", OrderItemViewSet, basename="order-item")
 
 
+# The API URLs are now determined automatically by the router.
 urlpatterns = [path("", include(router.urls))]

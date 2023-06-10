@@ -3,6 +3,8 @@ from django.db import models
 
 
 class Customer(models.Model):
+    """Model for storing customer information for Stripe"""
+
     _id = models.AutoField(primary_key=True, editable=False)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True

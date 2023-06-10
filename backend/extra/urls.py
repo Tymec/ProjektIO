@@ -10,6 +10,7 @@ from .views import (
     text_chat,
 )
 
+# Define API routes
 urlpatterns = [
     path(
         "image/",

@@ -6,6 +6,8 @@ from .utils import upload_to
 
 
 class Product(models.Model):
+    """Model for storing products sold in the store"""
+
     _id = models.AutoField(primary_key=True, editable=False)
 
     user = models.ForeignKey(
@@ -34,6 +36,8 @@ class Product(models.Model):
 
 
 class Review(models.Model):
+    """Model for storing user reviews about products"""
+
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
@@ -50,6 +54,8 @@ class Review(models.Model):
 
 
 class Order(models.Model):
+    """Model for storing orders placed by users"""
+
     _id = models.AutoField(primary_key=True, editable=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
@@ -94,6 +100,8 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    """Model for storing products in an order"""
+
     _id = models.AutoField(primary_key=True, editable=False)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
