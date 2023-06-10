@@ -64,6 +64,10 @@ export default function ProductPage() {
   };
 
   const buyNowHandler = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     createCheckoutSession({
       cartItems: [{ id: productId, qty }],
       path: `product/${productId}`
@@ -72,6 +76,10 @@ export default function ProductPage() {
 
   const submitHandler = (e) => {
     e.preventDefault();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     createReview({ product: productId, rating, comment, name: user.name });
   };
 
@@ -200,10 +208,10 @@ export default function ProductPage() {
           <Row>
             <Col md={5} className="py-4">
               <h4>Reviews</h4>
-              {product.reviews.length === 0 && <Message variant="info">No Reviews</Message>}
+              {product?.reviews && product.reviews.length === 0 && <Message variant="info">No Reviews</Message>}
 
               <ListGroup variant="flush">
-                {product.reviews.map((review) => (
+                {product?.reviews && product?.reviews.map((review) => (
                   <ListGroup.Item key={review._id}>
                     <strong>{review.name}</strong>
                     <Rating value={review.rating} color="#f8e825" />

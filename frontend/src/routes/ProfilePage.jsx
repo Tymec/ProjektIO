@@ -38,6 +38,9 @@ export default function ProfilePage() {
 
   const submitHandler = (e) => {
     e.preventDefault();
+    if (!user) {
+      navigate('/login');
+    }
 
     if (password !== confirmPassword) {
       setMessage('Passwords do not match');

@@ -16,6 +16,8 @@ export default function OrderPage() {
   const [deliverOrder, { isLoading: loadingDeliver, isSuccess: successDeliver }] =
     useDeliverOrderMutation();
 
+  console.log(order)
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -42,7 +44,7 @@ export default function OrderPage() {
             <ListGroup.Item>
               <h2>Shipping</h2>
               <p>
-                <strong>Name: </strong> {order.shippingAddress.fullName}
+                <strong>Name: </strong> {order.shippingAddress?.fullName || user.name}
               </p>
               <p>
                 <strong>Email: </strong>
@@ -50,14 +52,23 @@ export default function OrderPage() {
               </p>
               <p>
                 <strong>Shipping: </strong>
-                {order.shippingAddress.address.line}{' '}
-                {order.shippingAddress.address.line2
-                  ? `, ${order.shippingAddress.address.line2}`
-                  : ''}
-                {'  '}
-                {order.shippingAddress.postalCode} {order.shippingAddress.city},{'  '}
-                {order.shippingAddress.country}{' '}
-                {order.shippingAddress.state ? `, ${order.shippingAddress.state}` : ''}
+                {order.shippingAddress?.address && (
+                  <span>
+                    {order.shippingAddress.address.line || ''}{' '}
+                    {order.shippingAddress.address?.line2
+                      ? `, ${order.shippingAddress.address?.line2}`
+                      : ''}
+                    {'  '}
+                    {order.shippingAddress.postalCode} {order.shippingAddress.city}, {'  '}
+                    {order.shippingAddress.country}{' '}
+                    {order.shippingAddress?.state ? `, ${order.shippingAddress?.state}` : ''}
+                  </span>
+                )}
+                {!order.shippingAddress?.address && (
+                  <span>
+                    No shipping information available at this moment.
+                  </span>
+                )}
               </p>
 
               {order.isDelivered ? (
@@ -72,11 +83,21 @@ export default function OrderPage() {
             <ListGroup.Item>
               <h2>Payment Method</h2>
               <p>
-                <strong>{order.paymentMethod.brand.toUpperCase()}</strong> ••••{' '}
-                {order.paymentMethod.last4}
+                {order.paymentMethod && (
+                  <span>
+                    <strong>{order.paymentMethod.brand.toUpperCase()}</strong>
+                    {'  '}
+                    •••• {order.paymentMethod.last4}
+                  </span>
+                )}
+                {!order.paymentMethod && <span>No payment information available at this moment.</span>}
               </p>
               <p>
-                <strong>EXP:</strong> {order.paymentMethod.expMonth} / {order.paymentMethod.expYear}
+                {order.paymentMethod?.expMonth && order.paymentMethod?.expYear && (
+                  <span>
+                    <strong>EXP:</strong> {order.paymentMethod?.expMonth} / {order.paymentMethod?.expYear}
+                  </span>
+                )}
               </p>
               {order.isPaid ? (
                 <Message variant="success">
@@ -128,12 +149,7 @@ export default function OrderPage() {
                 <Row>
                   <Col>Items:</Col>
                   <Col>
-                    {moneyFormat(
-                      order.orderItems.reduce(
-                        (acc, item) => acc + item.quantity * item.product.price,
-                        0
-                      )
-                    )}
+                    {moneyFormat((order.totalPrice / 100))}
                   </Col>
                 </Row>
               </ListGroup.Item>
@@ -155,7 +171,9 @@ export default function OrderPage() {
               <ListGroup.Item>
                 <Row>
                   <Col>Total:</Col>
-                  <Col>{moneyFormat(order.totalPrice)}</Col>
+                  <Col>{moneyFormat(
+                      (order.totalPrice / 100) + order.shippingPrice + order.taxPrice
+                    )}</Col>
                 </Row>
               </ListGroup.Item>
 
