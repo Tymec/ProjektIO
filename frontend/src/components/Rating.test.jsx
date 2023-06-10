@@ -1,6 +1,6 @@
-import React from 'react';
 import { render } from '@testing-library/react';
-import Rating from '../src/components/Rating';
+
+import Rating from './Rating';
 
 describe('Rating', () => {
   test('renders correctly with no half stars', () => {

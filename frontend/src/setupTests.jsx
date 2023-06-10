@@ -1,11 +1,22 @@
+import { configureStore } from '@reduxjs/toolkit';
 import matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
 import { afterEach, expect } from 'vitest';
 
-// extends Vitest's expect method with methods from react-testing-library
+import { api } from './features';
+import { server } from './mock/server';
+import storeConfig from './store';
+
+const store = configureStore(storeConfig);
+
 expect.extend(matchers);
 
-// runs a cleanup after each test case (e.g. clearing jsdom)
+beforeAll(() => {
+  server.listen();
+});
+
 afterEach(() => {
+  server.resetHandlers();
   cleanup();
+  store.dispatch(api.util.resetApiState());
 });

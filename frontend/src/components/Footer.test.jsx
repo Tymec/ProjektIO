@@ -1,20 +1,14 @@
-import 'jest-localstorage-mock';
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import { configureStore } from '@reduxjs/toolkit';
-import { Provider } from 'react-redux';
-import Footer from '../src/components/Footer';
-import React from 'react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 
-
+import { StoreProviderWrapper } from '../testUtils';
+import Footer from './Footer';
 
 describe('Footer', () => {
-  const store = configureStore({ reducer: {} });
-
   test('renders correctly', () => {
     const { getByPlaceholderText } = render(
-      <Provider store={store}>
+      <StoreProviderWrapper>
         <Footer />
-      </Provider>
+      </StoreProviderWrapper>
     );
     const input = getByPlaceholderText('Newsletter');
     expect(input).toBeInTheDocument();
@@ -22,9 +16,9 @@ describe('Footer', () => {
 
   test('handles email input change', () => {
     const { getByPlaceholderText } = render(
-      <Provider store={store}>
+      <StoreProviderWrapper>
         <Footer />
-      </Provider>
+      </StoreProviderWrapper>
     );
     const input = getByPlaceholderText('Newsletter');
     fireEvent.change(input, { target: { value: 'test@example.com' } });
@@ -33,9 +27,9 @@ describe('Footer', () => {
 
   test('handles form submission', async () => {
     const { getByPlaceholderText, getByRole } = render(
-      <Provider store={store}>
+      <StoreProviderWrapper>
         <Footer />
-      </Provider>
+      </StoreProviderWrapper>
     );
     const input = getByPlaceholderText('Newsletter');
     const button = getByRole('button', { name: /Subscribe/i });
