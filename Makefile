@@ -14,7 +14,7 @@ frontend:
 	$(MAKE) -C frontend $(filter-out $@,$(MAKECMDGOALS))
 
 stripe:
-	stripe listen --forward-to localhost:8000/api/payments/webhook
+	stripe listen --forward-to localhost:8000/api/payments/webhook/
 
 %:
 	@true

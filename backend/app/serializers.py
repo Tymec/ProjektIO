@@ -4,7 +4,7 @@ from rest_framework.serializers import (
     SerializerMethodField,
 )
 
-from .models import Order, OrderItem, Product, Review, ShippingAddress
+from .models import Order, OrderItem, Product, Review
 
 
 class ReviewSerializer(ModelSerializer):
@@ -59,17 +59,6 @@ class OrderItemSerializer(ModelSerializer):
         product = obj.product
         serializer = ProductSerializer(product, many=False)
         return serializer.data
-
-
-class ShippingAddressSerializer(ModelSerializer):
-    class Meta:
-        model = ShippingAddress
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret["_id"] = str(ret["_id"])
-        return ret
 
 
 class OrderSerializer(ModelSerializer):

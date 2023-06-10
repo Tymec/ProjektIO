@@ -5,13 +5,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.routers import APIRootView
 
-from .models import Order, OrderItem, Product, Review, ShippingAddress
+from .models import Order, OrderItem, Product, Review
 from .serializers import (
     OrderItemSerializer,
     OrderSerializer,
     ProductSerializer,
     ReviewSerializer,
-    ShippingAddressSerializer,
 )
 
 
@@ -23,19 +22,6 @@ class APIRootView(APIRootView):
 
     def get_view_name(self):
         return "API"
-
-
-class ShippingAddressViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows shipping addresses to be viewed or edited.
-    """
-
-    queryset = ShippingAddress.objects.all()
-    serializer_class = ShippingAddressSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def get_view_name(self):
-        return "Shipping Addresses"
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -106,6 +92,34 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response(
+                {"message": "You are not authorized to perform this action"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        try:
+            rating = int(request.data["rating"])
+        except ValueError:
+            return Response(
+                {"message": "Rating must be an integer"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        product = Product.objects.get(_id=request.data["product"])
+        if product:
+            product.numReviews = product.numReviews + 1
+            product.rating = (
+                product.rating * (product.numReviews - 1) + rating
+            ) / product.numReviews
+            product.save()
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     @action(detail=False, methods=["GET"])
     def me(self, request, pk=None):
         reviews = self.get_queryset().filter(user=request.user)
@@ -166,3 +180,28 @@ class OrderItemViewSet(viewsets.ModelViewSet):
 
     def get_view_name(self):
         return "Order Items"
+
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response(
+                {"message": "You are not authorized to perform this action"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        try:
+            qty = int(request.data["qty"])
+        except ValueError:
+            return Response(
+                {"message": "Quantity must be an integer"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        product = Product.objects.get(_id=request.data["product"])
+        if product:
+            product.countInStock = product.countInStock - qty
+            product.save()
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
