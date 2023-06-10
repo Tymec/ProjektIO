@@ -10,7 +10,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.jsx',
     coverage: {
-      provider: 'istanbul'
+      provider: 'istanbul',
+      reporter: ['json'],
+      reportsDirectory: './docs'
     }
   }
 });
