@@ -1,36 +1,36 @@
-import { useEffect, useState } from 'react'
-import { Button, Col, Container, Form, Row } from 'react-bootstrap'
+import { useEffect, useState } from 'react';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 
-import { useSubscribeNewsletterMutation } from '../features'
+import { useSubscribeNewsletterMutation } from '../features';
 
 function Footer() {
-  const [email, setEmail] = useState('')
-  const [block, setBlock] = useState(false)
-  const [placeholder, setPlaceholder] = useState('Newsletter')
-  const [subscribe, { isSuccess, isError, error }] = useSubscribeNewsletterMutation()
+  const [email, setEmail] = useState('');
+  const [block, setBlock] = useState(false);
+  const [placeholder, setPlaceholder] = useState('Newsletter');
+  const [subscribe, { isSuccess, isError, error }] = useSubscribeNewsletterMutation();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    subscribe(email)
-      setEmail('')
-  }
+    e.preventDefault();
+    subscribe(email);
+    setEmail('');
+  };
 
   useEffect(() => {
     if (isError) {
-      setBlock(true)
-      setPlaceholder(error.data?.detail || "Error")
+      setBlock(true);
+      setPlaceholder(error.data?.detail || 'Error');
       setTimeout(() => {
-        setBlock(false)
-        setPlaceholder('Newsletter')
-        setEmail('')
-      }, 3000)
+        setBlock(false);
+        setPlaceholder('Newsletter');
+        setEmail('');
+      }, 3000);
     }
 
     if (isSuccess) {
-      setBlock(true)
-      setPlaceholder('Subscribed')
+      setBlock(true);
+      setPlaceholder('Subscribed');
     }
-  }, [isSuccess, isError])
+  }, [isSuccess, isError]);
 
   return (
     <footer>
@@ -40,9 +40,22 @@ function Footer() {
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formBasicEmail">
                 <Form.Label></Form.Label>
-                <Form.Control type="email" placeholder={placeholder} disabled={block} value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Form.Control
+                  type="email"
+                  placeholder={placeholder}
+                  disabled={block}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </Form.Group>
-              <Button variant={(isSuccess && block) ? 'success' : (isError && block) ? 'danger' : 'primary'} type="submit" block disabled={block}>Subscribe
+              <Button
+                variant={isSuccess && block ? 'success' : isError && block ? 'danger' : 'primary'}
+                type="submit"
+                block
+                disabled={block}
+              >
+                Subscribe
               </Button>
             </Form>
           </Col>
@@ -52,7 +65,7 @@ function Footer() {
         </Row>
       </Container>
     </footer>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

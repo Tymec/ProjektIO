@@ -20,7 +20,7 @@ function Header() {
 
   return (
     <header>
-      <Navbar bg="primary" variant="dark" expand="lg" style={{opacity : "0.95"}} collapseOnSelect>
+      <Navbar bg="primary" variant="dark" expand="lg" style={{ opacity: '0.95' }} collapseOnSelect>
         <Container>
           <LinkContainer to="/">
             <Navbar.Brand>PromptWorld</Navbar.Brand>
@@ -55,7 +55,8 @@ function Header() {
               {user && user.isAdmin && (
                 <LinkContainer
                   onClick={() => openInNewTab('http://localhost:8000/admin')}
-                  to={window.location.pathname}>
+                  to={window.location.pathname}
+                >
                   <Nav.Link>
                     <i className="fas fa-user"></i>Admin
                   </Nav.Link>

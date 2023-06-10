@@ -12,8 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
 
   const redirect = searchParams.get('redirect') || '/';
-  const [loginUser, { data: loginData, isLoading, isSuccess, isError, error }] = useLoginMutation();
-
+  const [loginUser, { isLoading, isSuccess, isError, error }] = useLoginMutation();
 
   useEffect(() => {
     if (isSuccess) {
@@ -39,7 +38,8 @@ export default function LoginPage() {
             placeholder="Enter Email"
             value={email}
             autoComplete="current-email"
-            onChange={(e) => setEmail(e.target.value)}></Form.Control>
+            onChange={(e) => setEmail(e.target.value)}
+          ></Form.Control>
         </Form.Group>
 
         <Form.Group controlId="password">
@@ -49,7 +49,8 @@ export default function LoginPage() {
             placeholder="Enter Password"
             value={password}
             autoComplete="current-password"
-            onChange={(e) => setPassword(e.target.value)}></Form.Control>
+            onChange={(e) => setPassword(e.target.value)}
+          ></Form.Control>
         </Form.Group>
 
         <Button type="submit" variant="primary">

@@ -92,7 +92,8 @@ export default function CartPage() {
                       value={cart.items.find((item) => item.id === product._id).qty}
                       onChange={(e) =>
                         dispatch(addToCart({ id: product._id, qty: Number(e.target.value) }))
-                      }>
+                      }
+                    >
                       {[...Array(product.countInStock).keys()].map((x) => (
                         <option key={x + 1} value={x + 1}>
                           {x + 1}
@@ -105,7 +106,8 @@ export default function CartPage() {
                     <Button
                       type="button"
                       variant="light"
-                      onClick={() => removeFromCartHandler(product._id)}>
+                      onClick={() => removeFromCartHandler(product._id)}
+                    >
                       <i className="fas fa-trash"></i>
                     </Button>
                   </Col>
@@ -146,7 +148,8 @@ export default function CartPage() {
               type="button"
               className="btn-block"
               disabled={cart.items.length === 0}
-              onClick={checkoutHandler}>
+              onClick={checkoutHandler}
+            >
               Proceed To Checkout
             </Button>
           </ListGroup.Item>

@@ -68,7 +68,8 @@ export default function ProfilePage() {
               placeholder="Enter name"
               autoComplete="new-name"
               value={user?.name}
-              disabled></Form.Control>
+              disabled
+            ></Form.Control>
           </Form.Group>
 
           <Form.Group controlId="email">
@@ -79,7 +80,8 @@ export default function ProfilePage() {
               placeholder="Enter Email"
               autoComplete="new-email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}></Form.Control>
+              onChange={(e) => setEmail(e.target.value)}
+            ></Form.Control>
           </Form.Group>
 
           <Form.Group controlId="password">
@@ -89,7 +91,8 @@ export default function ProfilePage() {
               placeholder="Enter Password"
               autoComplete="new-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}></Form.Control>
+              onChange={(e) => setPassword(e.target.value)}
+            ></Form.Control>
           </Form.Group>
 
           <Form.Group controlId="passwordConfirm">
@@ -99,7 +102,8 @@ export default function ProfilePage() {
               placeholder="Confirm Password"
               autoComplete="confirm-password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}></Form.Control>
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            ></Form.Control>
           </Form.Group>
 
           <Button type="submit" variant="primary">

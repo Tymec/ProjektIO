@@ -9,7 +9,7 @@ export const api = createApi({
         headers.set('Authorization', `Bearer ${token}`);
       }
       return headers;
-    },
+    }
   }),
   tagTypes: ['Product', 'Order', 'Review', 'User'],
   endpoints: () => ({})
