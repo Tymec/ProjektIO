@@ -107,6 +107,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        if rating < 1 or rating > 5:
+            return Response(
+                {"message": "Rating must be between 1 and 5"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if request.data["comment"].strip() == "":
+            return Response(
+                {"message": "Comment cannot be empty"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         product = Product.objects.get(_id=request.data["product"])
         if product:
             product.numReviews = product.numReviews + 1

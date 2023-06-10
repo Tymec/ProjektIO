@@ -27,6 +27,7 @@ export default function ProductPage() {
   const [comment, setComment] = useState('');
   const [status, setStatus] = useState(false);
   const [userBoughtProduct, setUserBoughtProduct] = useState(false);
+  const [internalError, setInternalError] = useState(false);
 
   const { data: product, isLoading, isError, error, refetch } = useGetProductQuery(productId);
   const { user } = useSelector((state) => state.userState);
@@ -51,12 +52,16 @@ export default function ProductPage() {
       navigate(`/order/${orderId}`);
     }
     if (isCheckoutSuccess) {
+      if (!checkoutData.url) {
+        console.error(checkoutData.detail);
+        setInternalError(true);
+      }
       window.location.href = checkoutData.url;
     }
     if (userBoughtSuccess) {
       setUserBoughtProduct(userBought.hasBought);
     }
-  }, [isCheckoutSuccess, checkoutData, success, orderId, userBoughtSuccess]);
+  }, [user, isCheckoutSuccess, checkoutData, success, orderId, userBoughtSuccess]);
 
   const addToCartHandler = () => {
     dispatch(addToCart({ id: productId, qty, increment: true }));
@@ -78,6 +83,9 @@ export default function ProductPage() {
     e.preventDefault();
     if (!user) {
       navigate('/login');
+      return;
+    }
+    if (comment.trim() === '') {
       return;
     }
     createReview({ product: productId, rating, comment, name: user.name });
@@ -103,7 +111,7 @@ export default function ProductPage() {
       </Link>
       {isLoading ? (
         <Loader />
-      ) : isError ? (
+      ) : (isError || internalError) ? (
         <Message variant="danger">{error.data?.detail || 'Error'}</Message>
       ) : (
         <div>

@@ -45,9 +45,9 @@ export default function ProfilePage() {
     if (password !== confirmPassword) {
       setMessage('Passwords do not match');
     } else {
-      console.log(user);
+      console.log(user)
       updateUser({
-        id: user._id,
+        id: user.id,
         email: email,
         password: password
       });

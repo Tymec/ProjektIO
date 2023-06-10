@@ -94,9 +94,9 @@ class OrderSerializer(ModelSerializer):
         ret["_id"] = str(ret["_id"])
         ret["user"] = str(ret["user"])
         ret["sessionId"] = str(ret["sessionId"])
-        ret["totalPrice"] = float(ret["totalPrice"])
-        ret["shippingPrice"] = float(ret["shippingPrice"])
-        ret["taxPrice"] = float(ret["taxPrice"])
+        ret["totalPrice"] = float(ret["totalPrice"] or 0.0)
+        ret["shippingPrice"] = float(ret["shippingPrice"] or 0.0)
+        ret["taxPrice"] = float(ret["taxPrice"] or 0.0)
         return ret
 
     def get_orderItems(self, obj):

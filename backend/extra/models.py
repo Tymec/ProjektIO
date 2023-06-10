@@ -1,3 +1,4 @@
+from app.models import Product
 from django.conf import settings
 from django.db import models
 
@@ -10,6 +11,9 @@ class ImageGeneration(models.Model):
     )
     image = models.ImageField(upload_to="extra/%Y/%m/%d", blank=True, null=True)
     prompt = models.TextField(blank=False, max_length=1000)
+    product = models.ForeignKey(
+        Product, on_delete=models.SET_NULL, null=True, blank=True
+    )
     createdAt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -39,4 +43,4 @@ class ChatConversationContext(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.init_message
+        return f"{self.user} |> {self.init_message}"

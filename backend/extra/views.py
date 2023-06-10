@@ -1,3 +1,4 @@
+import random
 import re
 import smtplib
 import ssl
@@ -6,6 +7,8 @@ from base64 import b64decode
 from email.message import EmailMessage
 
 import openai
+from app.models import Product
+from app.serializers import ProductSerializer
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -15,8 +18,6 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-
-from app.models import Product
 
 from .models import ChatConversationContext, ImageGeneration, NewsletterUser
 from .serializers import ImageGenerationSerializer, NewsletterUserSerializer
@@ -112,6 +113,14 @@ def text_chat(request):
             init_message=message, context={"conversation": []}
         )
 
+    current_product = data.get("currentProduct", None)
+    if current_product:
+        try:
+            current_product = Product.objects.get(_id=current_product)
+            current_product = f"The user is currently looking at the following product: ({current_product['_id']}|{current_product['name']}|{current_product['description'].strip()}|{current_product['rating']})."
+        except Exception:
+            pass
+
     user = request.user
     if user.is_authenticated:
         user = {"id": user.id, "name": user.email}
@@ -136,14 +145,20 @@ def text_chat(request):
                 "content": f"""
                 You are a chatbot assistant that helps users find the best product for them.
                 Here are the available products in the form of (id|name|description|rating): {', '.join(products)}
-                When recommending products make sure to include the id of the product in the message (the ID will be extracted with regex, so make sure when the ID is removed the message still makes sense and is formatted correctly).
-                Never share any URLs or personal information.
+                Try to format the product name to not clutter the message, for example instead of referring to some phone as "Samsung Galaxy S21 Ultra 5G (2023) Exynox CPU 8GB RAM", you can refer to it as "Samsung S21 Ultra".
+                Also, do not include any special characters in your message, such as quotes, brackets, parentheses, etc.
                 """,
             },
             # Initial message
             {
                 "role": "assistant",
-                "content": "Welcome to the chatbot, I will help you find the best product for you",
+                "content": "Welcome to the chatbot, I will help you find the best product for you. I will recommend products based on your preferences and the products' descriptions. Whenever I recommend product(s), I will add the product ID(s) at the end of the message like so: <MESSAGE> <PRODUCT_ID_1> <PRODUCT_ID_2> ...",
+            },
+            # Page context
+            {
+                "role": "system",
+                "content": current_product
+                or "The user is not looking at any specific product.",
             },
             # Conversation history
             *[message for message in context.context["conversation"] if message],
@@ -151,6 +166,7 @@ def text_chat(request):
             {"role": "user", "content": message},
         ],
         max_tokens=200,
+        temperature=0.9,
         user=f"{user['id']}-{user['name']}",
     )
     # Store the response
@@ -171,6 +187,157 @@ def text_chat(request):
         {"message": message_response, "contextId": str(context._id)},
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(["POST"])
+@permission_classes([IsAdminUser])
+def generate_product(request):
+    """Generate a product using DALL-E 2 for the image and GPT-4 for the rest"""
+    data = request.data
+    user = request.user
+
+    prompt = data.get("prompt", None)
+    if not prompt:
+        return Response(
+            {"detail": "Prompt is required"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    openai.api_key = settings.OPENAI_API_KEY
+
+    # 1. Generate the name, brand, description and price in USD
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "Your task is to generate a product in the form of (name|brand|description|price).",
+            },
+            {
+                "role": "assistant",
+                "content": "I will generate a product for you in the form of (name|brand|description|price).",
+            },
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=100,
+        temperature=0.9,
+    )
+    product = response["choices"][0]["message"]["content"]
+
+    # Try to parse the product
+    try:
+        product = product.split("|")
+        name = product[0].strip()
+        brand = product[1].strip()
+        description = product[2].strip()
+        price = product[3].strip().replace("$", "")
+        price = float(price)
+    except Exception:
+        return Response(
+            {"detail": "Product generation failed"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # 2. Generate the prompt for the image
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "Your task is to generate a prompt for DALLE-2 to generate the product image.",
+            },
+            {
+                "role": "assistant",
+                "content": "I will generate a prompt for DALLE-2 in the form of: <prompt>",
+            },
+            {
+                "role": "user",
+                "content": f"Product name: {name}, product brand: {brand}, product description: {description}",
+            },
+        ],
+        max_tokens=100,
+        temperature=0.9,
+    )
+    prompt = response["choices"][0]["message"]["content"]
+
+    # 3. Generate the image
+    response = openai.Image.create(
+        prompt=prompt,
+        n=1,
+        size="512x512",
+        response_format="b64_json",
+        user=f"{user.id}-{user.email}",
+    )
+
+    # Convert the image into a file for storage
+    image_data = b64decode(response["data"][0]["b64_json"])
+    content = ContentFile(image_data, name=f"{user.id}-{uuid.uuid4()}.png")
+
+    image = ImageGeneration.objects.create(
+        user=user,
+        prompt=prompt,
+        image=content,
+    )
+
+    # 4. Create the product
+    product = Product.objects.create(
+        user=user,
+        name=name,
+        brand=brand,
+        description=description,
+        category="AI Generated",
+        price=price,
+        image=content,
+        countInStock=10,
+    )
+
+    image.product = product
+    image.save()
+
+    # 5. [Extra] Generate fake reviews
+    review_count = random.randint(1, 5)
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "Your task is to generate fake reviews for the product.",
+            },
+            {
+                "role": "assistant",
+                "content": f"I will generate {review_count} reviews for the product in the form of: <name_1>|<1-5>|<review_1>;<name_2>|<1-5>|<review_2>;...",
+            },
+            {
+                "role": "user",
+                "content": f"Product name: {name}, product brand: {brand}, product description: {description}, price: {price}",
+            },
+        ],
+        max_tokens=200,
+        temperature=0.9,
+    )
+    reviews = response["choices"][0]["message"]["content"]
+    print(reviews)
+
+    # Try to parse the reviews
+    try:
+        reviews = reviews.split(";")
+        for review in reviews:
+            review = review.split("|")
+            name = review[0].strip()
+            rating = review[1].strip()
+            rating = int(rating)
+            comment = review[2].strip()
+
+            Review.objects.create(
+                product=product,
+                name=name,
+                rating=rating,
+                comment=comment,
+            )
+    except Exception:
+        pass
+
+    serializer = ProductSerializer(product, many=False)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])

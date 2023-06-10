@@ -2,6 +2,7 @@ import { Carousel, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 import { useListProductsQuery } from '../features';
+import { moneyFormat } from '../utils';
 import Loader from './Loader';
 import Message from './Message';
 
@@ -27,7 +28,7 @@ function ProductCarousel() {
             <Image src={product.image} alt={product.name} fluid />
             <Carousel.Caption className="carousel.caption">
               <h4>
-                {product.name} (${product.price})
+                {product.name} ({moneyFormat(product.price)})
               </h4>
             </Carousel.Caption>
           </Link>

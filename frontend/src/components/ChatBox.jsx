@@ -1,12 +1,18 @@
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Loader, Product } from '../components';
-import { useChatMutation, useListProductsQuery } from '../features';
+import { resetChatbotContextId, setChatbotContextId, useChatMutation, useListProductsQuery } from '../features';
 
 const ChatBox = () => {
-  const [contextId, setContextId] = useState('');
+  const dispatch = useDispatch();
+
+  const { chatbotContextId } = useSelector((state) => state.extraState);
+
+  // TODO: Implement page-context
+
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([
@@ -30,10 +36,18 @@ const ChatBox = () => {
     e.preventDefault();
     if (message.trim()) {
       setChatHistory((prevChatHistory) => [...prevChatHistory, { text: message, sender: 'User' }]);
-      sendMessage({ userMessage: message, contextId });
+      sendMessage({ userMessage: message, contextId: chatbotContextId || null });
 
       setMessage('');
     }
+  };
+
+  const resetContext = () => {
+    dispatch(resetChatbotContextId());
+    setChatHistory([
+      { text: 'Welcome to the chatbot, I will help you find the best product for you', sender: 'Bot' }
+    ]);
+    setMessage('');
   };
 
   useEffect(() => {
@@ -59,8 +73,8 @@ const ChatBox = () => {
         ...prevChatHistory,
         { text: botMessage, sender: 'Bot' }
       ]);
-      if (!contextId) {
-        setContextId(chatData.contextId);
+      if (!chatbotContextId) {
+        dispatch(setChatbotContextId(chatData.contextId));
       }
     }
   }, [isSuccess, isError]);
@@ -146,6 +160,9 @@ const ChatBox = () => {
             <div className="d-flex justify-content-center">
               <Button variant="primary" type="submit" className="m-2" style={{ width: '300px' }}>
                 Send
+              </Button>
+              <Button variant="primary" className="m-2" style={{ width: '100px' }} onClick={resetContext}>
+                Reset
               </Button>
             </div>
           </Form>

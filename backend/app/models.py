@@ -50,7 +50,7 @@ class Review(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
-        return f"{self.name} {self.rating} - {self._id}"
+        return f"{self.name} [{float(self.rating)}] | {self.product.name}"
 
 
 class Order(models.Model):
@@ -96,7 +96,7 @@ class Order(models.Model):
     updatedAt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user} - {self.createdAt} - {self.totalPrice}"
+        return f"{self.user} [{self.totalPrice}] | {self.createdAt.strftime('%m/%d/%Y-%H:%M:%S')}"
 
 
 class OrderItem(models.Model):
@@ -109,4 +109,4 @@ class OrderItem(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.order} - {self.quantity}"
+        return f"{self.product} [{self.quantity}] | {self.order.user}"

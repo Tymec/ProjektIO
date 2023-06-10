@@ -2,6 +2,7 @@ from django.urls import include, path
 
 from .views import (
     ImageGenerationViewSet,
+    generate_product,
     get_subscriber,
     image_gen,
     newsletter_send,
@@ -46,4 +47,5 @@ urlpatterns = [
             ]
         ),
     ),
+    path("product/", generate_product, name="generate-product"),
 ]

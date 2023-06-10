@@ -1,4 +1,33 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 import { api } from './api';
+
+const getFromLocalStorage = (key, def = '') => {
+  const value = localStorage.getItem(key);
+  if (value) {
+    return JSON.parse(value);
+  }
+  return def;
+};
+
+export const extraSlice = createSlice({
+  name: 'extra',
+  initialState: {
+    chatbotContextId: getFromLocalStorage('chatbotContextId', ''),
+  },
+  reducers: {
+    setChatbotContextId: (state, action) => {
+      state.chatbotContextId = action.payload;
+      localStorage.setItem('chatbotContextId', JSON.stringify(state.chatbotContextId));
+    },
+    resetChatbotContextId: (state) => {
+      state.chatbotContextId = '';
+      localStorage.removeItem('chatbotContextId');
+    }
+  }
+});
+
+export const { setChatbotContextId, resetChatbotContextId } = extraSlice.actions;
 
 export const extraApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -69,8 +98,15 @@ export const extraApi = api.injectEndpoints({
         body: {
           message: data.userMessage,
           contextId: data.contextId,
-          model: 'gpt-4'
+          model: 'gpt-4',
         }
+      })
+    }),
+    generateProduct: build.mutation({
+      query: prompt => ({
+        url: `/extra/product/`,
+        method: 'POST',
+        body: { prompt }
       })
     })
   })
@@ -84,5 +120,6 @@ export const {
   useImageListQuery,
   useImageGetQuery,
   useImageGenerateMutation,
-  useChatMutation
+  useChatMutation,
+  useGenerateProductMutation
 } = extraApi;

@@ -54,10 +54,10 @@ export default function OrderPage() {
                 <strong>Shipping: </strong>
                 {order.shippingAddress?.address && (
                   <span>
-                    {order.shippingAddress.address.line || ''}{' '}
+                    {order.shippingAddress.address.line || ''}
                     {order.shippingAddress.address?.line2
                       ? `, ${order.shippingAddress.address?.line2}`
-                      : ''}
+                      : ''},
                     {'  '}
                     {order.shippingAddress.postalCode} {order.shippingAddress.city}, {'  '}
                     {order.shippingAddress.country}{' '}
@@ -83,11 +83,15 @@ export default function OrderPage() {
             <ListGroup.Item>
               <h2>Payment Method</h2>
               <p>
-                {order.paymentMethod && (
+                {(order.paymentMethod && order.paymentMethod?.type === 'card') ? (
                   <span>
                     <strong>{order.paymentMethod.brand.toUpperCase()}</strong>
                     {'  '}
                     •••• {order.paymentMethod.last4}
+                  </span>
+                ) : (
+                  <span>
+                    <strong>{order.paymentMethod?.type?.toUpperCase()}</strong>
                   </span>
                 )}
                 {!order.paymentMethod && <span>No payment information available at this moment.</span>}

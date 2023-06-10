@@ -129,7 +129,10 @@ class StripeCheckoutView(APIView):
                     "setup_future_usage": "off_session",
                     "metadata": {"orderId": order._id},
                 },
-                payment_method_types=["card"],
+                customer_update={"shipping": "auto"},
+                automatic_tax={
+                    "enabled": True,
+                },
                 success_url=success_url,
                 cancel_url=cancel_url,
             )
@@ -229,14 +232,17 @@ class StripeWebhookView(APIView):
                 order.totalPrice = charge.amount
 
                 # Update the payment method of the order
-                payment_details = charge.payment_method_details.card
-                order.paymentMethod = {
-                    "brand": payment_details.brand,
-                    "last4": payment_details.last4,
-                    "expMonth": payment_details.exp_month,
-                    "expYear": payment_details.exp_year,
-                    "type": charge.payment_method_details.type or "card",
-                }
+                if charge.payment_method_details.type == "card":
+                    payment_details = charge.payment_method_details.card
+                    order.paymentMethod = {
+                        "type": charge.payment_method_details.type,
+                        "brand": payment_details.brand,
+                        "last4": payment_details.last4,
+                        "expMonth": payment_details.exp_month,
+                        "expYear": payment_details.exp_year,
+                    }
+                else:
+                    order.paymentMethod = {"type": charge.payment_method_details.type}
 
                 order.save()
             except Order.DoesNotExist:
