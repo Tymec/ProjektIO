@@ -6,6 +6,7 @@ import {
   HomePage,
   LoginPage,
   MaintenancePage,
+  NewsletterUnsubscribePage,
   OrderPage,
   ProductPage,
   ProfilePage,
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: 'cart/',
         element: <CartPage />
+      },
+      {
+        path: 'newsletter/unsubscribe/:id',
+        element: <NewsletterUnsubscribePage />
       }
     ]
   },

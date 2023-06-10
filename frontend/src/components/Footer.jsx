@@ -5,29 +5,30 @@ import { useSubscribeNewsletterMutation } from '../features'
 
 function Footer() {
   const [email, setEmail] = useState('')
-  const [blockButton, setBlockButton] = useState(false)
-  const [status, setStatus] = useState('Subscribe')
+  const [block, setBlock] = useState(false)
+  const [placeholder, setPlaceholder] = useState('Newsletter')
   const [subscribe, { isSuccess, isError, error }] = useSubscribeNewsletterMutation()
 
   const handleSubmit = (e) => {
     e.preventDefault()
     subscribe(email)
-    setEmail('')
+      setEmail('')
   }
 
   useEffect(() => {
     if (isError) {
-      setBlockButton(true)
-      setStatus(error.data?.detail || "Error")
+      setBlock(true)
+      setPlaceholder(error.data?.detail || "Error")
       setTimeout(() => {
-        setBlockButton(false)
-        setStatus('Subscribe')
+        setBlock(false)
+        setPlaceholder('Newsletter')
+        setEmail('')
       }, 3000)
     }
 
     if (isSuccess) {
-      setBlockButton(true)
-      setStatus('Subscribed')
+      setBlock(true)
+      setPlaceholder('Subscribed')
     }
   }, [isSuccess, isError])
 
@@ -39,9 +40,9 @@ function Footer() {
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formBasicEmail">
                 <Form.Label></Form.Label>
-                <Form.Control type="email" placeholder="Newsletter" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Form.Control type="email" placeholder={placeholder} disabled={block} value={email} onChange={(e) => setEmail(e.target.value)} required />
               </Form.Group>
-              <Button variant={status === "Subscribed" ? 'success' : status === "Subscribe" ? 'primary' : 'danger'} type="submit" block disabled={blockButton}>{status}
+              <Button variant={(isSuccess && block) ? 'success' : (isError && block) ? 'danger' : 'primary'} type="submit" block disabled={block}>Subscribe
               </Button>
             </Form>
           </Col>

@@ -2,6 +2,7 @@ from django.urls import include, path
 
 from .views import (
     ImageGenerationViewSet,
+    get_subscriber,
     image_gen,
     newsletter_send,
     newsletter_subscribe,
@@ -40,6 +41,7 @@ urlpatterns = [
                     name="newsletter-unsubscribe",
                 ),
                 path("send/", newsletter_send, name="newsletter-send"),
+                path("<int:pk>/", get_subscriber, name="newsletter-get-subscriber"),
             ]
         ),
     ),

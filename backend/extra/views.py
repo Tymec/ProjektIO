@@ -153,6 +153,19 @@ def text_chat(request):
     )
 
 
+@api_view(["GET"])
+@permission_classes([])
+def get_subscriber(request, pk):
+    try:
+        subscriber = NewsletterUser.objects.get(pk=pk)
+        serializer = NewsletterUserSerializer(subscriber, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except:
+        return Response(
+            {"detail": "Subscriber does not exist"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+
 @api_view(["POST"])
 @permission_classes([])
 def newsletter_subscribe(request):
@@ -211,6 +224,8 @@ def newsletter_unsubscribe(request):
 
     try:
         newsletter_user = NewsletterUser.objects.get(email=email)
+        if not newsletter_user.active:
+            raise NewsletterUser.DoesNotExist
         newsletter_user.active = False
         newsletter_user.save()
     except NewsletterUser.DoesNotExist:

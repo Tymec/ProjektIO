@@ -16,6 +16,12 @@ export const extraApi = api.injectEndpoints({
               body: { email }
           }),
         }),
+        getSubscriber: build.query({
+            query: id => ({
+                url: `/extra/newsletter/${id}/`,
+                method: 'GET',
+            }),
+        }),
         sendNewsletter: build.mutation({
           query: data => ({
               url: `/extra/newsletter/send/`,
@@ -29,6 +35,7 @@ export const extraApi = api.injectEndpoints({
                     image_url: data.image_url,
                     content: data.message,
                     link: data.link,
+                    unsubscribe_url: `${window.location.origin}/newsletter/unsubscribe/me`
                   },
               }
           }),
@@ -72,6 +79,7 @@ export const extraApi = api.injectEndpoints({
 export const {
   useSubscribeNewsletterMutation,
   useUnsubscribeNewsletterMutation,
+  useGetSubscriberQuery,
   useSendNewsletterMutation,
   useImageListQuery,
   useImageGetQuery,
