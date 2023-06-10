@@ -18,23 +18,25 @@ const ChatBox = () => {
 
   // TODO: Implement page-context
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState('');
+  const [contextId, setContextId] = useState(''); // State to store the context ID
+  const [isOpen, setIsOpen] = useState(false); // State to determine if the chat box is open
+  const [message, setMessage] = useState(''); // State to store the current user message
   const [chatHistory, setChatHistory] = useState([
+    // State to store the chat history
     { text: 'Welcome to the chatbot, I will help you find the best product for you', sender: 'Bot' }
   ]);
-  const [sendMessage, { data: chatData, isSuccess, isError, isLoading, error }] = useChatMutation();
-  const chatBoxRef = useRef(null);
+  const [sendMessage, { data: chatData, isSuccess, isError, isLoading, error }] = useChatMutation(); // Mutation for sending messages in the chat
+  const chatBoxRef = useRef(null); // Reference to the chat card component
 
-  const [productIds, setProductIds] = useState(skipToken);
-  const { data, isSuccess: isProductsSuccess } = useListProductsQuery(productIds);
+  const [productIds, setProductIds] = useState(skipToken); // State to store product IDs
+  const { data, isSuccess: isProductsSuccess } = useListProductsQuery(productIds); // Query to fetch a list of products
 
   const toggleChatBox = () => {
-    setIsOpen(!isOpen);
+    setIsOpen(!isOpen); // Toggle the isOpen state between true and false to open/close the chat
   };
 
   const handleInputChange = (event) => {
-    setMessage(event.target.value);
+    setMessage(event.target.value); // Update the message state based on the user input in the text field
   };
 
   const handleFormSubmit = (e) => {
@@ -43,7 +45,7 @@ const ChatBox = () => {
       setChatHistory((prevChatHistory) => [...prevChatHistory, { text: message, sender: 'User' }]);
       sendMessage({ userMessage: message, contextId: chatbotContextId || null });
 
-      setMessage('');
+      setMessage(''); // Clear the text field after sending the message
     }
   };
 
@@ -63,7 +65,7 @@ const ChatBox = () => {
       setChatHistory((prevChatHistory) => [
         ...prevChatHistory,
         { text: error.data?.detail || 'Error', sender: 'System' }
-      ]);
+      ]); // Add the error message to the chat history in case of an error
     }
 
     if (isSuccess) {
@@ -80,9 +82,14 @@ const ChatBox = () => {
       setChatHistory((prevChatHistory) => [
         ...prevChatHistory,
         { text: botMessage, sender: 'Bot' }
-      ]);
+      ]); // Add the bot message to the chat history
+
       if (!chatbotContextId) {
         dispatch(setChatbotContextId(chatData.contextId));
+      }
+
+      if (!contextId) {
+        setContextId(chatData.contextId);
       }
     }
   }, [isSuccess, isError]);
@@ -93,7 +100,7 @@ const ChatBox = () => {
         setChatHistory((prevChatHistory) => [
           ...prevChatHistory,
           { text: product, sender: 'Product' }
-        ]);
+        ]); // Add each product to the chat history
       }
     }
   }, [isProductsSuccess]);

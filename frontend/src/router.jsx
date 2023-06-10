@@ -12,6 +12,7 @@ import {
   Root
 } from './routes';
 
+// Define the routes configuration
 const routesConfig = [
   {
     path: '/',

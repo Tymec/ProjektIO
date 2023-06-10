@@ -323,6 +323,8 @@ def generate_product(request):
         for review in reviews:
             review = review.split("|")
             name = review[0].strip()
+            if not name.isalnum():
+                raise Exception("Invalid name")
             rating = review[1].strip()
             rating = int(rating)
             comment = review[2].strip()

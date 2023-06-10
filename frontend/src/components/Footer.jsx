@@ -4,31 +4,31 @@ import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { useSubscribeNewsletterMutation } from '../features';
 
 function Footer() {
-  const [email, setEmail] = useState('');
-  const [block, setBlock] = useState(false);
-  const [placeholder, setPlaceholder] = useState('Newsletter');
-  const [subscribe, { isSuccess, isError, error }] = useSubscribeNewsletterMutation();
+  const [email, setEmail] = useState(''); // State to store the email value
+  const [block, setBlock] = useState(false); // State to determine if the form is blocked
+  const [placeholder, setPlaceholder] = useState('Newsletter'); // State to store the input field placeholder
+  const [subscribe, { isSuccess, isError, error }] = useSubscribeNewsletterMutation(); // Mutation for subscribing to the newsletter
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    subscribe(email);
-    setEmail('');
+    subscribe(email); // Call the mutation to subscribe to the newsletter
+    setEmail(''); // Clear the email field
   };
 
   useEffect(() => {
     if (isError) {
-      setBlock(true);
-      setPlaceholder(error.data?.detail || 'Error');
+      setBlock(true); // Block the form
+      setPlaceholder(error.data?.detail || 'Error'); // Set the placeholder to the error message or a default error message
       setTimeout(() => {
-        setBlock(false);
-        setPlaceholder('Newsletter');
-        setEmail('');
+        setBlock(false); // Unblock the form after 3 seconds
+        setPlaceholder('Newsletter'); // Reset the placeholder
+        setEmail(''); // Clear the email field
       }, 3000);
     }
 
     if (isSuccess) {
-      setBlock(true);
-      setPlaceholder('Subscribed');
+      setBlock(true); // Block the form
+      setPlaceholder('Subscribed'); // Set the placeholder to indicate successful subscription
     }
   }, [isSuccess, isError]);
 

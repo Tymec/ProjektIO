@@ -29,7 +29,7 @@ export default function SearchBox({ user = null }) {
   const submitHandler = (e) => {
     e.preventDefault();
     if (keyword.trim()) {
-      navigate(`/?search=${keyword}&page=1`);
+      navigate(`/?search=${keyword}&page=1`); // Navigate to the search results page with the provided keyword
     }
   };
 
@@ -39,7 +39,7 @@ export default function SearchBox({ user = null }) {
         data-testid="search-box-input"
         type="text"
         name="q"
-        onChange={(e) => setKeyword(e.target.value)}
+        onChange={(e) => setKeyword(e.target.value)} // Update the keyword state on input change
         className="mr-sm-2 ml-sm-5"
       ></Form.Control>
       <Button
@@ -47,7 +47,7 @@ export default function SearchBox({ user = null }) {
         type="submit"
         variant="outline-success"
         className="p-2"
-        disabled={!keyword}
+        disabled={!keyword} // Disable the button if there is no keyword
       >
         Submit
       </Button>

@@ -10,17 +10,18 @@ export const userSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       state.user = {
+        // Set the user state with the provided payload
         email: action.payload.email,
         isAdmin: action.payload.isAdmin,
         token: action.payload.token,
         name: action.payload.name,
         id: action.payload._id
       };
-      localStorage.setItem('user', JSON.stringify(state.user));
+      localStorage.setItem('user', JSON.stringify(state.user)); // Store the user data in local storage
     },
     logout: (state) => {
-      state.user = null;
-      localStorage.removeItem('user');
+      state.user = null; // Clear the user state
+      localStorage.removeItem('user'); // Remove the user data from local storage
     }
   }
 });
@@ -38,7 +39,7 @@ export const userApi = api.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setUser(data));
+          dispatch(setUser(data)); // Dispatch setUser action to update the user state with the logged-in user data
         } catch (error) {
           console.error(error);
         }
@@ -53,12 +54,12 @@ export const userApi = api.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setUser(data));
+          dispatch(setUser(data)); // Dispatch setUser action to update the user state with the registered user data
         } catch (error) {
           console.error(error);
         }
       },
-      invalidatesTags: ['User']
+      invalidatesTags: ['User'] // Invalidates the 'User' tags after a successful registration
     }),
     getUser: build.query({
       query: (userId) => `/users/${userId}/`,
@@ -82,7 +83,7 @@ export const userApi = api.injectEndpoints({
     listUsers: build.query({
       query: (page) => `/users/?page=${page}`,
       transformResponse: (response) => ({
-        users: response.results,
+        users: response.results, // Transform the response to include the users, page, and pages properties
         page: response.pagination.page,
         pages: response.pagination.pages
       }),
