@@ -3,10 +3,22 @@
 default:
 	@echo "Please choose a target to build"
 
-run:
-	ENV=production NODE_OPTIONS=--openssl-legacy-provider npm run start
+build:
+	npm run build
 
 dev:
-	ENV=development NODE_OPTIONS=--openssl-legacy-provider npm run start
+	npm run start
 
-.PHONY: default eun dev
+lint:
+	npm run lint
+
+format:
+	npm run format
+
+test:
+	npm run test
+
+coverage:
+	npm run coverage
+
+.PHONY: default build dev lint format test coverage

@@ -15,10 +15,9 @@ jobs:
         uses: ./.github/actions/setup-frontend
 
       - name: Lint
-        run: npm run lint
-
-      - name: Format
-        run: npm run format
+        run: make frontend lint
 
       - name: Test
-        run: npm run test
+        run: make frontend coverage
+        env:
+          CI: true
