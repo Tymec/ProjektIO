@@ -1,13 +1,17 @@
-import './index.css';
 import './bootstrap.min.css';
+import './index.css';
 
+import { configureStore } from '@reduxjs/toolkit';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import router from './router';
-import store from './store';
+import routesConfig from './router';
+import storeConfig from './store';
+
+const router = createBrowserRouter(routesConfig);
+const store = configureStore(storeConfig);
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

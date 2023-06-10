@@ -1,4 +1,3 @@
-import { createBrowserRouter } from 'react-router-dom';
 
 import {
   CartPage,
@@ -14,7 +13,7 @@ import {
   Root
 } from './routes';
 
-const router = createBrowserRouter([
+const routesConfig = [
   {
     path: '/',
     element: <Root />,
@@ -63,6 +62,6 @@ const router = createBrowserRouter([
     element: <MaintenancePage />,
     errorElement: <ErrorPage />
   }
-]);
+];
 
-export default router;
+export default routesConfig;
