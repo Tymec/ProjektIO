@@ -21,7 +21,7 @@ const handlers = [
           image: 'image-url-2',
         },
       ]
-    }), ctx.delay(150))
+    }), ctx.delay(30))
   }),
 ];
 

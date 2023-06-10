@@ -11,6 +11,7 @@ import {
   useGetProductQuery,
   useHasUserBoughtProductQuery
 } from '../features';
+import { moneyFormat } from '../utils';
 
 export default function ProductPage() {
   const dispatch = useDispatch();
@@ -117,7 +118,7 @@ export default function ProductPage() {
                   />
                 </ListGroup.Item>
 
-                <ListGroup.Item>Price: ${product.price}</ListGroup.Item>
+                <ListGroup.Item>Price: {moneyFormat(product.price)}</ListGroup.Item>
 
                 <ListGroup.Item>Description: {product.description}</ListGroup.Item>
               </ListGroup>
@@ -130,7 +131,7 @@ export default function ProductPage() {
                     <Row>
                       <Col>Price:</Col>
                       <Col>
-                        <strong>${product.price}</strong>
+                        <strong>{moneyFormat(product.price)}</strong>
                       </Col>
                     </Row>
                   </ListGroup.Item>

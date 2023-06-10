@@ -46,7 +46,6 @@ const ChatBox = () => {
 
     if (isSuccess) {
       let botMessage = chatData.message;
-      console.log(botMessage);
       const re = /\b\d{18}\b/g;
 
       if (re.test(botMessage)) {
@@ -64,7 +63,21 @@ const ChatBox = () => {
         setContextId(chatData.contextId);
       }
     }
+
+
   }, [isSuccess, isError]);
+
+  useEffect(() => {
+    if (isProductsSuccess) {
+      for (const product of data.products) {
+        setChatHistory((prevChatHistory) => [
+          ...prevChatHistory,
+          { text: product, sender: 'Product' }
+        ]);
+      }
+    }
+  }, [isProductsSuccess]);
+
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -108,14 +121,17 @@ const ChatBox = () => {
             </Button>
           </Card.Header>
           <Card.Body style={{ maxHeight: '400px', overflowY: 'scroll' }}>
-            {chatHistory.map((msg, idx) => (
-              <p key={idx}>
-                <strong>{msg.sender}:</strong> {msg.text}
-              </p>
-            ))}
-            {productIds &&
-              isProductsSuccess &&
-              data.products.map((product) => <Product key={product.id} product={product} />)}
+            {chatHistory.map((msg, idx) => {
+              if (msg.sender === 'Product') {
+                const product = msg.text;
+                return (<Product key={idx} product={product} />)
+              }
+              return (
+                <p key={idx}>
+                  <strong>{msg.sender}: </strong> {msg.text}
+                </p>
+              )
+            })}
           </Card.Body>
           <Form onSubmit={handleFormSubmit} className="d-flex flex-column">
             {isLoading && <Loader />}

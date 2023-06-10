@@ -5,12 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { Loader, Message } from '../components';
 import { useDeliverOrderMutation, useGetOrderQuery } from '../features';
-
-const moneyFormat = (value, currency = 'USD') =>
-  new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency
-  }).format(Number(value || 0.0));
+import { moneyFormat } from '../utils';
 
 export default function OrderPage() {
   const navigate = useNavigate();

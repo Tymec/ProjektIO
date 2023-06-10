@@ -8,10 +8,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './setupTests.jsx',
+    setupFiles: './src/setupTests.jsx',
     coverage: {
       provider: 'istanbul',
     }
   },
-  root: './src',
 });
