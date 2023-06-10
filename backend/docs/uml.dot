@@ -1,6 +1,6 @@
 digraph model_graph {
   // Dotfile by Django-Extensions graph_models
-  // Created: 2023-06-08 21:19
+  // Created: 2023-06-10 17:01
   // Cli Options: --dot -o docs/uml.dot
 
   fontname = "Roboto"
@@ -554,6 +554,162 @@ digraph model_graph {
       >]
 
   }
+  subgraph cluster_extra {
+    label=<
+          <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+          <TR><TD COLSPAN="2" CELLPADDING="4" ALIGN="CENTER">
+          <FONT FACE="Roboto" COLOR="Black" POINT-SIZE="10">
+          <B>extra</B>
+          </FONT>
+          </TD></TR>
+          </TABLE>
+          >
+    color=olivedrab4
+    style="rounded"
+  
+    extra_models_ImageGeneration [label=<
+      <TABLE BGCOLOR="white" BORDER="1" CELLBORDER="0" CELLSPACING="0">
+      <TR><TD COLSPAN="2" CELLPADDING="5" ALIGN="CENTER" BGCOLOR="#1b563f">
+      <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
+      ImageGeneration
+      </B></FONT></TD></TR>
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto"><B>id</B></FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto"><B>BigAutoField</B></FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto"><B>user</B></FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto"><B>ForeignKey (id)</B></FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT COLOR="#7B7B7B" FACE="Roboto">createdAt</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT COLOR="#7B7B7B" FACE="Roboto">DateTimeField</FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT COLOR="#7B7B7B" FACE="Roboto">image</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT COLOR="#7B7B7B" FACE="Roboto">ImageField</FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto">prompt</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto">TextField</FONT>
+      </TD></TR>
+    
+    
+      </TABLE>
+      >]
+  
+    extra_models_NewsletterUser [label=<
+      <TABLE BGCOLOR="white" BORDER="1" CELLBORDER="0" CELLSPACING="0">
+      <TR><TD COLSPAN="2" CELLPADDING="5" ALIGN="CENTER" BGCOLOR="#1b563f">
+      <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
+      NewsletterUser
+      </B></FONT></TD></TR>
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto"><B>id</B></FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto"><B>BigAutoField</B></FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto">active</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto">BooleanField</FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT COLOR="#7B7B7B" FACE="Roboto">createdAt</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT COLOR="#7B7B7B" FACE="Roboto">DateTimeField</FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto">email</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto">EmailField</FONT>
+      </TD></TR>
+    
+    
+      </TABLE>
+      >]
+  
+    extra_models_ChatConversationContext [label=<
+      <TABLE BGCOLOR="white" BORDER="1" CELLBORDER="0" CELLSPACING="0">
+      <TR><TD COLSPAN="2" CELLPADDING="5" ALIGN="CENTER" BGCOLOR="#1b563f">
+      <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
+      ChatConversationContext
+      </B></FONT></TD></TR>
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto"><B>_id</B></FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto"><B>AutoField</B></FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto"><B>user</B></FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto"><B>ForeignKey (id)</B></FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto">context</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto">JSONField</FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT COLOR="#7B7B7B" FACE="Roboto">createdAt</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT COLOR="#7B7B7B" FACE="Roboto">DateTimeField</FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto">init_message</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto">TextField</FONT>
+      </TD></TR>
+    
+    
+      </TABLE>
+      >]
+
+  }
   subgraph cluster_app {
     label=<
           <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
@@ -763,72 +919,6 @@ digraph model_graph {
       </TABLE>
       >]
   
-    app_models_ShippingAddress [label=<
-      <TABLE BGCOLOR="white" BORDER="1" CELLBORDER="0" CELLSPACING="0">
-      <TR><TD COLSPAN="2" CELLPADDING="5" ALIGN="CENTER" BGCOLOR="#1b563f">
-      <FONT FACE="Roboto" COLOR="white" POINT-SIZE="10"><B>
-      ShippingAddress
-      </B></FONT></TD></TR>
-    
-    
-      <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT FACE="Roboto"><B>_id</B></FONT>
-      </TD><TD ALIGN="LEFT">
-      <FONT FACE="Roboto"><B>AutoField</B></FONT>
-      </TD></TR>
-    
-    
-    
-      <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">address</FONT>
-      </TD><TD ALIGN="LEFT">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
-      </TD></TR>
-    
-    
-    
-      <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">city</FONT>
-      </TD><TD ALIGN="LEFT">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
-      </TD></TR>
-    
-    
-    
-      <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">country</FONT>
-      </TD><TD ALIGN="LEFT">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
-      </TD></TR>
-    
-    
-    
-      <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">fullName</FONT>
-      </TD><TD ALIGN="LEFT">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
-      </TD></TR>
-    
-    
-    
-      <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">postalCode</FONT>
-      </TD><TD ALIGN="LEFT">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
-      </TD></TR>
-    
-    
-    
-      <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">state</FONT>
-      </TD><TD ALIGN="LEFT">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
-      </TD></TR>
-    
-    
-      </TABLE>
-      >]
-  
     app_models_Order [label=<
       <TABLE BGCOLOR="white" BORDER="1" CELLBORDER="0" CELLSPACING="0">
       <TR><TD COLSPAN="2" CELLPADDING="5" ALIGN="CENTER" BGCOLOR="#1b563f">
@@ -841,14 +931,6 @@ digraph model_graph {
       <FONT FACE="Roboto"><B>_id</B></FONT>
       </TD><TD ALIGN="LEFT">
       <FONT FACE="Roboto"><B>AutoField</B></FONT>
-      </TD></TR>
-    
-    
-    
-      <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT COLOR="#7B7B7B" FACE="Roboto"><B>shippingAddress</B></FONT>
-      </TD><TD ALIGN="LEFT">
-      <FONT COLOR="#7B7B7B" FACE="Roboto"><B>ForeignKey (_id)</B></FONT>
       </TD></TR>
     
     
@@ -910,9 +992,9 @@ digraph model_graph {
     
     
       <TR><TD ALIGN="LEFT" BORDER="0">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">paymentIntentId</FONT>
+      <FONT FACE="Roboto">paymentMethod</FONT>
       </TD><TD ALIGN="LEFT">
-      <FONT COLOR="#7B7B7B" FACE="Roboto">CharField</FONT>
+      <FONT FACE="Roboto">JSONField</FONT>
       </TD></TR>
     
     
@@ -921,6 +1003,14 @@ digraph model_graph {
       <FONT FACE="Roboto">sessionId</FONT>
       </TD><TD ALIGN="LEFT">
       <FONT FACE="Roboto">CharField</FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT FACE="Roboto">shippingAddress</FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT FACE="Roboto">JSONField</FONT>
       </TD></TR>
     
     
@@ -1089,6 +1179,13 @@ digraph model_graph {
   [label=" user (customer)"] [arrowhead=none, arrowtail=none, dir=both];
 
 
+  extra_models_ImageGeneration -> users_models_User
+  [label=" user (imagegeneration)"] [arrowhead=none, arrowtail=dot, dir=both];
+
+  extra_models_ChatConversationContext -> users_models_User
+  [label=" user (chatconversationcontext)"] [arrowhead=none, arrowtail=dot, dir=both];
+
+
   app_models_Product -> users_models_User
   [label=" user (product)"] [arrowhead=none, arrowtail=dot, dir=both];
 
@@ -1100,9 +1197,6 @@ digraph model_graph {
 
   app_models_Order -> users_models_User
   [label=" user (order)"] [arrowhead=none, arrowtail=dot, dir=both];
-
-  app_models_Order -> app_models_ShippingAddress
-  [label=" shippingAddress (order)"] [arrowhead=none, arrowtail=dot, dir=both];
 
   app_models_OrderItem -> app_models_Product
   [label=" product (orderitem)"] [arrowhead=none, arrowtail=dot, dir=both];
