@@ -60,12 +60,12 @@ export default function HomePage() {
         <div>
           <Row>
             {data.products.map((product) => (
-              <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
+              <Col key={product._id} sm={12} md={6} lg={4} xl={3} className="py-3">
                 <Product product={product} />
               </Col>
             ))}
           </Row>
-          <Paginate page={data.page} pages={data.pages} path="/" args={{ search }} />
+          <Paginate className="py-3" page={data.page} pages={data.pages} path="/" args={{ search }} />
         </div>
       )}
     </div>

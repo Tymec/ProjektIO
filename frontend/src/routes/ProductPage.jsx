@@ -100,10 +100,13 @@ export default function ProductPage() {
       ) : (
         <div>
           <Row>
-            <Col md={6}>
-              <Image src={product.image} alt={product.name} fluid />
+            <Col md={5}>
+              <Image src={product.image} alt={product.name} fluid style={{
+              aspectRatio: '1 / 1',
+              objectFit: 'cover',
+              objectPosition: 'center',
+            }} />
             </Col>
-
             <Col md={3}>
               <ListGroup variant="flush">
                 <ListGroup.Item>
@@ -187,10 +190,10 @@ export default function ProductPage() {
                 </ListGroup>
               </Card>
             </Col>
-          </Row>
+            </Row>
 
           <Row>
-            <Col md={6}>
+            <Col md={5} className="py-4">
               <h4>Reviews</h4>
               {product.reviews.length === 0 && <Message variant="info">No Reviews</Message>}
 
@@ -204,7 +207,7 @@ export default function ProductPage() {
                   </ListGroup.Item>
                 ))}
 
-                <ListGroup.Item>
+                <ListGroup.Item className="py-3">
                   <h4>Write a review</h4>
 
                   {status && isReviewLoading && <Loader />}

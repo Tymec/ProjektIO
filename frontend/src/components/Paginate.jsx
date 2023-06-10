@@ -1,7 +1,7 @@
 import { Pagination } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-function Paginate({ pages, page, path, args = {} }) {
+function Paginate({ pages, page, path, args = {}, className = '' }) {
   const navigate = useNavigate();
 
   const goto = (page) => {
@@ -14,7 +14,7 @@ function Paginate({ pages, page, path, args = {} }) {
 
   return (
     pages > 1 && (
-      <Pagination>
+      <Pagination className={className}>
         {[...Array(pages).keys()].map((x) => (
           <Pagination.Item active={x + 1 === page} key={x + 1} onClick={() => goto(x + 1)}>
             {x + 1}

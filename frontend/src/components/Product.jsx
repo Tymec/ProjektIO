@@ -4,11 +4,21 @@ import { Link } from 'react-router-dom';
 import { moneyFormat } from '../utils';
 import Rating from './Rating';
 
-function Product({ product }) {
+function Product({ product, rounded = false }) {
   return (
-    <Card className="my-3 p-3 rounded">
+    <Card className="my-3" style={{
+      border: 'none',
+      borderRadius: rounded ? '0.5rem 0.5rem 0.5rem 0.5rem' : '0.3rem',
+      height: '100%',
+    }}>
       <Link to={`/product/${product._id}`}>
-        <Card.Img src={product.image} />
+        <Card.Img src={product.image} style={{
+          width: '100%',
+          aspectRatio: '1 / 1',
+          objectFit: 'cover',
+          objectPosition: 'right',
+          borderRadius: rounded ? '0.5rem 0.5rem 0 0' : '0.3rem 0.3rem 0 0',
+        }} />
       </Link>
 
       <Card.Body>
