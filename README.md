@@ -1,5 +1,5 @@
 # ProjektIO
-<br>
+
 ## Skład zespołu
 - Konrad Sitek
 - Tymoteusz Grabowski
@@ -31,7 +31,7 @@ jak rozmowa z wirtualnym asystentem, personalizacja konta i możliwość subskry
 <br><br>
 
 ## Funkcjonalności
-<br>
+
 ### Wirtualny asystent
 Strona zapewnia funkcję rozmowy z wirtualnym
 asystentem, który może odpowiedzieć na pytania, udzielić wskazówek i
