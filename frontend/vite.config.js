@@ -11,8 +11,8 @@ export default defineConfig({
     setupFiles: './src/setupTests.jsx',
     coverage: {
       provider: 'istanbul',
-      reporter: ['json'],
-      reportsDirectory: './docs'
+      reporter: ['text', 'json-summary', 'json'],
+      reportsDirectory: './coverage'
     }
   }
 });

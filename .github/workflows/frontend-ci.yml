@@ -21,3 +21,10 @@ jobs:
         run: make frontend coverage
         env:
           CI: true
+
+      - name: Code coverage report
+        if: github.event_name == 'pull_request'
+        uses: davelosert/vitest-coverage-report-action@v1
+        with:
+          working-directory: frontend/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
