@@ -9,7 +9,13 @@ export const api = createApi({
         headers.set('Authorization', `Bearer ${token}`); // Add the token to the request headers if it exists
       }
       return headers;
-    },
+    }
+    // validateStatus: (response) => {
+    //   if (response.status === 401) {
+    //     localStorage.removeItem('user'); // FIXME
+    //   }
+    //   return response.status < 500;
+    // }
   }),
   tagTypes: ['Product', 'Order', 'Review', 'User'], // Define tag types for the API endpoints
   endpoints: () => ({}) // Define the API endpoints

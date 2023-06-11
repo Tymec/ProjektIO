@@ -50,7 +50,7 @@ class Review(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
-        return f"{self.name} [{float(self.rating)}] | {self.product.name}"
+        return f"{self.name} [{float(self.rating)}] | {self.product.name if self.product else 'Product'}"
 
 
 class Order(models.Model):

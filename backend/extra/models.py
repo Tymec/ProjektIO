@@ -44,4 +44,4 @@ class ChatConversationContext(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user} |> {self.init_message}"
+        return f"{self.init_message}"
