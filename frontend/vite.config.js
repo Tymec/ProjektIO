@@ -20,8 +20,10 @@ export default defineConfig({
       statements: 20,
       exclude: [
         ...configDefaults.coverage.exclude,
-        "src/mock/**", "src/features/**", "src/routes/**"
+        'src/mock/**',
+        'src/features/**',
+        'src/routes/**'
       ]
-    },
+    }
   }
 });

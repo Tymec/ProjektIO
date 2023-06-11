@@ -2,8 +2,9 @@ from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
-from extra.models import ChatConversationContext, ImageGeneration, NewsletterUser
 from rest_framework import status
+
+from extra.models import ChatConversationContext, ImageGeneration, NewsletterUser
 
 pytestmark = pytest.mark.django_db
 

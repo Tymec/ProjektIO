@@ -7,8 +7,6 @@ from base64 import b64decode
 from email.message import EmailMessage
 
 import openai
-from app.models import Product, Review
-from app.serializers import ProductSerializer
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -18,6 +16,9 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+
+from app.models import Product, Review
+from app.serializers import ProductSerializer
 
 from .models import ChatConversationContext, ImageGeneration, NewsletterUser
 from .serializers import ImageGenerationSerializer, NewsletterUserSerializer

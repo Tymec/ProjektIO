@@ -5,11 +5,10 @@ import Header from './Header';
 
 describe('Header Component Tests', () => {
   test('renders Navbar.Brand with correct text', () => {
-
     render(
-        <FullProviderWrapper route="/">
-          <Header />
-        </FullProviderWrapper>
+      <FullProviderWrapper route="/">
+        <Header />
+      </FullProviderWrapper>
     );
 
     const navbarBrand = screen.getByRole('link', { name: /PromptWorld/i });
