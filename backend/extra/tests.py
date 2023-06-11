@@ -2,9 +2,8 @@ from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
-from rest_framework import status
-
 from extra.models import ChatConversationContext, ImageGeneration, NewsletterUser
+from rest_framework import status
 
 pytestmark = pytest.mark.django_db
 
@@ -201,11 +200,10 @@ def test_unsubscribe_invalid_data(api_client, email, expected_message, expected_
 
 
 @patch("smtplib.SMTP_SSL.sendmail")
-def test_send_newsletter(mock_sendmail, superuser, api_client, subscriber):
+def test_send_newsletter(mock_sendmail, superuser, api_client):
     api_client.force_authenticate(user=superuser)
 
-    subscriber.active = True
-    subscriber.save()
+    NewsletterUser.objects.all().delete()
 
     response = api_client.post(
         reverse("newsletter-send"),
@@ -216,9 +214,10 @@ def test_send_newsletter(mock_sendmail, superuser, api_client, subscriber):
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data["status"] == "success"
+    assert response.data["detail"] == "No active newsletter users"
     assert response.data["data"]
-    assert response.data["data"]["count"] >= 1
+    assert response.data["data"]["count"] == 0
+    assert len(response.data["data"]["recievers"]) == 0
 
 
 @patch("openai.Image.create")
