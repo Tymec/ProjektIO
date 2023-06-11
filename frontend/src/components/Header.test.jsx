@@ -1,24 +1,15 @@
 import { render, screen } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-import configureStore from 'redux-mock-store';
 
+import { FullProviderWrapper } from '../testUtils';
 import Header from './Header';
-
-const mockStore = configureStore([]);
 
 describe('Header Component Tests', () => {
   test('renders Navbar.Brand with correct text', () => {
-    const store = mockStore({
-      userState: { user: null }
-    });
 
     render(
-      <Provider store={store}>
-        <BrowserRouter>
+        <FullProviderWrapper route="/">
           <Header />
-        </BrowserRouter>
-      </Provider>
+        </FullProviderWrapper>
     );
 
     const navbarBrand = screen.getByRole('link', { name: /PromptWorld/i });

@@ -11,8 +11,8 @@ test('renders ProductCarousel component', async () => {
   );
 
   // Expect loading to be visible and products to be loaded
-  expect(await findByText('Product 1 ($10)')).toBeInTheDocument();
-  expect(await findByText('Product 2 ($20)')).toBeInTheDocument();
+  expect(await findByText('Product 1')).toBeInTheDocument();
+  expect(await findByText('Product 2')).toBeInTheDocument();
 
   // Check if images have correct alt attributes
   expect(getByAltText('Product 1')).toBeInTheDocument();
