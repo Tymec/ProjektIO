@@ -92,6 +92,20 @@ założenia konta to: imię, nazwisko, email, hasło.
 
 <br />
 
+### Autogenerowanie obrazków z promptami
+
+Strona oferuje funkcję autogenerowania nowych na backendzie. Administrator
+może wprowadzić prompt, a następnie zobaczyć samogenerowany obraz z
+wykorzystaniem algorytmu DALL·E 2. Istnieje możliwość dostosowania
+parametrów generowania, takich jak styl, kolorystyka, kompozycja a
+następnie udostępnienie obrazka na stronie.
+
+
+![image](https://github.com/Tymec/ProjektIO/assets/69002597/f38701a0-228c-47ea-b02e-32eb17a90aa0)
+
+![image](https://github.com/Tymec/ProjektIO/assets/69002597/e5dd1472-3317-405e-8749-3d414f1c1e26)
+
+
 ### Newsletter
 
 Strona umożliwia subskrypcję newslettera, który regularnie dostarcza
