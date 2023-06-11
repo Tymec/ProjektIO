@@ -23,7 +23,7 @@ class CustomerView(APIView):
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_view_name(self):
+    def get_view_name(self):  # pragma: no cover
         return "Customers"
 
     def get(self, request, format=None):

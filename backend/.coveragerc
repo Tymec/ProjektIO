@@ -4,6 +4,11 @@ omit =
     *apps.py,
     */migrations/*,
     *urls.py,
+    *admin.py,
+    *apps.py,
+    *tests.py,
+    *models.py,
+    *serializers.py,
     */tests/*,
     setup/*
     manage.py

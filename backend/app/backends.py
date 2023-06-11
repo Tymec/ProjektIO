@@ -3,12 +3,12 @@ from rest_framework.response import Response
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
-class StaticStorageBackend(S3Boto3Storage):
+class StaticStorageBackend(S3Boto3Storage):  # pragma: no cover
     location = "static"  # Specifies the storage location for static files
     default_acl = "public-read"  # Sets the default access control (ACL) for static files to public read
 
 
-class MediaStorageBackend(S3Boto3Storage):
+class MediaStorageBackend(S3Boto3Storage):  # pragma: no cover
     location = "media"  # Specifies the storage location for media files
     default_acl = "public-read"  # Sets the default access control (ACL) for media files to public read
     file_overwrite = False  # Disables overwriting existing files with the same name

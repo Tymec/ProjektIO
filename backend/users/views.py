@@ -29,7 +29,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """Return the permission classes that apply to the current view"""
-        if self.action == "me":
+
+        if self.kwargs.get("pk", None) == "me" and self.action in [
+            "retrieve",
+            "update",
+        ]:
             permission_classes = [IsAuthenticated]
         else:
             permission_classes = [IsAdminUser]
@@ -94,9 +98,9 @@ def register(request):
     # Create user
     user = User.objects.create_user(
         email=email,
+        password=password,
         first_name=data["firstName"],
         last_name=data["lastName"],
-        password=password,
     )
 
     # Return serialized user data with token

@@ -1,9 +1,4 @@
-import json
-
-
-def pretty_json(s):
-    # Formats and indents a JSON string for printing
-    return json.dumps(json.loads(s), indent=2)
+from app.utils import pretty_json
 
 
 class DebugRequestsMiddleware:
@@ -22,6 +17,9 @@ class DebugRequestsMiddleware:
         # Print response information
         res_body = response.content or "{}"
         print(f"Response: {response.status_code}")
-        print(f"Body:\n {pretty_json(res_body)}")
+        try:
+            print(f"Body:\n {pretty_json(res_body)}")
+        except Exception:
+            print(f"Body:\n {res_body}")
 
         return response

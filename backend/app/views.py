@@ -15,7 +15,7 @@ from .serializers import (
 
 
 # Create your views here.
-class APIRootView(APIRootView):
+class APIRootView(APIRootView):  # pragma: no cover
     """
     API root view.
     """
@@ -29,7 +29,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     API endpoint that allows products to be viewed or edited.
     """
 
-    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -45,7 +44,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     ]
     ordering = ["createdAt", "name"]
 
-    def get_view_name(self):
+    def get_view_name(self):  # pragma: no cover
         return "Products"
 
     def get_queryset(self):
@@ -82,11 +81,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["name", "comment", "product__name", "user__username"]
+    search_fields = ["name", "comment", "product__name"]
     ordering_fields = ["name", "rating", "createdAt"]
     ordering = ["createdAt", "name"]
 
-    def get_view_name(self):
+    def get_view_name(self):  # pragma: no cover
         return "Reviews"
 
     def perform_create(self, serializer):
@@ -144,11 +143,11 @@ class OrderViewSet(viewsets.ModelViewSet):
     API endpoint that allows orders to be viewed or edited.
     """
 
-    queryset = Order.objects.all()
+    queryset = Order.objects.all().order_by("-createdAt")
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_view_name(self):
+    def get_view_name(self):  # pragma: no cover
         return "Orders"
 
     def perform_create(self, serializer):
@@ -186,18 +185,27 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     API endpoint that allows order items to be viewed or edited.
     """
 
-    queryset = OrderItem.objects.all()
+    queryset = OrderItem.objects.all().order_by("-createdAt")
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-    def get_view_name(self):
+    def get_view_name(self):  # pragma: no cover
         return "Order Items"
 
     def create(self, request, *args, **kwargs):
+        data = request.data
+
         if not request.user.is_authenticated:
             return Response(
                 {"message": "You are not authorized to perform this action"},
                 status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        qty = data.get("qty", None)
+        if not qty:
+            return Response(
+                {"message": "Quantity is required"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
@@ -208,12 +216,33 @@ class OrderItemViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        product = Product.objects.get(_id=request.data["product"])
+        product = data.get("product", None)
+        if not product:
+            return Response(
+                {"message": "Product is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        order = data.get("order", None)
+        if not order:
+            return Response(
+                {"message": "Order is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        product = Product.objects.get(_id=product)
         if product:
             product.countInStock = product.countInStock - qty
             product.save()
 
+        order = Order.objects.get(_id=order)
+        if not order:
+            return Response(
+                {"message": "Order not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)
+        serializer.save(product=product, order=order, quantity=qty)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

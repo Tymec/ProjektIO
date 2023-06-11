@@ -9,6 +9,7 @@ def django_db_setup(django_db_blocker):
     settings.DATABASES["default"] = {
         "NAME": ":memory:",
         "ENGINE": "django.db.backends.sqlite3",
+        "ATOMIC_REQUESTS": True,
     }
 
     settings.MEDIA_URL = "/media/"
@@ -17,11 +18,15 @@ def django_db_setup(django_db_blocker):
         "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"}
     }
 
-    settings.CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-        }
-    }
-
     with django_db_blocker.unblock():
         call_command("migrate", "--noinput")
+
+
+def pytest_configure(config):
+    pass
+
+
+pytest_plugins = [
+    "tests.fixtures",
+    "tests.db_tests",
+]

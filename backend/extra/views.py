@@ -27,13 +27,14 @@ from .serializers import ImageGenerationSerializer, NewsletterUserSerializer
 class ImageGenerationViewSet(viewsets.ModelViewSet):
     """View for listing and viewing image generations"""
 
-    queryset = ImageGeneration.objects.all()
     serializer_class = ImageGenerationSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """Return only the image generations for the current user"""
-        return ImageGeneration.objects.filter(user=self.request.user)
+        return ImageGeneration.objects.filter(user=self.request.user).order_by(
+            "-createdAt"
+        )
 
 
 @api_view(["POST"])
@@ -98,6 +99,13 @@ def text_chat(request):
             {"detail": "Message is required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
+    model = request.POST.get("model", "gpt-3.5-turbo")
+    if model not in ["gpt-3.5-turbo", "gpt-4"]:
+        return Response(
+            {"detail": "Model must be one of gpt-3.5-turbo, gpt-4"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
     # The context allows us to store the conversation history, so that the frontend
     # doesn't have to keep track of it
     context_id = data.get("contextId", None)
@@ -138,7 +146,7 @@ def text_chat(request):
 
     openai.api_key = settings.OPENAI_API_KEY
     response = openai.ChatCompletion.create(
-        model=request.POST.get("model", "gpt-3.5-turbo"),
+        model=model,
         messages=[
             # The system message is used to tell the chatbot what to do
             {
@@ -273,6 +281,7 @@ def generate_product(request):
     image_data = b64decode(response["data"][0]["b64_json"])
     content = ContentFile(image_data, name=f"{user.id}-{uuid.uuid4()}.png")
 
+    print(prompt)
     image = ImageGeneration.objects.create(
         user=user,
         prompt=prompt,
