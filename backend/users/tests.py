@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from users.serializers import (
     CustomTokenObtainPairSerializer,
     UserSerializer,
