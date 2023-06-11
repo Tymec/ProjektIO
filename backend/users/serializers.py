@@ -79,6 +79,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
 
         serializer = UserSerializerWithToken(self.user)
+
         for key, value in serializer.data.items():
             data[key] = value
 

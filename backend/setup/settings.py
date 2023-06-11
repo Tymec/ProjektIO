@@ -43,7 +43,6 @@ if not USE_PIPENV:
 DEBUG = ENV == "development"
 ALLOWED_HOSTS = []
 DEFAULT_CURRENCY = "USD"
-SITE_ID = 1
 
 ### Application definition
 INSTALLED_APPS = [

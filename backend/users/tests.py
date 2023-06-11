@@ -1,7 +1,6 @@
 import pytest
 from django.urls import reverse
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from users.serializers import (
     CustomTokenObtainPairSerializer,
     UserSerializer,
@@ -77,7 +76,7 @@ def test_detail_user(api_client, superuser):
 def test_detail_me(api_client, user):
     api_client.force_authenticate(user)
 
-    response = api_client.get(reverse("user-detail", args=["me"]))
+    response = api_client.get(reverse("user-me"))
 
     assert response.status_code == 200
     assert response.data
@@ -85,7 +84,7 @@ def test_detail_me(api_client, user):
 
 
 def test_detail_invalid_me(api_client):
-    response = api_client.get(reverse("user-detail", args=["me"]))
+    response = api_client.get(reverse("user-me"))
 
     assert response.status_code == 401
 
@@ -94,7 +93,7 @@ def test_update_me(api_client, user):
     api_client.force_authenticate(user)
 
     response = api_client.put(
-        reverse("user-detail", args=["me"]),
+        reverse("user-me"),
         {
             "email": "always@never.com",
             "password": "newpass",
@@ -109,7 +108,7 @@ def test_update_me(api_client, user):
 
 def test_update_invalid_me(api_client):
     response = api_client.put(
-        reverse("user-detail", args=["me"]),
+        reverse("user-me"),
         {
             "email": "new@email.com",
             "password": "newpass",
