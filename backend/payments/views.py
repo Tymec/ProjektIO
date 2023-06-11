@@ -129,7 +129,7 @@ class StripeCheckoutView(APIView):
                     "setup_future_usage": "off_session",
                     "metadata": {"orderId": order._id},
                 },
-                customer_update={"shipping": "auto"},
+                customer_update={"shipping": "auto"} if customer else None,
                 automatic_tax={
                     "enabled": True,
                 },
@@ -150,6 +150,8 @@ class StripeCheckoutView(APIView):
             for order_item in order_items:
                 order_item.delete()
             order.delete()
+
+            print(e)
 
             return Response(data={"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
