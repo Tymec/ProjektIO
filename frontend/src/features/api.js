@@ -10,12 +10,6 @@ export const api = createApi({
       }
       return headers;
     },
-    validateStatus: (response) => {
-      if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('user');
-      }
-      return response.status < 500;
-    }
   }),
   tagTypes: ['Product', 'Order', 'Review', 'User'], // Define tag types for the API endpoints
   endpoints: () => ({}) // Define the API endpoints

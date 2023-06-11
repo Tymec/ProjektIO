@@ -53,7 +53,7 @@ export default function ProductPage() {
   ] = useDeleteProductMutation();
 
   useEffect(() => {
-    if (success) {
+    if (success && orderId) {
       navigate(`/order/${orderId}`);
     }
     if (isCheckoutSuccess) {

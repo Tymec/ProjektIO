@@ -1,14 +1,13 @@
 from datetime import datetime, timezone
 
 import stripe
+from app.models import Order, OrderItem, Product
 from django.conf import settings
 from requests.models import PreparedRequest
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from app.models import Order, OrderItem, Product
 
 from .models import Customer
 from .serializers import CustomerSerializer
