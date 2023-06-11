@@ -14,16 +14,18 @@ import {
 const ChatBox = () => {
   const dispatch = useDispatch();
 
-  const { chatbotContextId } = useSelector((state) => state.extraState);
+  const { chatbotContextId: contextId } = useSelector((state) => state.extraState);
 
-  // TODO: Implement page-context
-
-  const [contextId, setContextId] = useState(''); // State to store the context ID
   const [isOpen, setIsOpen] = useState(false); // State to determine if the chat box is open
   const [message, setMessage] = useState(''); // State to store the current user message
   const [chatHistory, setChatHistory] = useState([
     // State to store the chat history
-    { text: 'Welcome to the chatbot, I will help you find the best product for you', sender: 'Bot' }
+    {
+      text: contextId
+        ? 'Welcome back to the chatbot, I will help you find the best product for you'
+        : 'Welcome to the chatbot, I will help you find the best product for you',
+      sender: 'Bot'
+    }
   ]);
   const [sendMessage, { data: chatData, isSuccess, isError, isLoading, error }] = useChatMutation(); // Mutation for sending messages in the chat
   const chatBoxRef = useRef(null); // Reference to the chat card component
@@ -43,7 +45,7 @@ const ChatBox = () => {
     e.preventDefault();
     if (message.trim()) {
       setChatHistory((prevChatHistory) => [...prevChatHistory, { text: message, sender: 'User' }]);
-      sendMessage({ userMessage: message, contextId: chatbotContextId || null });
+      sendMessage({ userMessage: message, contextId: contextId || null });
 
       setMessage(''); // Clear the text field after sending the message
     }
@@ -62,21 +64,25 @@ const ChatBox = () => {
 
   useEffect(() => {
     if (isError) {
+      console.log(error);
       setChatHistory((prevChatHistory) => [
         ...prevChatHistory,
         { text: error.data?.detail || 'Error', sender: 'System' }
       ]); // Add the error message to the chat history in case of an error
+      return;
     }
 
     if (isSuccess) {
       let botMessage = chatData.message;
-      const re = /\b\d{18}\b/g;
 
-      if (re.test(botMessage)) {
-        const match = botMessage.match(re);
-        botMessage = botMessage.replace(re, '');
+      if (chatData.finished) {
+        botMessage = 'My time has come to an end. Goodbye!';
+        resetContext();
+        return;
+      }
 
-        setProductIds({ ids: match });
+      if (chatData.productIds) {
+        setProductIds({ ids: chatData.productIds });
       }
 
       setChatHistory((prevChatHistory) => [
@@ -84,12 +90,8 @@ const ChatBox = () => {
         { text: botMessage, sender: 'Bot' }
       ]); // Add the bot message to the chat history
 
-      if (!chatbotContextId) {
-        dispatch(setChatbotContextId(chatData.contextId));
-      }
-
       if (!contextId) {
-        setContextId(chatData.contextId);
+        dispatch(setChatbotContextId(chatData.contextId));
       }
     }
   }, [isSuccess, isError]);
