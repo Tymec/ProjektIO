@@ -40,7 +40,7 @@ export default function CartPage() {
   });
 
   useEffect(() => {
-    if (success) {
+    if (success && orderId) {
       dispatch(resetCart());
       navigate(`/order/${orderId}`);
     }
