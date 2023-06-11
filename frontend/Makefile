@@ -3,6 +3,9 @@
 default:
 	@echo "Please choose a target to build"
 
+install:
+	npm install
+
 build:
 	npm run build
 
@@ -21,4 +24,4 @@ test:
 coverage:
 	npm run coverage
 
-.PHONY: default build dev lint format test coverage
+.PHONY: default install build dev lint format test coverage

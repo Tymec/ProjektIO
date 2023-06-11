@@ -1,6 +1,6 @@
 digraph model_graph {
   // Dotfile by Django-Extensions graph_models
-  // Created: 2023-06-10 17:01
+  // Created: 2023-06-11 16:41
   // Cli Options: --dot -o docs/uml.dot
 
   fontname = "Roboto"
@@ -579,6 +579,14 @@ digraph model_graph {
       <FONT FACE="Roboto"><B>id</B></FONT>
       </TD><TD ALIGN="LEFT">
       <FONT FACE="Roboto"><B>BigAutoField</B></FONT>
+      </TD></TR>
+    
+    
+    
+      <TR><TD ALIGN="LEFT" BORDER="0">
+      <FONT COLOR="#7B7B7B" FACE="Roboto"><B>product</B></FONT>
+      </TD><TD ALIGN="LEFT">
+      <FONT COLOR="#7B7B7B" FACE="Roboto"><B>ForeignKey (_id)</B></FONT>
       </TD></TR>
     
     
@@ -1181,6 +1189,9 @@ digraph model_graph {
 
   extra_models_ImageGeneration -> users_models_User
   [label=" user (imagegeneration)"] [arrowhead=none, arrowtail=dot, dir=both];
+
+  extra_models_ImageGeneration -> app_models_Product
+  [label=" product (imagegeneration)"] [arrowhead=none, arrowtail=dot, dir=both];
 
   extra_models_ChatConversationContext -> users_models_User
   [label=" user (chatconversationcontext)"] [arrowhead=none, arrowtail=dot, dir=both];

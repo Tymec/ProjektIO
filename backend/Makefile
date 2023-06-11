@@ -3,6 +3,9 @@
 default:
 	@echo "Please choose a target to build"
 
+install:
+	pipenv install --dev
+
 dev:
 	ENV=development pipenv run python manage.py runserver
 
@@ -44,7 +47,7 @@ audit:
 secrets:
 	doppler secrets download --no-file --format env > .env
 
-.PHONY: default dev run migrate test coverage black isort flake8 lint uml requirements audit secrets
+.PHONY: default install dev run migrate test coverage black isort flake8 lint uml requirements audit secrets
 
 .EXPORT_ALL_VARIABLES:
 PIPENV_VERBOSITY = -1
