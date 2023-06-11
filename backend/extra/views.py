@@ -7,8 +7,6 @@ from base64 import b64decode
 from email.message import EmailMessage
 
 import openai
-from app.models import Product, Review
-from app.serializers import ProductSerializer
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -18,6 +16,9 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+
+from app.models import Product, Review
+from app.serializers import ProductSerializer
 
 from .models import ChatConversationContext, ImageGeneration, NewsletterUser
 from .serializers import ImageGenerationSerializer, NewsletterUserSerializer
@@ -98,7 +99,7 @@ def text_chat(request):
             {"detail": "Message is required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    model = request.POST.get("model", "gpt-3.5-turbo")
+    model = data.get("model", "gpt-3.5-turbo")
     if model not in ["gpt-3.5-turbo", "gpt-4"]:
         return Response(
             {"detail": "Model must be one of gpt-3.5-turbo, gpt-4"},
@@ -121,14 +122,6 @@ def text_chat(request):
             init_message=message, context={"conversation": []}
         )
 
-    current_product = data.get("currentProduct", None)
-    if current_product:
-        try:
-            current_product = Product.objects.get(_id=current_product)
-            current_product = f"The user is currently looking at the following product: ({current_product['_id']}|{current_product['name']}|{current_product['description'].strip()}|{current_product['rating']})."
-        except Exception:
-            pass
-
     user = request.user
     if user.is_authenticated:
         user = {"id": user.id, "name": user.email}
@@ -144,41 +137,73 @@ def text_chat(request):
     products = [product.replace("\n", " ") for product in products]
 
     openai.api_key = settings.OPENAI_API_KEY
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=[
-            # System message guiding the assistant's behavior
-            {
-                "role": "system",
-                "content": f"""
-        You are an AI assistant that helps users select the best product based on their preferences.
-        The available products are given in this format: (id|name|description|rating). The product details are given in this format: {', '.join(products)}.
-        When referring to products, use simplified names to avoid clutter. For instance, use "Samsung S21 Ultra" instead of "Samsung Galaxy S21 Ultra 5G (2023) Exynox CPU 8GB RAM".
-        Avoid using special characters in your message, like quotes, brackets, parentheses, etc.
-        """,
-            },
-            # Assistant's initial message
-            {
-                "role": "assistant",
-                "content": "Welcome! I'm here to help you find the best product according to your needs. I will base my recommendations on your preferences and the products' descriptions. I will include the product IDs in my suggestions like so: <MESSAGE> <PRODUCT_ID_1> <PRODUCT_ID_2> ...",
-            },
-            # System message setting the page context
-            {
-                "role": "system",
-                "content": current_product
-                or "The user is not currently focusing on any specific product.",
-            },
-            # Conversation history
-            *[message for message in context.context["conversation"] if message],
-            # User's message
-            {"role": "user", "content": message},
-        ],
-        max_tokens=200,
-        temperature=0.9,
-        user=f"{user['id']}-{user['name']}",
-    )
+    try:
+        response = openai.ChatCompletion.create(
+            model=model,
+            messages=[
+                # System message guiding the assistant's behavior
+                {
+                    "role": "system",
+                    "content": f"""
+                    You are an AI assistant that helps users select the best product based on their preferences.
+                    The available products are listed in the following format: (id|name|description|rating). The product details are given as: {', '.join(products)}.
+                    When referring to products, please use simplified names to avoid confusion. For example, use "Samsung S21 Ultra" instead of "Samsung Galaxy S21 Ultra 5G (2023) Exynox CPU 8GB RAM".
+                    Please avoid using special characters like quotes, brackets, parentheses, etc., in your messages.
+                    """.strip(),
+                },
+                # Assistant's initial message
+                {
+                    "role": "assistant",
+                    "content": "Welcome! I'm here to help you find the best product according to your needs. I will base my recommendations on your preferences and the products' descriptions. I will include the product IDs in my suggestions like this: <MESSAGE> <PRODUCT_ID_1> <PRODUCT_ID_2> ...",
+                },
+                # Conversation history
+                *[message for message in context.context["conversation"] if message],
+                # User's message
+                {"role": "user", "content": message},
+            ],
+            max_tokens=200,
+            temperature=0.5,
+            user=f"{user['id']}-{user['name']}",
+        )
+    except openai.error.InvalidRequestError:
+        return Response({"finished": True}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
     # Store the response
     message_response = response["choices"][0]["message"]["content"]
+
+    # Extract the product IDs from the response
+    product_ids = re.findall(r"\b\d{18}\b", message_response)
+    message_response = re.sub(r"\b\d{18}\b", "", message_response)
+
+    # Format the response
+    message_response = message_response.replace("\n", " ")
+    message_response = message_response.replace("<MESSAGE>", "")
+    message_response = message_response.strip()
+    # remove any "Product ID", "The product ID is", "Product ID: "
+    message_response = re.sub(r"Product ID", "", message_response)
+    message_response = re.sub(r"The product ID is", "", message_response)
+    message_response = re.sub(r"The product IDs are", "", message_response)
+    message_response = re.sub(r"Product ID:", "", message_response)
+    # remove any empty parentheses
+    message_response = re.sub(r"\(\s*\)", "", message_response)
+    # remove any empty brackets
+    message_response = re.sub(r"\[\s*\]", "", message_response)
+    # remove any empty curly braces
+    message_response = re.sub(r"\{\s*\}", "", message_response)
+    # remove any alone commas or dots
+    message_response = re.sub(r"[\.,]\s*[\.,]", "", message_response)
+    # remove any number followed by a dot and a space
+    message_response = re.sub(r"\d+\.\s*", "", message_response)
+    # replace any multiple spaces with a single space
+    message_response = re.sub(r"\s+", " ", message_response)
+    # if the message ends with a comma, replace it with a period
+    message_response = re.sub(r",\s*$", ".", message_response)
+    # replace any colon followed by a space with a period
+    message_response = re.sub(r":\s*", ". ", message_response)
 
     # Update the conversation history
     conversation = context.context["conversation"] + [
@@ -192,7 +217,11 @@ def text_chat(request):
 
     # Return the response
     return Response(
-        {"message": message_response, "contextId": str(context._id)},
+        {
+            "message": message_response,
+            "productIds": product_ids,
+            "contextId": str(context._id),
+        },
         status=status.HTTP_200_OK,
     )
 
@@ -246,25 +275,31 @@ def generate_product(request):
         )
 
     # 2. Generate the prompt for the image
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {
-                "role": "system",
-                "content": "Your task is to generate a prompt for DALLE-2 to generate the product image.",
-            },
-            {
-                "role": "assistant",
-                "content": "I will generate a prompt for DALLE-2 in the form of: <prompt>",
-            },
-            {
-                "role": "user",
-                "content": f"Product name: {name}, product brand: {brand}, product description: {description}",
-            },
-        ],
-        max_tokens=100,
-        temperature=0.9,
-    )
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Your task is to generate a prompt for DALL-E 2 to generate the product image.",
+                },
+                {
+                    "role": "assistant",
+                    "content": "I will generate a prompt for DALL-E 2 in the form of: <prompt>",
+                },
+                {
+                    "role": "user",
+                    "content": f"Product name: {name}, product brand: {brand}, product description: {description}",
+                },
+            ],
+            max_tokens=100,
+            temperature=0.9,
+        )
+    except Exception as e:
+        return Response(
+            {"detail": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
     prompt = response["choices"][0]["message"]["content"]
 
     # 3. Generate the image
@@ -279,8 +314,6 @@ def generate_product(request):
     # Convert the image into a file for storage
     image_data = b64decode(response["data"][0]["b64_json"])
     content = ContentFile(image_data, name=f"{user.id}-{uuid.uuid4()}.png")
-
-    print(prompt)
     image = ImageGeneration.objects.create(
         user=user,
         prompt=prompt,
@@ -288,42 +321,51 @@ def generate_product(request):
     )
 
     # 4. Create the product
-    product = Product.objects.create(
-        user=user,
-        name=name,
-        brand=brand,
-        description=description,
-        category="AI Generated",
-        price=price,
-        image=content,
-        countInStock=10,
-    )
+    try:
+        product = Product.objects.create(
+            user=user,
+            name=name,
+            brand=brand,
+            description=description,
+            category="AI Generated",
+            price=price,
+            image=content,
+            countInStock=10,
+        )
+    except Exception as e:
+        return Response(
+            {"detail": str(e)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     image.product = product
     image.save()
 
     # 5. [Extra] Generate fake reviews
     review_count = random.randint(1, 5)
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {
-                "role": "system",
-                "content": "Your task is to generate fake reviews for the product.",
-            },
-            {
-                "role": "assistant",
-                "content": f"I will generate {review_count} reviews for the product in the form of: <name_1>|<1-5>|<review_1>;<name_2>|<1-5>|<review_2>;...",
-            },
-            {
-                "role": "user",
-                "content": f"Product name: {name}, product brand: {brand}, product description: {description}, price: {price}",
-            },
-        ],
-        max_tokens=200,
-        temperature=0.9,
-    )
-    reviews = response["choices"][0]["message"]["content"]
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Your task is to generate fake reviews for the product.",
+                },
+                {
+                    "role": "assistant",
+                    "content": f"I will generate {review_count} reviews for the product in the form of: <name_1>|<1-5>|<review_1>;<name_2>|<1-5>|<review_2>;...",
+                },
+                {
+                    "role": "user",
+                    "content": f"Product name: {name}, product brand: {brand}, product description: {description}, price: {price}",
+                },
+            ],
+            max_tokens=200,
+            temperature=0.9,
+        )
+        reviews = response["choices"][0]["message"]["content"]
+    except Exception:
+        reviews = ""
 
     # Try to parse the reviews
     try:
@@ -494,8 +536,7 @@ def newsletter_send(request):
             for key, value in content.items():
                 template = template.replace("{{ " + key + " }}", value)
             content = re.sub(r"\{\{(.+?)\}\}", "", template)
-        except Exception as e:
-            print(e)
+        except Exception:
             return Response(
                 {"detail": "Template is not valid or does not exist"},
                 status=status.HTTP_400_BAD_REQUEST,
