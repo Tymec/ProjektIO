@@ -23,7 +23,7 @@ jobs:
           CI: true
 
       - name: Code coverage report
-        if: github.event_name == 'pull_request'
+        if: always()
         uses: davelosert/vitest-coverage-report-action@v1
         with:
           working-directory: frontend/
