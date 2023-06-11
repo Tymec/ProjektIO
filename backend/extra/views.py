@@ -7,6 +7,8 @@ from base64 import b64decode
 from email.message import EmailMessage
 
 import openai
+from app.models import Product, Review
+from app.serializers import ProductSerializer
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -16,9 +18,6 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-
-from app.models import Product, Review
-from app.serializers import ProductSerializer
 
 from .models import ChatConversationContext, ImageGeneration, NewsletterUser
 from .serializers import ImageGenerationSerializer, NewsletterUserSerializer
@@ -148,30 +147,30 @@ def text_chat(request):
     response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            # The system message is used to tell the chatbot what to do
+            # System message guiding the assistant's behavior
             {
                 "role": "system",
                 "content": f"""
-                You are a chatbot assistant that helps users find the best product for them.
-                Here are the available products in the form of (id|name|description|rating): {', '.join(products)}
-                Try to format the product name to not clutter the message, for example instead of referring to some phone as "Samsung Galaxy S21 Ultra 5G (2023) Exynox CPU 8GB RAM", you can refer to it as "Samsung S21 Ultra".
-                Also, do not include any special characters in your message, such as quotes, brackets, parentheses, etc.
-                """,
+        You are an AI assistant that helps users select the best product based on their preferences.
+        The available products are given in this format: (id|name|description|rating). The product details are given in this format: {', '.join(products)}.
+        When referring to products, use simplified names to avoid clutter. For instance, use "Samsung S21 Ultra" instead of "Samsung Galaxy S21 Ultra 5G (2023) Exynox CPU 8GB RAM".
+        Avoid using special characters in your message, like quotes, brackets, parentheses, etc.
+        """,
             },
-            # Initial message
+            # Assistant's initial message
             {
                 "role": "assistant",
-                "content": "Welcome to the chatbot, I will help you find the best product for you. I will recommend products based on your preferences and the products' descriptions. Whenever I recommend product(s), I will add the product ID(s) at the end of the message like so: <MESSAGE> <PRODUCT_ID_1> <PRODUCT_ID_2> ...",
+                "content": "Welcome! I'm here to help you find the best product according to your needs. I will base my recommendations on your preferences and the products' descriptions. I will include the product IDs in my suggestions like so: <MESSAGE> <PRODUCT_ID_1> <PRODUCT_ID_2> ...",
             },
-            # Page context
+            # System message setting the page context
             {
                 "role": "system",
                 "content": current_product
-                or "The user is not looking at any specific product.",
+                or "The user is not currently focusing on any specific product.",
             },
             # Conversation history
             *[message for message in context.context["conversation"] if message],
-            # User message
+            # User's message
             {"role": "user", "content": message},
         ],
         max_tokens=200,
