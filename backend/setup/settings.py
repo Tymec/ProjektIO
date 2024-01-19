@@ -25,7 +25,7 @@ USE_PIPENV = os.getenv("PIPENV_ACTIVE") == "1"
 SECRET_KEY = os.getenv("DJANGO_SECRET")
 STRIPE_SK = os.getenv("STRIPE_SK")
 STRIPE_WH = os.getenv("STRIPE_WH")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") if not CI else "fake-key"
 SMTP_HOST = os.getenv("SMTP_HOST")
 SMTP_PORT = os.getenv("SMTP_PORT")
 SMTP_USER = os.getenv("SMTP_USER")
