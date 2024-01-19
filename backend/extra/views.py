@@ -270,8 +270,9 @@ def generate_product(request):
         price = product[3].strip().replace("$", "").replace(")", "")
         price = float(price)
     except Exception as e:
+        print(str(e))
         return Response(
-            {"detail": f"Product generation failed, please try again. {str(e)}"},
+            {"detail": "Product generation failed"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 

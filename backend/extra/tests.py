@@ -40,9 +40,9 @@ def test_detail_image_generation(api_client, user):
     assert response.data["prompt"] == "test prompt"
 
 
-@patch("openai.resources.Images.create")
+@patch("openai.resources.Images.generate")
 def test_image_gen(mock_image_create, api_client, user):
-    mock_image_create.return_value = {"data": [{"b64_json": b"dGVzdA=="}]}
+    mock_image_create.return_value.data[0].b64_json = "dGVzdA=="
 
     api_client.force_authenticate(user=user)
     response = api_client.post(
@@ -92,9 +92,7 @@ def test_image_gen_invalid_data(
 
 @patch("openai.resources.chat.Completions.create")
 def test_text_chat(mock_chat_create, api_client):
-    mock_chat_create.return_value = {
-        "choices": [{"message": {"content": "test response"}}]
-    }
+    mock_chat_create.return_value.choices[0].message.content = "test response"
 
     response = api_client.post(
         reverse("text-generation-chat"),
@@ -221,17 +219,13 @@ def test_send_newsletter(mock_sendmail, superuser, api_client):
     assert len(response.data["data"]["recievers"]) == 0
 
 
-@patch("openai.resources.Images.create")
+@patch("openai.resources.Images.generate")
 @patch("openai.resources.chat.Completions.create")
 def test_generate_product(mock_chat_create, mock_image_create, api_client, superuser):
     api_client.force_authenticate(user=superuser)
 
-    mock_chat_create.return_value = {
-        "choices": [
-            {"message": {"content": "test product|test brand|test description|0.0"}}
-        ]
-    }
-    mock_image_create.return_value = {"data": [{"b64_json": "dGVzdA=="}]}
+    mock_chat_create.return_value.choices[0].message.content = "test product|test brand|test description|0.0"
+    mock_image_create.return_value.data[0].b64_json = "dGVzdA=="
 
     response = api_client.post(
         reverse("generate-product"),
@@ -243,7 +237,7 @@ def test_generate_product(mock_chat_create, mock_image_create, api_client, super
     assert response.data
 
 
-@patch("openai.resources.Images.create")
+@patch("openai.resources.Images.generate")
 @patch("openai.resources.chat.Completions.create")
 @pytest.mark.parametrize(
     "prompt, product_output, expected_status, expected_message, is_superuser",
@@ -288,10 +282,8 @@ def test_generate_product_invalid_data(
     else:
         api_client.force_authenticate(user=user)
 
-    mock_chat_create.return_value = {
-        "choices": [{"message": {"content": product_output}}]
-    }
-    mock_image_create.return_value = {"data": [{"b64_json": "dGVzdA=="}]}
+    mock_chat_create.return_value.choices[0].message.content = product_output
+    mock_image_create.return_value.data[0].b64_json = "dGVzdA=="
 
     response = api_client.post(
         reverse("generate-product"),
