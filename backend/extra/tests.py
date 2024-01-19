@@ -40,7 +40,7 @@ def test_detail_image_generation(api_client, user):
     assert response.data["prompt"] == "test prompt"
 
 
-@patch("openai.Image.create")
+@patch("openai.resources.Images.create")
 def test_image_gen(mock_image_create, api_client, user):
     mock_image_create.return_value = {"data": [{"b64_json": b"dGVzdA=="}]}
 
@@ -90,7 +90,7 @@ def test_image_gen_invalid_data(
     assert response.data["detail"] == expected_message
 
 
-@patch("openai.ChatCompletion.create")
+@patch("openai.resources.chat.Completions.create")
 def test_text_chat(mock_chat_create, api_client):
     mock_chat_create.return_value = {
         "choices": [{"message": {"content": "test response"}}]
@@ -221,8 +221,8 @@ def test_send_newsletter(mock_sendmail, superuser, api_client):
     assert len(response.data["data"]["recievers"]) == 0
 
 
-@patch("openai.Image.create")
-@patch("openai.ChatCompletion.create")
+@patch("openai.resources.Images.create")
+@patch("openai.resources.chat.Completions.create")
 def test_generate_product(mock_chat_create, mock_image_create, api_client, superuser):
     api_client.force_authenticate(user=superuser)
 
@@ -243,8 +243,8 @@ def test_generate_product(mock_chat_create, mock_image_create, api_client, super
     assert response.data
 
 
-@patch("openai.Image.create")
-@patch("openai.ChatCompletion.create")
+@patch("openai.resources.Images.create")
+@patch("openai.resources.chat.Completions.create")
 @pytest.mark.parametrize(
     "prompt, product_output, expected_status, expected_message, is_superuser",
     [
