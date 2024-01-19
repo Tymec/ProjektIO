@@ -224,7 +224,9 @@ def test_send_newsletter(mock_sendmail, superuser, api_client):
 def test_generate_product(mock_chat_create, mock_image_create, api_client, superuser):
     api_client.force_authenticate(user=superuser)
 
-    mock_chat_create.return_value.choices[0].message.content = "test product|test brand|test description|0.0"
+    mock_chat_create.return_value.choices[
+        0
+    ].message.content = "test product|test brand|test description|0.0"
     mock_image_create.return_value.data[0].b64_json = "dGVzdA=="
 
     response = api_client.post(

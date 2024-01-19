@@ -5,20 +5,21 @@ import ssl
 import uuid
 from base64 import b64decode
 from email.message import EmailMessage
-import openai
-from openai import OpenAI
 
-from app.models import Product, Review
-from app.serializers import ProductSerializer
+import openai
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.base import ContentFile
 from django.core.validators import ValidationError, validate_email
+from openai import OpenAI
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+
+from app.models import Product, Review
+from app.serializers import ProductSerializer
 
 from .models import ChatConversationContext, ImageGeneration, NewsletterUser
 from .serializers import ImageGenerationSerializer, NewsletterUserSerializer
@@ -65,11 +66,13 @@ def image_gen(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    response = client.images.generate(prompt=prompt,
-    n=1,
-    size=f"{size}x{size}",
-    response_format="b64_json",
-    user=f"{user.id}-{user.email}")
+    response = client.images.generate(
+        prompt=prompt,
+        n=1,
+        size=f"{size}x{size}",
+        response_format="b64_json",
+        user=f"{user.id}-{user.email}",
+    )
 
     # Convert the image into a file for storage
     image_data = b64decode(response.data[0].b64_json)
@@ -137,36 +140,36 @@ def text_chat(request):
 
     try:
         response = client.chat.completions.create(
-        model=model,
-        messages=[
-            # System message guiding the assistant's behavior
-            {
-                "role": "system",
-                "content": f"""
+            model=model,
+            messages=[
+                # System message guiding the assistant's behavior
+                {
+                    "role": "system",
+                    "content": f"""
                 You are an AI assistant that helps users select the best product based on their preferences.
                 The available products are listed in the following format: (id|name|description|rating). The product details are given as: {', '.join(products)}.
                 When referring to products, please use simplified names to avoid confusion. For example, use "Samsung S21 Ultra" instead of "Samsung Galaxy S21 Ultra 5G (2023) Exynox CPU 8GB RAM".
                 Please avoid using special characters like quotes, brackets, parentheses, etc., in your messages.
                 """.strip(),
-            },
-            # Assistant's initial message
-            {
-                "role": "assistant",
-                "content": "Welcome! I'm here to help you find the best product according to your needs. I will base my recommendations on your preferences and the products' descriptions. I will include the product IDs in my suggestions like this: <MESSAGE> <PRODUCT_ID_1> <PRODUCT_ID_2> ...",
-            },
-            # Conversation history
-            *[message for message in context.context["conversation"] if message],
-            # User's message
-            {"role": "user", "content": message},
-        ],
-        max_tokens=200,
-        temperature=0.3,
-        user=f"{user['id']}-{user['name']}")
+                },
+                # Assistant's initial message
+                {
+                    "role": "assistant",
+                    "content": "Welcome! I'm here to help you find the best product according to your needs. I will base my recommendations on your preferences and the products' descriptions. I will include the product IDs in my suggestions like this: <MESSAGE> <PRODUCT_ID_1> <PRODUCT_ID_2> ...",
+                },
+                # Conversation history
+                *[message for message in context.context["conversation"] if message],
+                # User's message
+                {"role": "user", "content": message},
+            ],
+            max_tokens=200,
+            temperature=0.3,
+            user=f"{user['id']}-{user['name']}",
+        )
     except openai.BadRequestError as e:
-        return Response({
-            "finished": True,
-            "message": str(e)
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {"finished": True, "message": str(e)}, status=status.HTTP_200_OK
+        )
     except Exception as e:
         return Response(
             {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -243,22 +246,23 @@ def generate_product(request):
             {"detail": "Prompt is required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-
     # 1. Generate the name, brand, description and price in USD
-    response = client.chat.completions.create(model="gpt-4",
-    messages=[
-        {
-            "role": "system",
-            "content": "Your task is to generate a product in the form of (name|brand|description|price).",
-        },
-        {
-            "role": "assistant",
-            "content": "I will generate a product for you in the form of (name|brand|description|price).",
-        },
-        {"role": "user", "content": prompt},
-    ],
-    max_tokens=100,
-    temperature=0.7)
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "Your task is to generate a product in the form of (name|brand|description|price).",
+            },
+            {
+                "role": "assistant",
+                "content": "I will generate a product for you in the form of (name|brand|description|price).",
+            },
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=100,
+        temperature=0.7,
+    )
     product = response.choices[0].message.content
 
     # Try to parse the product
@@ -278,23 +282,25 @@ def generate_product(request):
 
     # 2. Generate the prompt for the image
     try:
-        response = client.chat.completions.create(model="gpt-4",
-        messages=[
-            {
-                "role": "system",
-                "content": "Your task is to generate a prompt for DALL-E 2 to generate the product image.",
-            },
-            {
-                "role": "assistant",
-                "content": "I will generate a prompt for DALL-E 2 in the form of: <prompt>",
-            },
-            {
-                "role": "user",
-                "content": f"Product name: {name}, product brand: {brand}, product description: {description}",
-            },
-        ],
-        max_tokens=100,
-        temperature=0.9)
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Your task is to generate a prompt for DALL-E 2 to generate the product image.",
+                },
+                {
+                    "role": "assistant",
+                    "content": "I will generate a prompt for DALL-E 2 in the form of: <prompt>",
+                },
+                {
+                    "role": "user",
+                    "content": f"Product name: {name}, product brand: {brand}, product description: {description}",
+                },
+            ],
+            max_tokens=100,
+            temperature=0.9,
+        )
     except Exception as e:
         return Response(
             {"detail": str(e)},
@@ -303,11 +309,13 @@ def generate_product(request):
     prompt = response.choices[0].message.content
 
     # 3. Generate the image
-    response = client.images.generate(prompt=prompt,
-    n=1,
-    size="512x512",
-    response_format="b64_json",
-    user=f"{user.id}-{user.email}")
+    response = client.images.generate(
+        prompt=prompt,
+        n=1,
+        size="512x512",
+        response_format="b64_json",
+        user=f"{user.id}-{user.email}",
+    )
 
     # Convert the image into a file for storage
     image_data = b64decode(response.data[0].b64_json)
@@ -342,23 +350,25 @@ def generate_product(request):
     # 5. [Extra] Generate fake reviews
     review_count = random.randint(1, 5)
     try:
-        response = client.chat.completions.create(model="gpt-4",
-        messages=[
-            {
-                "role": "system",
-                "content": "Your task is to generate fake reviews for the product.",
-            },
-            {
-                "role": "assistant",
-                "content": f"I will generate {review_count} reviews for the product in the form of: <name_1>|<1-5>|<review_1>;<name_2>|<1-5>|<review_2>;...",
-            },
-            {
-                "role": "user",
-                "content": f"Product name: {name}, product brand: {brand}, product description: {description}, price: {price}",
-            },
-        ],
-        max_tokens=200,
-        temperature=0.7)
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Your task is to generate fake reviews for the product.",
+                },
+                {
+                    "role": "assistant",
+                    "content": f"I will generate {review_count} reviews for the product in the form of: <name_1>|<1-5>|<review_1>;<name_2>|<1-5>|<review_2>;...",
+                },
+                {
+                    "role": "user",
+                    "content": f"Product name: {name}, product brand: {brand}, product description: {description}, price: {price}",
+                },
+            ],
+            max_tokens=200,
+            temperature=0.7,
+        )
         reviews = response.choices[0].message.content
     except Exception:
         reviews = ""
